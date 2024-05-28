@@ -25,14 +25,13 @@ class InternalDeclaration(ASTNode):
         return f"InternalDeclaration(name={self.name}, declarations={self.declarations})"
 
 class AsciiDeclaration(ASTNode):
-    def __init__(self, name, terminator, attri_type='str'):
+    def __init__(self, name, terminator, attri_type='str', base = 'base10'):
         self.name = name
         self.terminator = terminator
         self.attri_type = attri_type
-
+        self.base = base
     def __repr__(self):
         return f"AsciiDeclaration(name={self.name}, terminator={self.terminator}, attri_type={self.attri_type})"
-
 class GenericDeclaration(ASTNode):
     def __init__(self, type_name, name):
         self.type_name = type_name
@@ -96,7 +95,7 @@ class Parser:
         self.consume('ascii')
         name = self.consume()
         self.consume(':')
-        
+        base = ''
         terminator = None
         attri_type = 'str'
         
@@ -112,7 +111,7 @@ class Parser:
                 self.consume()  # Consume unexpected tokens
         
         self.consume(';')
-        return AsciiDeclaration(name, terminator, attri_type)
+        return AsciiDeclaration(name, terminator, attri_type, base)
 
     def parse_generic_declaration(self):
         type_name = self.consume()
@@ -124,9 +123,9 @@ class Parser:
         attri_type = self.consume()
         if self.pos < len(self.tokens) and self.tokens[self.pos] == '(':
             self.consume('(')
-            self.consume('base10')
+            base = self.consume()
             self.consume(')')
-        return attri_type
+        return (attri_type, base)
     
     def parse_terminator(self):
         self.consume('terminated_by')
@@ -287,6 +286,7 @@ print(ast1)
 ast2 = parse_ast(ast1)
 go_code = generate_go_code(ast2)
 print(go_code)
+
 '''
 app = Flask(__name__)
 
