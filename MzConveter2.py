@@ -111,11 +111,11 @@ class Parser:
         if self.tokens[self.pos] == '"':
             self.consume('"')
             value = self.consume()
-            print(value)
+            value = symbol_to_hex(value)
             self.consume('"')
         else:
             value = self.consume()
-            print(value)
+            value = symbol_to_hex(value)    
         self.consume(')')
         return Terminator(value)
 
@@ -211,11 +211,13 @@ def generate_go_code(external_declarations):
 
 
 def symbol_to_hex(symbol):
+    if isinstance(symbol, str) and symbol.startswith("0x"):
+        return symbol
     return hex_map.get(symbol, None)
 def parse_ast(ast_str):
     # Define regex patterns to match the AST representation
     external_declaration_pattern = r"ExternalDeclaration\(name=(\w+), declarations=\[(.*?)\]\)"
-    ascii_declaration_pattern = r"AsciiDeclaration\(name=(\w+), terminator=Terminator\(value=([ !\"#$%&'()*+,\-./:;<=>?@[\\\]^_`{|}~]*)\)\)"
+    ascii_declaration_pattern = r"AsciiDeclaration\(name=(\w+), terminator=Terminator\(value=([a-fA-F0-9]*)\)\)"
     generic_declaration_pattern = r"GenericDeclaration\(type_name=(\w+), name=(\w+)\)"
 
     # Extract individual ASTs from the provided string
