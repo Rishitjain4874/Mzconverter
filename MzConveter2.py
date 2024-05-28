@@ -16,21 +16,22 @@ class ExternalDeclaration(ASTNode):
     def __repr__(self):
         return f"ExternalDeclaration(name={self.name}, declarations={self.declarations})"
 
-class IntegerDeclaration(ASTNode):
-    def __init__(self, name, terminator):
+class InternalDeclaration(ASTNode):
+    def __init__(self, name, declarations):
         self.name = name
-        self.terminator = terminator
+        self.declarations = declarations
 
     def __repr__(self):
-        return f"IntegerDeclaration(name={self.name}, terminator={self.terminator})"
+        return f"InternalDeclaration(name={self.name}, declarations={self.declarations})"
 
 class AsciiDeclaration(ASTNode):
-    def __init__(self, name, terminator):
+    def __init__(self, name, terminator, attri_type='str'):
         self.name = name
         self.terminator = terminator
+        self.attri_type = attri_type
 
     def __repr__(self):
-        return f"AsciiDeclaration(name={self.name}, terminator={self.terminator})"
+        return f"AsciiDeclaration(name={self.name}, terminator={self.terminator}, attri_type={self.attri_type})"
 
 class GenericDeclaration(ASTNode):
     def __init__(self, type_name, name):
@@ -81,7 +82,7 @@ class Parser:
 
     def parse_declaration_list(self):
         declarations = []
-        while self.tokens[self.pos] != '}':
+        while self.pos < len(self.tokens) and self.tokens[self.pos] != '}':
             if self.tokens[self.pos] in ['\n', '']:
                 self.pos += 1
                 continue
@@ -95,16 +96,38 @@ class Parser:
         self.consume('ascii')
         name = self.consume()
         self.consume(':')
-        terminator = self.parse_terminator()
+        
+        terminator = None
+        attri_type = 'str'
+        
+        while self.pos < len(self.tokens) and self.tokens[self.pos] != ';':
+            token = self.tokens[self.pos]
+            if token == 'terminated_by':
+                terminator = self.parse_terminator()
+            elif token in ['int', 'str', 'long']:
+                attri_type = self.parse_attri_type()
+                if self.pos < len(self.tokens) and self.tokens[self.pos] == ',':
+                    self.consume(',')
+            else:
+                self.consume()  # Consume unexpected tokens
+        
         self.consume(';')
-        return AsciiDeclaration(name, terminator)
+        return AsciiDeclaration(name, terminator, attri_type)
 
     def parse_generic_declaration(self):
         type_name = self.consume()
         name = self.consume()
         self.consume(';')
         return GenericDeclaration(type_name, name)
-
+    
+    def parse_attri_type(self):
+        attri_type = self.consume()
+        if self.pos < len(self.tokens) and self.tokens[self.pos] == '(':
+            self.consume('(')
+            self.consume('base10')
+            self.consume(')')
+        return attri_type
+    
     def parse_terminator(self):
         self.consume('terminated_by')
         self.consume('(')
@@ -115,9 +138,12 @@ class Parser:
             self.consume('"')
         else:
             value = self.consume()
-            value = symbol_to_hex(value)    
+            value = symbol_to_hex(value)
         self.consume(')')
         return Terminator(value)
+    
+def symbol_to_hex(symbol):
+    return symbol.encode('utf-8').hex()
 
 def parse_multiple_lists(token_lists):
     asts = []
