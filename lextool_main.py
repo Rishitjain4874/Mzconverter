@@ -1,4 +1,3 @@
-import os
 import re
 from nltk.tokenize import RegexpTokenizer
 from flask import Flask, request, jsonify

@@ -36,7 +36,7 @@ external DctDef : identified_by(tag == "DCT_DEF") {
 };
 
 external DctDefValue  {
-    ascii CDR_TYPE : terminated_by(":");
+    ascii CDR_TYPE : terminated_by("&");
     ascii DCT_NAME : terminated_by(":");
     ascii HAS_FILEHDR : terminated_by(":");
     ascii HAS_FILETRAILER : terminated_by(":");
@@ -48,6 +48,19 @@ external DctDefValue  {
     ascii trailingBytes :  terminated_by(0xA);
     --Column names not decoded, ignored...
 };
+external Rishit_jain  {
+    ascii CDR_TYPE : terminated_by(":");
+    ascii DCT_NAME : terminated_by(":");
+    ascii HAS_FILEHDR : terminated_by(":");
+    ascii HAS_FILETRAILER : terminated_by(":");
+    ascii HAS_RECHDR : terminated_by(":");
+    ascii HAS_FIELDLABEL : terminated_by(":");
+    ascii DELIMITERS : terminated_by(":");
+    ascii ENUM_FMTTYPE : terminated_by(":");
+    ascii FMT_METHOD : terminated_by(":");
+    ascii trailingBytes :  terminated_by(0xA);
+    --Column names not decoded, ignored...
+}
 //End of Header part
 
 //VCDR starts

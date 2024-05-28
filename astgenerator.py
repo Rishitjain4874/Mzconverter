@@ -4,7 +4,6 @@ from flask import Flask
 class ASTNode:
     def __str__(self):
         return self.__repr__()
-
 class ExternalDeclaration(ASTNode):
     def __init__(self, name, declarations):
         self.name = name
@@ -113,7 +112,18 @@ class Parser:
             value = self.consume()
         self.consume(')')
         return Terminator(value)
-    
+
+def parse_multiple_lists(token_lists):
+    asts = []
+    for tokens in token_lists:
+        parser = Parser(tokens)
+        try:
+            ast = parser.parse()
+            asts.append(ast)
+        except Exception as e:
+            pass
+            continue
+    return asts
 
 url = 'http://127.0.0.1:5000/test'
 response = requests.get(url)
@@ -121,18 +131,16 @@ if response.status_code == 200:
     tokens = response.json()
 else:
     print("Failed to retrieve tokens. Status code:", response.status_code)
+asts = parse_multiple_lists(tokens)
+
+ast1=""
+for ast in asts:
+    ast1 = ast1 + str(ast) + "\n"
+
 
 app = Flask(__name__)
 @app.route('/', methods=['GET'])
 def hostast():
-    parser1 = Parser(tokens[0])
-    ast1 = parser1.parse()
-    parser2 = Parser(tokens[6])
-    ast2 = parser2.parse()
-    parser3 = Parser(tokens[10])
-    ast3 = parser3.parse()
-    parser4 = Parser(tokens[31])
-    ast4 = parser4.parse()
-    return f'({str(ast1)} \n {str(ast2)} \n {str(ast3)} \n {str(ast4)})'
+    return ast1
 if __name__ == '__main__':
     app.run(port=5001, debug=True)
