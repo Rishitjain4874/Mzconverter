@@ -92,7 +92,7 @@ external VCDR_Ext{
     ascii TranslatedNumber : terminated_by(",");
     ascii DigitType: terminated_by(",");
     ascii ServiceFeatureCode : terminated_by(",");
-    ascii CallID : terminated_by(","),long(base10);
+    ascii CallID : terminated_by(","),long(base2);
     ascii OrigIncomingSignals: terminated_by(",");//,long(base10);
     ascii OrigOutgoingSignals : terminated_by(",");//,long(base10);
     ascii TermIncomingSignals : terminated_by(",");//,long(base10);

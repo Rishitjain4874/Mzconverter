@@ -2,7 +2,10 @@ import re
 from nltk.tokenize import RegexpTokenizer
 from flask import Flask, request
 import string
+
 hex_map = {c: hex(ord(c)) for c in string.printable}
+
+
 # AST Generator
 class ASTNode:
     def __str__(self):
@@ -25,11 +28,10 @@ class InternalDeclaration(ASTNode):
         return f"InternalDeclaration(name={self.name}, declarations={self.declarations})"
 
 class AsciiDeclaration(ASTNode):
-    def __init__(self, name, terminator, attri_type='str', base = 'base10'):
+    def __init__(self, name, terminator, attri_type='str'):
         self.name = name
         self.terminator = terminator
         self.attri_type = attri_type
-        self.base = base
     def __repr__(self):
         return f"AsciiDeclaration(name={self.name}, terminator={self.terminator}, attri_type={self.attri_type})"
 class GenericDeclaration(ASTNode):
@@ -95,7 +97,6 @@ class Parser:
         self.consume('ascii')
         name = self.consume()
         self.consume(':')
-        base = ''
         terminator = None
         attri_type = 'str'
         
@@ -108,10 +109,10 @@ class Parser:
                 if self.pos < len(self.tokens) and self.tokens[self.pos] == ',':
                     self.consume(',')
             else:
-                self.consume()  # Consume unexpected tokens
+                self.consume()  
         
         self.consume(';')
-        return AsciiDeclaration(name, terminator, attri_type, base)
+        return AsciiDeclaration(name, terminator, attri_type)
 
     def parse_generic_declaration(self):
         type_name = self.consume()
