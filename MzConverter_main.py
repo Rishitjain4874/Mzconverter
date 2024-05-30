@@ -313,7 +313,7 @@ def parse_ast(ast_str):
 
 
 # Read the file and process
-
+'''
 file = 'sampleUltraFormat.txt'
 with open(file, 'r') as f:
     content = f.read()
@@ -326,8 +326,8 @@ for ast in asts:
 ast2 = parse_ast(ast1)
 go_code = generate_go_code(ast2)
 print(go_code)
-
 '''
+
 app = Flask(__name__)
 
 @app.route('/', methods=['POST'])
@@ -345,4 +345,4 @@ def receive_tokens_ext():
     return go_code
 
 if __name__ == '__main__':
-    app.run(port=5011)'''
+    app.run(port=5011)
