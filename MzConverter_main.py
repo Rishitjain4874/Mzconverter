@@ -257,11 +257,17 @@ def generate_go_code(external_declarations):
         for declaration in external_declaration.declarations:
             if isinstance(declaration, AsciiDeclaration):
                 terminator_value = declaration.terminator.value
+                attri_value = declaration.attri_type
                 if terminator_value:
                     terminator_value_str = terminator_value if terminator_value.startswith('0x') else f"'{terminator_value}'"
                 else:
                     terminator_value_str = "''"
-                go_code += f"\t{declaration.name} string `mzConverter: terminated_by({terminator_value_str})\"`\n"
+                if attri_value == 'str':
+                    go_code += f"\t{declaration.name} string `mzConverter: terminated_by({terminator_value_str})\"`\n"
+                elif 'int' in attri_value:
+                    go_code += f"\t{declaration.name} Int64 `mzConverter: terminated_by({terminator_value_str}), base({attri_value})\"`\n"
+                elif 'long' in attri_value:
+                    go_code += f"\t{declaration.name} Decimal.decimal `mzConverter: terminated_by({terminator_value_str}), base({attri_value})\"`\n"
             elif isinstance(declaration, GenericDeclaration):
                 go_code += f"\t{declaration.name} {declaration.type_name}\n"
         go_code += "}\n\n"
@@ -287,9 +293,7 @@ def parse_ast(ast_str):
     for match in ast_matches:
         name = match[0]
         declarations_str = match[1]
-        print(declarations_str)
         declarations = []
-        print('TEST -1')
         for declaration_match in re.finditer(ascii_declaration_pattern, declarations_str):
             declaration_name = declaration_match.group(1)
             terminator_value = declaration_match.group(2).strip()
@@ -304,7 +308,7 @@ def parse_ast(ast_str):
             declarations.append(declaration)
     
         external_declarations.append(ExternalDeclaration(name=name, declarations=declarations))
-        
+
     return external_declarations
 
 
@@ -320,7 +324,6 @@ for ast in asts:
     ast1 = ast1 + str(ast) + "\n"
 print(ast1)
 ast2 = parse_ast(ast1)
-print(ast2)
 go_code = generate_go_code(ast2)
 print(go_code)
 
