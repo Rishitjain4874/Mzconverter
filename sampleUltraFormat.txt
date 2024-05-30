@@ -61,7 +61,7 @@ external VCDR {
     VCDR_Ext vcdr;
 };
 external VCDR_Ext{
-    ascii CDRSequenceNumber : terminated_by(","),long(base10);
+    ascii CDRSequenceNumber : terminated_by(","),long(base2);
     ascii CDRMajorVersion : terminated_by(","),int(base10);
     ascii CDRMinorVersion : terminated_by(","),int(base10);
     ascii LongCallDurationIndicator: terminated_by(","),int(base10);

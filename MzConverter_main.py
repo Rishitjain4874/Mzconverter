@@ -265,9 +265,9 @@ def generate_go_code(external_declarations):
                 if attri_value == 'str':
                     go_code += f"\t{declaration.name} string `mzConverter: terminated_by({terminator_value_str})\"`\n"
                 elif 'int' in attri_value:
-                    go_code += f"\t{declaration.name} Int64 `mzConverter: terminated_by({terminator_value_str}), base({attri_value})\"`\n"
+                    go_code += f"\t{declaration.name} Int64 `mzConverter: terminated_by({terminator_value_str}), base({(eval(attri_value))[1]})\"`\n"
                 elif 'long' in attri_value:
-                    go_code += f"\t{declaration.name} Decimal.decimal `mzConverter: terminated_by({terminator_value_str}), base({attri_value})\"`\n"
+                    go_code += f"\t{declaration.name} Decimal.decimal `mzConverter: terminated_by({terminator_value_str}), base({eval((attri_value))[1]})\"`\n"
             elif isinstance(declaration, GenericDeclaration):
                 go_code += f"\t{declaration.name} {declaration.type_name}\n"
         go_code += "}\n\n"
@@ -322,7 +322,7 @@ asts = parse_multiple_lists(block_value_ext)
 ast1 = ""
 for ast in asts:
     ast1 = ast1 + str(ast) + "\n"
-print(ast1)
+
 ast2 = parse_ast(ast1)
 go_code = generate_go_code(ast2)
 print(go_code)
