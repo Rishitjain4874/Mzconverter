@@ -14,6 +14,8 @@ def check_Ext_int(tokens, key):
     in_block = False
     skip_next_close_brace = False
     for i in tokens:
+        if i in ['external', 'internal', 'in_map', 'out_map', 'session'] and i != key:
+            in_block = False
         if i == key:    
             in_block = True
         elif i == '}':
@@ -60,6 +62,7 @@ def getcontentfile(content):
         token1.extend(tokens)
         token1.append('\n')
     return token1
+
 
 
 app = Flask(__name__)
