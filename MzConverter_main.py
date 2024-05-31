@@ -43,11 +43,11 @@ class GenericDeclaration(ASTNode):
         return f"GenericDeclaration(type_name={self.type_name}, name={self.name})"
 
 class Identifier(ASTNode):
-    def __init__(self, tag):
+    def __init__(self, tag, terminator):
         self.tag = tag
-
+        self. terminator = terminator
     def __repr__(self):
-        return f"Identified_by(value={self.tag})"
+        return f"Identified_by(tag={self.tag}, terminator= terminator{self.terminator})"
 
 class Terminator(ASTNode):
     def __init__(self, value):
@@ -105,11 +105,16 @@ class Parser:
         self.consume('identified_by')
         self.consume('(')
         self.consume('tag')
+        self.consume('"')
         identifier = self.consume()
+        self.consume('"')
         self.consume(')')
         self.consume('{')
-        self.parse_ascii_declaration()
-        return Identifier(identifier)
+        if self.pos < len(self.tokens) and self.tokens[self.pos] == 'ascii':
+            ascii_declaration1 = self.parse_ascii_declaration()    
+            if self.pos < len(self.tokens) and self.tokens[self.pos] == 'ascii':
+                ascii_declaration2 = self.parse_ascii_declaration()
+        return Identifier(identifier, ascii_declaration1, ascii_declaration2)
     
     def parse_ascii_declaration(self):
         self.consume('ascii')
@@ -170,6 +175,20 @@ class Parser:
             value = self.consume()
             value = symbol_to_hex(value)
         self.consume(')')
+        if self.pos < len(self.tokens) and self.tokens[self.pos] == ',':
+            self.consume(',')
+            if self.tokens[self.pos] == 'encode_value':
+                self.consume('encode_value')
+                self.consume('(')
+                self.consume('"')
+                self.consume()
+                self.consume('"')
+                self.consume(')')
+                if self.tokens[self.pos] == ',':    
+                    self.consume(',')
+                    self.consume('external_only')
+            elif self.tokens[self.pos] == 'external_only':
+                self.consume('external_only')
         return Terminator(value)
     
 def symbol_to_hex(symbol):
@@ -335,11 +354,9 @@ def receive_tokens_ext():
     cont = request.data.decode('utf-8')
     block_value_ext = check_Ext_int(getcontentfile(cont), 'external')
     asts = parse_multiple_lists(block_value_ext)
-    print(block_value_ext)
     ast1 = ""
     for ast in asts:
         ast1 = ast1 + str(ast) + "\n"
-    print(ast1)
     ast2 = parse_ast(ast1)
     go_code = generate_go_code(ast2)
     return go_code
