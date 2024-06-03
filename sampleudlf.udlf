@@ -1,0 +1,80 @@
+external Filename : identified_by(tag == "FILENAME") {
+   ascii tag :  terminated_by("="), encode_value("FILENAME"), external_only;
+   ascii value : terminated_by(0xA);
+};
+
+external errorBlock : identified_by(strStartsWith(errorCode, "DRP")) {
+    ascii errorCode : terminated_by(",");
+    ascii errorMessage : terminated_by(",");
+};
+
+external VCDR {
+    set {
+        errorBlock error : optional;
+    };    
+    VCDR_Ext vcdr;
+};
+
+external inContentFormat_GenBand {
+    ascii incomingSwitch         : align(left), padded_with(0x20), static_size(20);
+    ascii outgoingSwitch         : align(left), padded_with(0x20), static_size(20);
+    ascii eventStartDate         : align(left), padded_with(0x20), static_size(8);
+    ascii eventStartTime         : align(left), padded_with(0x20), static_size(8);
+    ascii eventDuration          : align(right), padded_with("0"), static_size(10);
+    ascii aNum                   : align(left), padded_with(0x20), static_size(28); 
+    ascii bNum                   : align(left), padded_with(0x20), static_size(28); 
+    ascii incomingTrunk          : align(left), padded_with(0x20), static_size(20);
+    ascii outgoingTrunk          : align(left), padded_with(0x20), static_size(20);
+    ascii incomingProduct        : align(left), padded_with(0x20), static_size(14); 
+    ascii outgoingProduct        : align(left), padded_with(0x20), static_size(14);
+    ascii eventDirection         : align(left), padded_with(0x20), static_size(1);
+    ascii discreteRatingParam_1  : align(left), padded_with(0x20), static_size(15); 
+    ascii discreteRatingParam_2  : static_size(15);
+    ascii discreteRatingParam_3  : static_size(15);
+    ascii dataUnit               : align(left), padded_with(0x20), static_size(8);
+    ascii recSeqNum              : long(base10), align(left), padded_with(0x20), static_size(40);
+    ascii recType                : align(left), padded_with(0x20), static_size(2); 
+    ascii userSummarization      : align(left), padded_with(0x20), static_size(20);
+    ascii userData               : align(left), padded_with(0x20), static_size(30);
+    ascii userData_2             : align(left), padded_with(0x20), static_size(30);
+    ascii linkField              : align(left), padded_with(0x20), static_size(2);   
+    ascii userData_3             : align(left), padded_with(0x20), static_size(80); 
+    ascii lineFeed               : terminated_by(0xA), external_only;
+};
+
+external inContentFormat_GenBand_Spectrum : identified_by (recordType == "MGCF_Record"){
+    ascii recordType : terminated_by(",");
+    ascii eventEndDate : terminated_by(",");
+    ascii eventEndTime : terminated_by(",");
+    inContentFormat_GenBand mgcfRecord;
+
+};
+
+external ildContentFormat_GenBand {
+
+    ascii incomingSwitch         : align(left), padded_with(0x20), static_size(20);
+    ascii outgoingSwitch         : align(left), padded_with(0x20), static_size(20);
+    ascii eventStartDate         : align(left), padded_with(0x20), static_size(8);
+    ascii eventStartTime         : align(left), padded_with(0x20), static_size(8);
+    ascii eventDuration          : align(right), padded_with("0"), static_size(10);
+    ascii aNum                   : align(left), padded_with(0x20), static_size(28);
+    ascii bNum                   : align(left), padded_with(0x20), static_size(28); 
+    ascii incomingTrunk          : align(left), padded_with(0x20), static_size(20);
+    ascii outgoingTrunk          : align(left), padded_with(0x20), static_size(20);
+    ascii incomingProduct        : align(left), padded_with(0x20), static_size(14); 
+    ascii outgoingProduct        : align(left), padded_with(0x20), static_size(14);
+    ascii eventDirection         : align(left), padded_with(0x20), static_size(1);
+    ascii discreteRatingParam_1  : align(left), padded_with(0x20), static_size(15); 
+    ascii dataUnit               : align(left), padded_with(0x20), static_size(8);
+    ascii recSeqNum              : long(base10), align(left), padded_with(0x20), static_size(40);
+    ascii recType                : align(left), padded_with(0x20), static_size(2); 
+    ascii userSummarization      : align(left), padded_with(0x20), static_size(20);
+    ascii userData               : align(left), padded_with(0x20), static_size(30);
+    ascii userData_2             : align(left), padded_with(0x20), static_size(30);
+    ascii linkField              : align(left), padded_with(0x20), static_size(2);  
+    ascii inEventMappingCode     : align(left), padded_with(0x20), static_size(20); 
+    ascii outEventMappingCode    : align(left), padded_with(0x20), static_size(20); 
+    ascii userData_3             : align(left), padded_with(0x20), static_size(80); 
+    ascii lineFeed               : terminated_by(0xA), external_only;
+}; 
+
