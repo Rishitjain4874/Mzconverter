@@ -115,9 +115,6 @@ in_map VCDR_im : external(VCDR), target_internal(VCDR_TI) {
     automatic : use_external_names;
 };
 
-out_map VCDR_om : external(VCDR), internal(VCDR_TI) {
-    automatic;
-};
 
 decoder VCDR_Dec : in_map(VCDR_im);
 encoder VCDR_Enc : out_map(VCDR_om);

@@ -41,17 +41,16 @@ class AsciiDeclaration(ASTNode):
     def __repr__(self):
         if self.align_value and self.padded_value and self.static_size_value:
             return f"AsciiDeclaration(name={self.name}, attri_type={self.attri_type}, align_value={self.align_value}, padded_value={self.padded_value}, static_size_value={self.static_size_value})"
-        if not self.additional_attributes or self.additional_attributes == [','] or self.encoded_value == None or self.externalonly == None or self.align_value == None or self.padded_value == None or self.static_size_value == None and self.terminator != None:
-            return f"AsciiDeclaration(name={self.name}, terminator={self.terminator}, attri_type={self.attri_type})"
-        if self.encoded_value and not self.externalonly and not self.align_value and not self.padded_value and not self.static_size_value and self.terminator != None:
+        elif self.encoded_value and not self.externalonly and not self.align_value and not self.padded_value and not self.static_size_value and self.terminator != None:
            return f"AsciiDeclaration(name={self.name}, terminator={self.terminator}, attri_type={self.attri_type}, encoded_value={self.encoded_value})"
-        if self.externalonly and not self.encoded_value and not self.align_value and not self.padded_value and not self.static_size_value and self.terminator != None:
+        elif self.externalonly and not self.encoded_value and not self.align_value and not self.padded_value and not self.static_size_value and self.terminator != None:
             return f"AsciiDeclaration(name={self.name}, terminator={self.terminator}, attri_type={self.attri_type}, externalonly={self.externalonly})"
-        if self.encoded_value and self.externalonly and not self.align_value and not self.padded_value and not self.static_size_value and self.terminator != None:
+        elif self.encoded_value and self.externalonly and not self.align_value and not self.padded_value and not self.static_size_value and self.terminator != None:
             return f"AsciiDeclaration(name={self.name}, terminator={self.terminator}, attri_type={self.attri_type}, encoded_value={self.encoded_value}, externalonly={self.externalonly})"
-        if self.additional_attributes and self.externalonly and self.encoded_value and self.terminator != None:
+        elif self.additional_attributes and self.externalonly and self.encoded_value and self.terminator != None:
             return f"AsciiDeclaration(name={self.name}, terminator={self.terminator}, attri_type={self.attri_type}, encoded_value={self.encoded_value}, externalonly={self.externalonly}, additional_attributes={self.additional_attributes})"
-        
+        elif not self.additional_attributes or self.additional_attributes == [','] or self.encoded_value == None or self.externalonly == None or self.align_value == None or self.padded_value == None or self.static_size_value == None and self.terminator != None:
+            return f"AsciiDeclaration(name={self.name}, terminator={self.terminator}, attri_type={self.attri_type})"
 class GenericDeclaration(ASTNode):
     def __init__(self, type_name, name):
         self.type_name = type_name
@@ -242,7 +241,6 @@ def parse_multiple_lists(token_lists):
         except Exception as e:
             print(f"Error parsing AST: {e}")
             continue
-    print(asts)
     return asts
 
 # Text parsing functions
@@ -313,20 +311,44 @@ def generate_go_code(external_declarations):
         go_code += f"type {external_declaration.name} struct " + "{\n"
         for declaration in external_declaration.declarations:
             if isinstance(declaration, AsciiDeclaration):
-                terminator_value = declaration.terminator.value
-                attri_value = declaration.attri_type
-                if terminator_value:
-                    terminator_value_str = terminator_value if terminator_value.startswith('0x') else f"'{terminator_value}'"
+                if declaration.terminator:
+                    terminator_value = declaration.terminator.value
                 else:
-                    terminator_value_str = "''"
-                if attri_value == 'str':
-                    go_code += f"\t{declaration.name} string `mzConverter: terminated_by({terminator_value_str})\"`\n"
+                    terminator_value = None
+                attri_value = declaration.attri_type
+                encoded_value = declaration.encoded_value
+                externalonly = declaration.externalonly
+                align_value = declaration.align_value
+                padded_value = declaration.padded_value
+                static_size_value = declaration.static_size_value
+                if encoded_value and externalonly:
+                    go_code += f"\t{declaration.name} string `mzConverter: terminated_by({terminator_value}), encoded_by({encoded_value}), {externalonly}\"`\n"
+                elif static_size_value:
+                    go_code += f"\t{declaration.name} string `mzConverter: static_size({static_size_value}), align({align_value}), padded_with({padded_value})\"`\n"
+                elif attri_value == 'str':
+                    go_code += f"\t{declaration.name} string `mzConverter: terminated_by({terminator_value})\"`\n"
                 elif 'int' in attri_value:
-                    go_code += f"\t{declaration.name} Int64 `mzConverter: terminated_by({terminator_value_str}), base({(eval(attri_value))[1]})\"`\n"
+                    go_code += f"\t{declaration.name} Int64 `mzConverter: terminated_by({terminator_value}), base({(eval(attri_value))[1]})\"`\n"
                 elif 'long' in attri_value:
-                    go_code += f"\t{declaration.name} Decimal.decimal `mzConverter: terminated_by({terminator_value_str}), base({eval((attri_value))[1]})\"`\n"
+                    go_code += f"\t{declaration.name} Decimal.decimal `mzConverter: terminated_by({terminator_value}), base({eval((attri_value))[1]})\"`\n"
+
             elif isinstance(declaration, GenericDeclaration):
                 go_code += f"\t{declaration.name} {declaration.type_name}\n"
+            elif isinstance(declaration, Identifier):
+                for attr in declaration.tag:
+                    if isinstance(attr, AsciiDeclaration):
+                        terminator_value = attr.terminator.value
+                        attri_value = attr.attri_type
+                        if terminator_value:
+                            terminator_value_str = terminator_value if terminator_value.startswith('0x') else f"'{terminator_value}'"
+                        else:
+                            terminator_value_str = "''"
+                        if attri_value == 'str':
+                            go_code += f"\t{declaration.tag} string `mzConverter: terminated_by({terminator_value_str}, encoded_by({encoded_value}), {externalonly})\"`\n"
+                        elif 'int' in attri_value:
+                            go_code += f"\t{declaration.tag} Int64 `mzConverter: terminated_by({terminator_value_str}), base({(eval(attri_value))[1]})\"`\n"
+                        elif 'long' in attri_value:
+                            go_code += f"\t{declaration.tag} Decimal.decimal `mzConverter: terminated_by({terminator_value_str}), base({eval((attri_value))[1]})\"`\n"
         go_code += "}\n\n"
     return go_code
 
@@ -338,10 +360,10 @@ def symbol_to_hex(symbol):
 def parse_ast(ast_str):
     # Define regex patterns to match the AST representation
     external_declaration_pattern = r"ExternalDeclaration\(name=(\w+), declarations=\[(.*?)\]\)"
-    ascii_declaration_pattern = r"AsciiDeclaration\(name=([^,]+),\s*terminator=Terminator\(value=(0x[0-9A-Fa-f]+)\),\s*attri_type=(str|\('int', 'base\d+'\)|\('long', 'base\d+'\))\)"
+    ascii_declaration_pattern = r"AsciiDeclaration\(name=([^,]+), terminator=Terminator\(value=([^)]+)\), \s*attri_type=(str|\('int', 'base(\d+)'\)|\('long', 'base(\d+)'\))"
+    ascii_declaration_pattern1 = r"AsciiDeclaration\(name=([^,]+), \s*attri_type=(str|\('int', 'base\d+'\)|\('long', 'base\d+'\)), \s*align_value=([^,]+), \s*padded_value=([^,]+), \s*static_size_value=(\d+)\)"
     generic_declaration_pattern = r"GenericDeclaration\(type_name=(\w+), name=(\w+)\)"
-    identified_by_pattern = r"Identified_by\(tag=([^,]+)\)"
-
+    identified_by_pattern = r"Identified_by\(tag=([^,]+), AsciiDeclaration\(name=([^,]+), terminator=Terminator\(value=([^)]+)\), \s*attri_type=(str|\('int', 'base(\d+)'\)|\('long', 'base(\d+)'\))(?:, align_value=([^,]+))?(?:, padded_value=([^,]+))?(?:, static_size_value=(\d+))?(?:, encoded_value=([^,]+))?(?:, externalonly=([^,]+))?(?:, additional_attributes=\[(.*?)\])?\)"
     # Extract individual ASTs from the provided string
     ast_matches = re.findall(external_declaration_pattern, ast_str, re.DOTALL)
     if not ast_matches:
@@ -352,7 +374,18 @@ def parse_ast(ast_str):
         name = match[0]
         declarations_str = match[1]
         declarations = []
-        
+        for declaration_match in re.finditer(identified_by_pattern, declarations_str):
+            tag = declaration_match.group(1)
+            ascii_declaration_name = declaration_match.group(2)
+            terminator_value = declaration_match.group(3)
+            attri_type = declaration_match.group(4)
+            encoded_value = declaration_match.group(10)
+            externalonly = declaration_match.group(11)
+            ascii_declaration = AsciiDeclaration(name=ascii_declaration_name, terminator=Terminator(value=terminator_value), attri_type=attri_type, encoded_value=encoded_value, externalonly=externalonly)
+            identifier = Identifier(tag=tag.rstrip(")"))
+            declarations.append(identifier)
+            declarations.append(ascii_declaration)
+
         for declaration_match in re.finditer(ascii_declaration_pattern, declarations_str):
             declaration_name = declaration_match.group(1)
             terminator_value = declaration_match.group(2).strip()
@@ -360,24 +393,27 @@ def parse_ast(ast_str):
             declaration = AsciiDeclaration(name=declaration_name, terminator=Terminator(value=terminator_value), attri_type=attri_type)
             declarations.append(declaration)
 
+        for declaration_match in re.finditer(ascii_declaration_pattern1, declarations_str):
+            declaration_name = declaration_match.group(1)
+            attri_type = declaration_match.group(2)
+            align_value = declaration_match.group(3)
+            padded_value = declaration_match.group(4)
+            static_size_value = int(declaration_match.group(5))
+            declaration = AsciiDeclaration(name=declaration_name, terminator=None, attri_type=attri_type, align_value=align_value, padded_value=padded_value, static_size_value=static_size_value)
+            declarations.append(declaration)
+
         for declaration_match in re.finditer(generic_declaration_pattern, declarations_str):
             type_name = declaration_match.group(1)
             declaration_name = declaration_match.group(2)
             declaration = GenericDeclaration(type_name=type_name, name=declaration_name)
             declarations.append(declaration)
-        
-        for declaration_match in re.finditer(identified_by_pattern, declarations_str):
-            tag = declaration_match.group(1)
-            declaration = Identifier(tag=tag)
-            declarations.append(declaration)
-        
-        external_declarations.append(ExternalDeclaration(name=name, declarations=declarations))
 
+        external_declarations.append(ExternalDeclaration(name=name, declarations=declarations))
     return external_declarations
 
 # Read the file and process
-
-file = 'sampleUltraFormat copy 2.txt'
+'''
+file = 'sampleUltraFormat.txt'
 with open(file, 'r') as f:
     content = f.read()
 block_value_ext = check_Ext_int(getcontentfile(content), 'external')
@@ -408,4 +444,4 @@ def receive_tokens_ext():
     return go_code
 
 if __name__ == '__main__':
-    app.run(port=5011)'''
+    app.run(port=5011)

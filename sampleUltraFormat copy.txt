@@ -12,7 +12,7 @@ external File_Header_Ext{
 external Filename : identified_by(tag == "FILENAME") {
    ascii tag :  terminated_by("="), encode_value("FILENAME"), external_only;
    ascii value : terminated_by(0xA);
-};
+};      
 
 external CreationTime : identified_by(tag == "CREATION_TIME") {
     ascii tag :  terminated_by("="), encode_value("CREATION_TIME"), external_only;
