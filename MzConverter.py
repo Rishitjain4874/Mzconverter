@@ -2,7 +2,7 @@ import re
 from nltk.tokenize import RegexpTokenizer
 from flask import Flask, request
 import string
-from collections import namedtuple
+
 hex_map = {c: hex(ord(c)) for c in string.printable}
 
 # AST Generator
@@ -27,14 +27,31 @@ class InternalDeclaration(ASTNode):
         return f"InternalDeclaration(name={self.name}, declarations={self.declarations})"
 
 class AsciiDeclaration(ASTNode):
-    def __init__(self, name, terminator, attri_type='str'):
+    def __init__(self, name, terminator, attri_type='str', encoded_value= None , externalonly= None, align_value=None, padded_value=None, static_size_value=0, additional_attributes=None):
         self.name = name
         self.terminator = terminator
         self.attri_type = attri_type
-
+        self.encoded_value = encoded_value
+        self.externalonly = externalonly  
+        self.align_value = align_value
+        self.padded_value = padded_value
+        self.static_size_value = static_size_value
+        self.additional_attributes = additional_attributes or []
+        
     def __repr__(self):
-        return f"AsciiDeclaration(name={self.name}, terminator={self.terminator}, attri_type={self.attri_type})"
-
+        if self.align_value and self.padded_value and self.static_size_value:
+            return f"AsciiDeclaration(name={self.name}, attri_type={self.attri_type}, align_value={self.align_value}, padded_value={self.padded_value}, static_size_value={self.static_size_value})"
+        if not self.additional_attributes or self.additional_attributes == [','] or self.encoded_value == None or self.externalonly == None or self.align_value == None or self.padded_value == None or self.static_size_value == None and self.terminator != None:
+            return f"AsciiDeclaration(name={self.name}, terminator={self.terminator}, attri_type={self.attri_type})"
+        if self.encoded_value and not self.externalonly and not self.align_value and not self.padded_value and not self.static_size_value and self.terminator != None:
+           return f"AsciiDeclaration(name={self.name}, terminator={self.terminator}, attri_type={self.attri_type}, encoded_value={self.encoded_value})"
+        if self.externalonly and not self.encoded_value and not self.align_value and not self.padded_value and not self.static_size_value and self.terminator != None:
+            return f"AsciiDeclaration(name={self.name}, terminator={self.terminator}, attri_type={self.attri_type}, externalonly={self.externalonly})"
+        if self.encoded_value and self.externalonly and not self.align_value and not self.padded_value and not self.static_size_value and self.terminator != None:
+            return f"AsciiDeclaration(name={self.name}, terminator={self.terminator}, attri_type={self.attri_type}, encoded_value={self.encoded_value}, externalonly={self.externalonly})"
+        if self.additional_attributes and self.externalonly and self.encoded_value and self.terminator != None:
+            return f"AsciiDeclaration(name={self.name}, terminator={self.terminator}, attri_type={self.attri_type}, encoded_value={self.encoded_value}, externalonly={self.externalonly}, additional_attributes={self.additional_attributes})"
+        
 class GenericDeclaration(ASTNode):
     def __init__(self, type_name, name):
         self.type_name = type_name
@@ -48,7 +65,7 @@ class Identifier(ASTNode):
         self.tag = tag
 
     def __repr__(self):
-        return f"Identified_by(value={self.tag})"
+        return f"Identified_by(tag={self.tag})"
 
 class Terminator(ASTNode):
     def __init__(self, value):
@@ -84,7 +101,7 @@ class Parser:
         elif self.tokens[self.pos] == ':':
             self.consume(':')
             declarations = self.parse_declaration_list()
-            self.consume(';')
+            self.consume('}')
             self.consume(';')
         return ExternalDeclaration(name, declarations)
 
@@ -101,71 +118,103 @@ class Parser:
             else:
                 declarations.append(self.parse_generic_declaration())
         return declarations
-    
+
     def parse_identified_by(self):
         self.consume('identified_by')
         self.consume('(')
         self.consume('tag')
+        self.consume('=')
+        self.consume('=')
+        self.consume('"')
         identifier = self.consume()
+        self.consume('"')
         self.consume(')')
         self.consume('{')
-        self.parse_ascii_declaration()
+        ascii_declaration1 = []
+        if self.pos < len(self.tokens) and self.tokens[self.pos] == 'ascii':
+            ascii_declaration1.append(self.parse_ascii_declaration())
+            if self.pos < len(self.tokens) and self.tokens[self.pos] == 'ascii':
+                ascii_declaration1.append(self.parse_ascii_declaration())
         return Identifier(identifier)
-    
+
     def parse_ascii_declaration(self):
         self.consume('ascii')
         name = self.consume()
         self.consume(':')
         terminator = None
-        attri_type = 'str'  # Default attribute type is string
+        encoded_value = None
+        externalonly = None
+        attri_type = 'str'
+        align_value = None
+        padded_value = None
+        static_size_value = 0
+        additional_attributes = []
         
         while self.pos < len(self.tokens) and self.tokens[self.pos] != ';':
             token = self.tokens[self.pos]
-            if token == 'terminated_by':
+            if token == 'align':
+                self.consume('align')
+                self.consume('(')
+                align_value = self.consume()
+                self.consume(')')
+            elif token == 'padded_with':
+                self.consume('padded_with')
+                self.consume('(')
+                if self.pos < len(self.tokens) and self.tokens[self.pos] == '"':
+                    self.consume('"')
+                    padded_value = self.consume()
+                    padded_value = symbol_to_hex(padded_value)
+                    self.consume('"')
+                else:
+                    padded_value = self.consume()
+                self.consume(')')
+            elif token == 'static_size':
+                self.consume('static_size')
+                self.consume('(')
+                static_size_value = self.consume()
+                self.consume(')')
+            elif token == 'terminated_by':
                 terminator = self.parse_terminator()
+            elif token in ['int', 'str', 'long']:
+                attri_type = self.parse_attri_type()
                 if self.pos < len(self.tokens) and self.tokens[self.pos] == ',':
                     self.consume(',')
-                    if self.tokens[self.pos] == 'encode_value':
-                        self.consume('encode_value')
-                        self.consume('(')
-                        self.consume('"')
-                        self.consume()
-                        self.consume('"')
-                        self.consume(')')
-                        self.consume(',')
-                        self.consume('external_only')
-                        self.consume(';')
-            elif token in ['int', 'str', 'long']:
-                # Set attri_type based on token value
-                if token == 'int':
-                    attri_type = 'int64'
-                elif token == 'str':
-                    attri_type = 'string'
-                elif token == 'long':
-                    attri_type = 'decimal.Decimal'
-                self.consume()  # Consume the attribute type token
-                if self.pos < len(self.tokens) and self.tokens[self.pos] == ',':
-                    self.consume(',')  # Consume comma if present
+            elif token == 'encode_value':
+                self.consume('encode_value')
+                self.consume('(')
+                self.consume('"')
+                encoded_value = self.consume()
+                self.consume('"')
+                self.consume(')')
+            elif token == 'external_only':
+                externalonly = self.consume('external_only')
             else:
-                self.consume()  # Consume other tokens
-            
-        self.consume(';')
-        return AsciiDeclaration(name, terminator, attri_type)
+                additional_attributes.append(token)
+                self.consume()
+        if self.pos < len(self.tokens) and self.tokens[self.pos] == ';':
+            self.consume(';')  
+        elif self.pos < len(self.tokens) and self.tokens[self.pos] == '}':
+            self.consume('}')
+        
+        ascii_decl = AsciiDeclaration(name, terminator, attri_type, encoded_value, externalonly, align_value, padded_value, static_size_value)
+        ascii_decl.additional_attributes = additional_attributes
+        return ascii_decl
 
     def parse_generic_declaration(self):
         type_name = self.consume()
         name = self.consume()
         self.consume(';')
         return GenericDeclaration(type_name, name)
-    
+
     def parse_attri_type(self):
         attri_type = self.consume()
+        base = None
         if self.pos < len(self.tokens) and self.tokens[self.pos] == '(':
             self.consume('(')
             base = self.consume()
             self.consume(')')
-        return attri_type
-    
+        return attri_type if not base else (attri_type, base)
+
     def parse_terminator(self):
         self.consume('terminated_by')
         self.consume('(')
@@ -179,7 +228,7 @@ class Parser:
             value = symbol_to_hex(value)
         self.consume(')')
         return Terminator(value)
-    
+
 def symbol_to_hex(symbol):
     return symbol.encode('utf-8').hex()
 
@@ -193,11 +242,11 @@ def parse_multiple_lists(token_lists):
         except Exception as e:
             print(f"Error parsing AST: {e}")
             continue
+    print(asts)
     return asts
 
 # Text parsing functions
 def check_Ext_int(tokens, key):
-    print(f'Checking for {key} keyword in the file\n')
     block = []
     block_value = []
     preview_list = []
@@ -258,12 +307,40 @@ def getcontentfile(content):
     return token1
 
 # Go code generator
-# Go code generator
+def generate_go_code(external_declarations):
+    go_code = "package main\n\n"
+    for external_declaration in external_declarations:
+        go_code += f"type {external_declaration.name} struct " + "{\n"
+        for declaration in external_declaration.declarations:
+            if isinstance(declaration, AsciiDeclaration):
+                terminator_value = declaration.terminator.value
+                attri_value = declaration.attri_type
+                if terminator_value:
+                    terminator_value_str = terminator_value if terminator_value.startswith('0x') else f"'{terminator_value}'"
+                else:
+                    terminator_value_str = "''"
+                if attri_value == 'str':
+                    go_code += f"\t{declaration.name} string `mzConverter: terminated_by({terminator_value_str})\"`\n"
+                elif 'int' in attri_value:
+                    go_code += f"\t{declaration.name} Int64 `mzConverter: terminated_by({terminator_value_str}), base({(eval(attri_value))[1]})\"`\n"
+                elif 'long' in attri_value:
+                    go_code += f"\t{declaration.name} Decimal.decimal `mzConverter: terminated_by({terminator_value_str}), base({eval((attri_value))[1]})\"`\n"
+            elif isinstance(declaration, GenericDeclaration):
+                go_code += f"\t{declaration.name} {declaration.type_name}\n"
+        go_code += "}\n\n"
+    return go_code
+
+
+def symbol_to_hex(symbol):
+    if isinstance(symbol, str) and symbol.startswith("0x"):
+        return symbol
+    return hex_map.get(symbol, None)
 def parse_ast(ast_str):
     # Define regex patterns to match the AST representation
     external_declaration_pattern = r"ExternalDeclaration\(name=(\w+), declarations=\[(.*?)\]\)"
-    ascii_declaration_pattern = r"AsciiDeclaration\(name=(\w+), terminator=Terminator\(value=0x([a-fA-F0-9]+)\), attri_type=(\w+|(?:\('.*?'\)))\)"
+    ascii_declaration_pattern = r"AsciiDeclaration\(name=([^,]+),\s*terminator=Terminator\(value=(0x[0-9A-Fa-f]+)\),\s*attri_type=(str|\('int', 'base\d+'\)|\('long', 'base\d+'\))\)"
     generic_declaration_pattern = r"GenericDeclaration\(type_name=(\w+), name=(\w+)\)"
+    identified_by_pattern = r"Identified_by\(tag=([^,]+)\)"
 
     # Extract individual ASTs from the provided string
     ast_matches = re.findall(external_declaration_pattern, ast_str, re.DOTALL)
@@ -275,45 +352,32 @@ def parse_ast(ast_str):
         name = match[0]
         declarations_str = match[1]
         declarations = []
-        print('TEST -1')
+        
         for declaration_match in re.finditer(ascii_declaration_pattern, declarations_str):
-            print('TEST 0')
             declaration_name = declaration_match.group(1)
-            print('TEST 1')
             terminator_value = declaration_match.group(2).strip()
-            print('TEST 2')
             attri_type = declaration_match.group(3)
-            print('TEST 3')
             declaration = AsciiDeclaration(name=declaration_name, terminator=Terminator(value=terminator_value), attri_type=attri_type)
             declarations.append(declaration)
-            
+
         for declaration_match in re.finditer(generic_declaration_pattern, declarations_str):
             type_name = declaration_match.group(1)
             declaration_name = declaration_match.group(2)
             declaration = GenericDeclaration(type_name=type_name, name=declaration_name)
             declarations.append(declaration)
-
+        
+        for declaration_match in re.finditer(identified_by_pattern, declarations_str):
+            tag = declaration_match.group(1)
+            declaration = Identifier(tag=tag)
+            declarations.append(declaration)
+        
         external_declarations.append(ExternalDeclaration(name=name, declarations=declarations))
 
     return external_declarations
 
-def generate_go_code(external_declarations):
-    go_code = "package main\n\nimport (\n\t\"github.com/shopspring/decimal\"\n)\n\n"
-    
-    for external_declaration in external_declarations:
-        go_code += f"type {external_declaration.name} struct {{\n"
-        for declaration in external_declaration.declarations:
-            if isinstance(declaration, AsciiDeclaration):
-                go_code += f"\t{declaration.name} string\n"
-            elif isinstance(declaration, GenericDeclaration):
-                go_code += f"\t{declaration.name} {declaration.type_name}\n"
-        go_code += "}\n\n"
-    
-    return go_code
-
-
 # Read the file and process
-file = 'sampleUltraFormat.txt'
+
+file = 'sampleUltraFormat copy 2.txt'
 with open(file, 'r') as f:
     content = f.read()
 block_value_ext = check_Ext_int(getcontentfile(content), 'external')
@@ -321,24 +385,24 @@ asts = parse_multiple_lists(block_value_ext)
 ast1 = ""
 for ast in asts:
     ast1 = ast1 + str(ast) + "\n"
-print(ast1)
 ast2 = parse_ast(ast1)
 go_code = generate_go_code(ast2)
 print(go_code)
 
 '''
 app = Flask(__name__)
-
 @app.route('/', methods=['POST'])
 def receive_tokens_ext():
     cont = request.data.decode('utf-8')
-    block_value_ext = check_Ext_int(getcontentfile(cont), 'external')
-    asts = parse_multiple_lists(block_value_ext)
-    print(block_value_ext)
+    blocks = {'external':  check_Ext_int(getcontentfile(cont), 'external'),
+        'internal': check_Ext_int(getcontentfile(cont), 'internal'), 
+        'in_map':  check_Ext_int(getcontentfile(cont), 'in_map'), 
+        'out_map':  check_Ext_int(getcontentfile(cont), 'out_map'), 
+        'session':  check_Ext_int(getcontentfile(cont), 'session')}
+    asts = parse_multiple_lists(blocks['external'])
     ast1 = ""
     for ast in asts:
         ast1 = ast1 + str(ast) + "\n"
-    print(ast1)
     ast2 = parse_ast(ast1)
     go_code = generate_go_code(ast2)
     return go_code

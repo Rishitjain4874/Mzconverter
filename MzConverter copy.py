@@ -5,7 +5,6 @@ import string
 
 hex_map = {c: hex(ord(c)) for c in string.printable}
 
-
 # AST Generator
 class ASTNode:
     def __str__(self):
@@ -32,8 +31,13 @@ class AsciiDeclaration(ASTNode):
         self.name = name
         self.terminator = terminator
         self.attri_type = attri_type
+        self.additional_attributes = []
+        
     def __repr__(self):
-        return f"AsciiDeclaration(name={self.name}, terminator={self.terminator}, attri_type={self.attri_type})"
+        if not self.additional_attributes or self.additional_attributes == [',']:
+            return f"AsciiDeclaration(name={self.name}, terminator={self.terminator}, attri_type={self.attri_type})"
+        else:
+            return f"AsciiDeclaration(name={self.name}, terminator={self.terminator}, attri_type={self.attri_type}, additional_attributes={self.additional_attributes})"
 class GenericDeclaration(ASTNode):
     def __init__(self, type_name, name):
         self.type_name = type_name
@@ -45,6 +49,7 @@ class GenericDeclaration(ASTNode):
 class Identifier(ASTNode):
     def __init__(self, tag):
         self.tag = tag
+
     def __repr__(self):
         return f"Identified_by(tag={self.tag})"
 
@@ -54,6 +59,7 @@ class Terminator(ASTNode):
 
     def __repr__(self):
         return f"Terminator(value={self.value})"
+
 class Parser:
     def __init__(self, tokens):
         self.tokens = tokens
@@ -98,7 +104,7 @@ class Parser:
             else:
                 declarations.append(self.parse_generic_declaration())
         return declarations
-    
+
     def parse_identified_by(self):
         self.consume('identified_by')
         self.consume('(')
@@ -116,13 +122,14 @@ class Parser:
             if self.pos < len(self.tokens) and self.tokens[self.pos] == 'ascii':
                 ascii_declaration1.append(self.parse_ascii_declaration())
         return Identifier(identifier)
-    
+
     def parse_ascii_declaration(self):
         self.consume('ascii')
         name = self.consume()
         self.consume(':')
         terminator = None
         attri_type = 'str'
+        additional_attributes = []
         
         while self.pos < len(self.tokens) and self.tokens[self.pos] != ';':
             token = self.tokens[self.pos]
@@ -132,28 +139,33 @@ class Parser:
                 attri_type = self.parse_attri_type()
                 if self.pos < len(self.tokens) and self.tokens[self.pos] == ',':
                     self.consume(',')
-                
             else:
+                additional_attributes.append(token)
                 self.consume()
+        
         if self.pos < len(self.tokens) and self.tokens[self.pos] == ';':
             self.consume(';')  
         elif self.pos < len(self.tokens) and self.tokens[self.pos] == '}':
             self.consume('}')
-        return AsciiDeclaration(name, terminator, attri_type)
+        
+        ascii_decl = AsciiDeclaration(name, terminator, attri_type)
+        ascii_decl.additional_attributes = additional_attributes
+        return ascii_decl
 
     def parse_generic_declaration(self):
         type_name = self.consume()
         name = self.consume()
         self.consume(';')
         return GenericDeclaration(type_name, name)
-    
+
     def parse_attri_type(self):
         attri_type = self.consume()
+        base = None
         if self.pos < len(self.tokens) and self.tokens[self.pos] == '(':
             self.consume('(')
             base = self.consume()
             self.consume(')')
-        return attri_type, base
+        return attri_type if not base else (attri_type, base)
 
     def parse_terminator(self):
         self.consume('terminated_by')
@@ -168,7 +180,7 @@ class Parser:
             value = symbol_to_hex(value)
         self.consume(')')
         return Terminator(value)
-    
+
 def symbol_to_hex(symbol):
     return symbol.encode('utf-8').hex()
 
@@ -280,7 +292,7 @@ def parse_ast(ast_str):
     external_declaration_pattern = r"ExternalDeclaration\(name=(\w+), declarations=\[(.*?)\]\)"
     ascii_declaration_pattern = r"AsciiDeclaration\(name=([^,]+),\s*terminator=Terminator\(value=(0x[0-9A-Fa-f]+)\),\s*attri_type=(str|\('int', 'base\d+'\)|\('long', 'base\d+'\))\)"
     generic_declaration_pattern = r"GenericDeclaration\(type_name=(\w+), name=(\w+)\)"
-    identifed_by_pattern = r"Identified_by\(tag=(\w+), \[AsciiDeclaration\(name=([^,]+),\s*terminator=Terminator\(value=(0x[0-9A-Fa-f]+)\),\s*attri_type=(str|\('int', 'base\d+'\)|\('long', 'base\d+'\))\)\]\)"
+    identifed_by_pattern = r"Identified_by\(tag=(\w+)\), AsciiDeclaration\(name=([^,]+),\s*terminator=Terminator\(value=(0x[0-9A-Fa-f]+)\),\s*attri_type=(str|\('int', 'base\d+'\)|\('long', 'base\d+'\)),\s*additional_attributes=(.*?)\)"
     # Extract individual ASTs from the provided string
     ast_matches = re.findall(external_declaration_pattern, ast_str, re.DOTALL)
     if not ast_matches:
@@ -290,6 +302,7 @@ def parse_ast(ast_str):
     for match in ast_matches:
         name = match[0]
         declarations_str = match[1]
+        print(declarations_str)
         declarations = []
         for declaration_match in re.finditer(ascii_declaration_pattern, declarations_str):
             declaration_name = declaration_match.group(1)
@@ -304,11 +317,14 @@ def parse_ast(ast_str):
             declaration = GenericDeclaration(type_name=type_name, name=declaration_name)
             declarations.append(declaration)
         for declaration_match in re.finditer(identifed_by_pattern, declarations_str):
+            print('test 01')
             tag = declaration_match.group(1)
             declaration_name = declaration_match.group(2)
             terminator_value = declaration_match.group(3).strip()
             attri_type = declaration_match.group(4)
-            declaration = Identifier(tag=tag, attributes=AsciiDeclaration(name=declaration_name, terminator=Terminator(value=terminator_value), attri_type=attri_type))
+            additional_attributes = declaration_match.group(5).split(', ')
+            attributes = AsciiDeclaration(name=declaration_name, terminator=Terminator(value=terminator_value), attri_type=attri_type, additional_attributes=additional_attributes)
+            declaration = Identifier(tag=tag, attributes=attributes)
             declarations.append(declaration)
         external_declarations.append(ExternalDeclaration(name=name, declarations=declarations))
 
@@ -317,7 +333,7 @@ def parse_ast(ast_str):
 
 # Read the file and process
 
-file = 'sampleUltraFormat copy 2.txt'
+file = 'sampleUltraFormat.txt'
 with open(file, 'r') as f:
     content = f.read()
 block_value_ext = check_Ext_int(getcontentfile(content), 'external')
