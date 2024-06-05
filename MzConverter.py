@@ -174,7 +174,7 @@ class Parser:
                 self.consume(')')
             elif token == 'terminated_by':
                 terminator = self.parse_terminator()
-            elif token in ['int', 'str', 'long']:
+            elif token in ['int', 'str', 'long', 'byte', 'short', 'bigint']:
                 attri_type = self.parse_attri_type()
                 if self.pos < len(self.tokens) and self.tokens[self.pos] == ',':
                     self.consume(',')
@@ -239,8 +239,9 @@ def parse_multiple_lists(token_lists):
             ast = parser.parse()
             asts.append(ast)
         except Exception as e:
-            print(f"Error parsing AST: {e}")
+            print(f"Error parsing AST: {e}, for token {tokens}")
             continue
+    print(asts)
     return asts
 
 # Text parsing functions
@@ -390,7 +391,10 @@ def parse_ast(ast_str):
             declaration_name = declaration_match.group(1)
             terminator_value = declaration_match.group(2).strip()
             attri_type = declaration_match.group(3)
-            declaration = AsciiDeclaration(name=declaration_name, terminator=Terminator(value=terminator_value), attri_type=attri_type)
+            if declaration_name == 'tag':
+                continue
+            else:
+                declaration = AsciiDeclaration(name=declaration_name, terminator=Terminator(value=terminator_value), attri_type=attri_type)
             declarations.append(declaration)
 
         for declaration_match in re.finditer(ascii_declaration_pattern1, declarations_str):
@@ -401,7 +405,7 @@ def parse_ast(ast_str):
             static_size_value = int(declaration_match.group(5))
             declaration = AsciiDeclaration(name=declaration_name, terminator=None, attri_type=attri_type, align_value=align_value, padded_value=padded_value, static_size_value=static_size_value)
             declarations.append(declaration)
-
+        
         for declaration_match in re.finditer(generic_declaration_pattern, declarations_str):
             type_name = declaration_match.group(1)
             declaration_name = declaration_match.group(2)
@@ -412,7 +416,7 @@ def parse_ast(ast_str):
     return external_declarations
 
 # Read the file and process
-'''
+
 file = 'sampleUltraFormat.txt'
 with open(file, 'r') as f:
     content = f.read()
@@ -444,4 +448,4 @@ def receive_tokens_ext():
     return go_code
 
 if __name__ == '__main__':
-    app.run(port=5011)
+    app.run(port=5011)'''

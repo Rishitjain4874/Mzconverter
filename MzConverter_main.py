@@ -317,7 +317,7 @@ def parse_ast(ast_str):
 
 # Read the file and process
 
-file = 'sampleUltraFormat copy 2.txt'
+file = 'sampleUltraFormat copy.txt'
 with open(file, 'r') as f:
     content = f.read()
 block_value_ext = check_Ext_int(getcontentfile(content), 'external')
