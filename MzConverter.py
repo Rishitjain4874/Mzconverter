@@ -251,11 +251,13 @@ def check_Ext_int(tokens, key):
     preview_list = []
     in_block = False
     skip_next_close_brace = False
+    prev_token = None
     for i in tokens:
         if i in ['external', 'internal', 'in_map', 'out_map', 'session'] and i != key:
             in_block = False
-        if i == key:    
-            in_block = True
+        if i == key:
+            if prev_token == '\n' or prev_token == None:
+                in_block = True
         elif i == '}':
             if in_block:
                 if skip_next_close_brace:
@@ -278,6 +280,7 @@ def check_Ext_int(tokens, key):
             if i == 'set':
                 skip_next_close_brace = True
             block.append(i)
+        prev_token = i
     return block_value
 
 def getcontentfile(content):
@@ -332,6 +335,12 @@ def generate_go_code(external_declarations):
                     go_code += f"\t{declaration.name} Int64 `mzConverter: terminated_by({terminator_value}), base({(eval(attri_value))[1]})\"`\n"
                 elif 'long' in attri_value:
                     go_code += f"\t{declaration.name} Decimal.decimal `mzConverter: terminated_by({terminator_value}), base({eval((attri_value))[1]})\"`\n"
+                elif 'byte' in attri_value:
+                    go_code += f"\t{declaration.name} byte `mzConverter: terminated_by({terminator_value})\"`\n"
+                elif 'short' in attri_value:
+                    go_code += f"\t{declaration.name} int16 `mzConverter: terminated_by({terminator_value}), base({eval((attri_value))[1]})\"`\n"
+                elif 'bigint' in attri_value:
+                    go_code += f"\t{declaration.name} big.Int `mzConverter: terminated_by({terminator_value}), base({eval((attri_value))[1]})\"`\n"
 
             elif isinstance(declaration, GenericDeclaration):
                 go_code += f"\t{declaration.name} {declaration.type_name}\n"
@@ -361,7 +370,7 @@ def symbol_to_hex(symbol):
 def parse_ast(ast_str):
     # Define regex patterns to match the AST representation
     external_declaration_pattern = r"ExternalDeclaration\(name=(\w+), declarations=\[(.*?)\]\)"
-    ascii_declaration_pattern = r"AsciiDeclaration\(name=([^,]+), terminator=Terminator\(value=([^)]+)\), \s*attri_type=(str|\('int', 'base(\d+)'\)|\('long', 'base(\d+)'\))"
+    ascii_declaration_pattern = r"AsciiDeclaration\(name=([^,]+), terminator=Terminator\(value=([^)]+)\), \s*attri_type=(str|\('int', 'base(\d+)'\)|\('long', 'base(\d+)'\)|\('short', 'base(\d+)'\)|\('bigint', 'base(\d+)'\))"
     ascii_declaration_pattern1 = r"AsciiDeclaration\(name=([^,]+), \s*attri_type=(str|\('int', 'base\d+'\)|\('long', 'base\d+'\)), \s*align_value=([^,]+), \s*padded_value=([^,]+), \s*static_size_value=(\d+)\)"
     generic_declaration_pattern = r"GenericDeclaration\(type_name=(\w+), name=(\w+)\)"
     identified_by_pattern = r"Identified_by\(tag=([^,]+), AsciiDeclaration\(name=([^,]+), terminator=Terminator\(value=([^)]+)\), \s*attri_type=(str|\('int', 'base(\d+)'\)|\('long', 'base(\d+)'\))(?:, align_value=([^,]+))?(?:, padded_value=([^,]+))?(?:, static_size_value=(\d+))?(?:, encoded_value=([^,]+))?(?:, externalonly=([^,]+))?(?:, additional_attributes=\[(.*?)\])?\)"
