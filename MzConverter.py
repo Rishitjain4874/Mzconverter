@@ -73,6 +73,16 @@ class Terminator(ASTNode):
     def __repr__(self):
         return f"Terminator(value={self.value})"
 
+class SetDeclaration(ASTNode):
+    def __init__(self, name, varname, field, query, query_nxt):
+        self.name = name
+        self.varname = varname
+        self.field = field
+        self.query = query
+        self.query_nxt = query_nxt
+
+    def __repr__(self):
+        return f"SetDeclaration(name={self.name}, varname={self.varname}, field={self.field}, query={self.query}, query_nxt={self.query_nxt})" 
 class Parser:
     def __init__(self, tokens):
         self.tokens = tokens
@@ -103,31 +113,89 @@ class Parser:
             self.consume('}')
             self.consume(';')
         return ExternalDeclaration(name, declarations)
-
+    
     def parse_declaration_list(self):
         declarations = []
+        if 'set' in self.tokens:
+            declarations.append(self.parse_set())
         while self.pos < len(self.tokens) and self.tokens[self.pos] != '}':
             if self.tokens[self.pos] in ['\n', '']:
                 self.pos += 1
                 continue
-            if self.tokens[self.pos] == 'ascii':
+            elif self.tokens[self.pos] == 'ascii':
                 declarations.append(self.parse_ascii_declaration())
             elif self.tokens[self.pos] == 'identified_by':
                 declarations.append(self.parse_identified_by())
             else:
                 declarations.append(self.parse_generic_declaration())
         return declarations
+    def parse_set(self):
+        self.consume('\n')
+        if self.tokens[self.pos] == 'set':
+            self.consume('set')
+            self.consume('{')
+            while self.pos + 3 < len(self.tokens) and self.tokens[self.pos] != '}' and self.tokens[self.pos + 1] != ';' and self.tokens[self.pos + 2] != '\n':
+                self.consume('\n')
+                while self.tokens[self.pos] != '}':
+                    name = self.consume()
+                    varname = self.consume()
+                    if self.tokens[self.pos] == ':':
+                        self.consume(':')
+                    else:
+                        pass
+                    field = self.consume()   
+                    self.consume(';')
+                    self.consume('\n')
+
+                self.consume('}')
+                self.consume(';')
+                self.consume('\n')
+                self.consume(';')
+                self.consume('\n')
+                while self.tokens[self.pos] != '}':
+                    query = self.consume()
+                    if self.tokens[self.pos] == ':':
+                        self.consume(':')
+                    else:
+                        pass
+                    query_nxt = self.consume()
+                    self.consume(';')
+                    self.consume('\n')
+                
+        print(name, varname, field, query, query_nxt)
+        return SetDeclaration(name, varname, field, query, query_nxt)
 
     def parse_identified_by(self):
         self.consume('identified_by')
         self.consume('(')
-        self.consume('tag')
-        self.consume('=')
-        self.consume('=')
-        self.consume('"')
-        identifier = self.consume()
-        self.consume('"')
-        self.consume(')')
+        if self.tokens[self.pos] == 'tag':
+            self.consume('tag')
+            self.consume('=')
+            self.consume('=')
+            self.consume('"')
+            identifier = self.consume()
+            self.consume('"')
+            self.consume(')')
+        elif self.tokens[self.pos] == 'strStartsWith':
+            self.consume('strStartsWith')
+            self.consume('(')
+            self.consume()
+            self.consume(',')
+            self.consume('"')
+            identifier = self.consume()
+            self.consume('"')
+            self.consume(')')
+            self.consume(')')
+        elif self.tokens[self.pos] == 'strContains':
+            self.consume('strContains')
+            self.consume('(')
+            self.consume()
+            self.consume(',')
+            self.consume('"')
+            identifier = self.consume()
+            self.consume('"')
+            self.consume(')')
+            self.consume(')')
         self.consume('{')
         ascii_declaration1 = []
         if self.pos < len(self.tokens) and self.tokens[self.pos] == 'ascii':
@@ -279,7 +347,9 @@ def check_Ext_int(tokens, key):
         elif in_block:
             if i == 'set':
                 skip_next_close_brace = True
-            block.append(i)
+                block.append(i)
+            else:
+                block.append(i)
         prev_token = i
     return block_value
 
@@ -368,17 +438,14 @@ def symbol_to_hex(symbol):
         return symbol
     return hex_map.get(symbol, None)
 def parse_ast(ast_str):
-    # Define regex patterns to match the AST representation
     external_declaration_pattern = r"ExternalDeclaration\(name=(\w+), declarations=\[(.*?)\]\)"
     ascii_declaration_pattern = r"AsciiDeclaration\(name=([^,]+), terminator=Terminator\(value=([^)]+)\), \s*attri_type=(str|\('int', 'base(\d+)'\)|\('long', 'base(\d+)'\)|\('short', 'base(\d+)'\)|\('bigint', 'base(\d+)'\))"
     ascii_declaration_pattern1 = r"AsciiDeclaration\(name=([^,]+), \s*attri_type=(str|\('int', 'base\d+'\)|\('long', 'base\d+'\)), \s*align_value=([^,]+), \s*padded_value=([^,]+), \s*static_size_value=(\d+)\)"
     generic_declaration_pattern = r"GenericDeclaration\(type_name=(\w+), name=(\w+)\)"
     identified_by_pattern = r"Identified_by\(tag=([^,]+), AsciiDeclaration\(name=([^,]+), terminator=Terminator\(value=([^)]+)\), \s*attri_type=(str|\('int', 'base(\d+)'\)|\('long', 'base(\d+)'\))(?:, align_value=([^,]+))?(?:, padded_value=([^,]+))?(?:, static_size_value=(\d+))?(?:, encoded_value=([^,]+))?(?:, externalonly=([^,]+))?(?:, additional_attributes=\[(.*?)\])?\)"
-    # Extract individual ASTs from the provided string
     ast_matches = re.findall(external_declaration_pattern, ast_str, re.DOTALL)
     if not ast_matches:
         raise ValueError("Invalid AST format")
-    
     external_declarations = []
     for match in ast_matches:
         name = match[0]
