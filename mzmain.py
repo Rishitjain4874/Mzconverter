@@ -51,6 +51,7 @@ class AsciiDeclaration(ASTNode):
             return f"AsciiDeclaration(name={self.name}, terminator={self.terminator}, attri_type={self.attri_type}, encoded_value={self.encoded_value}, externalonly={self.externalonly}, additional_attributes={self.additional_attributes})"
         elif not self.additional_attributes or self.additional_attributes == [','] or self.encoded_value == None or self.externalonly == None or self.align_value == None or self.padded_value == None or self.static_size_value == None and self.terminator != None:
             return f"AsciiDeclaration(name={self.name}, terminator={self.terminator}, attri_type={self.attri_type})"
+
 class GenericDeclaration(ASTNode):
     def __init__(self, type_name, name):
         self.type_name = type_name
@@ -83,6 +84,58 @@ class SetDeclaration(ASTNode):
 
     def __repr__(self):
         return f"SetDeclaration(name={self.name}, varname={self.varname}, field={self.field}, query={self.query}, query_nxt={self.query_nxt})" 
+
+class Asn_LengthDeclaration(ASTNode):
+    def __init__(self, name, terminator, options=None):
+        self.name = name
+        self.terminator = terminator
+        self.options = options
+
+    def __repr__(self):
+        if self.options:
+            return f"Asn_LengthDeclaration(name={self.name}, terminator={self.terminator}, options={self.options})"
+        else:
+            return f"Asn_LengthDeclaration(name={self.name}, terminator={self.terminator})"
+
+class BcdDeclaration(ASTNode):
+    def __init__(self, name, terminator, order):
+        self.name = name
+        self.terminator = terminator
+        self.order = order
+
+    def __repr__(self):
+        return f"BcdDeclaration(name={self.name}, terminator={self.terminator}, order={self.order})"
+
+class EbcdicDeclaration(ASTNode):
+    def __init__(self, name, terminator, additional_attributes=None):
+        self.name = name
+        self.terminator = terminator
+        self.additional_attributes = additional_attributes or []
+
+    def __repr__(self):
+        if self.additional_attributes:
+            return f"EbcdicDeclaration(name={self.name}, terminator={self.terminator}, additional_attributes={self.additional_attributes})"
+        else:
+            return f"EbcdicDeclaration(name={self.name}, terminator={self.terminator})"
+
+class Msp_LengthDeclaration(ASTNode):
+    def __init__(self, name, externalonly):
+        self.name = name
+        self.externalonly = externalonly
+
+    def __repr__(self):
+        return f"Msp_LengthDeclaration(name={self.name}, externalonly={self.externalonly})"
+
+class ListDeclaration(ASTNode):
+    def __init__(self, name, terminator, element_type, element_count):
+        self.name = name
+        self.terminator = terminator
+        self.element_type = element_type
+        self.element_count = element_count
+
+    def __repr__(self):
+        return f"ListDeclaration(name={self.name}, terminator={self.terminator}, element_type={self.element_type}, element_count={self.element_count})"
+
 class Parser:
     def __init__(self, tokens):
         self.tokens = tokens
@@ -98,8 +151,8 @@ class Parser:
         self.pos += 1
         if expected_value and token != expected_value:
             raise SyntaxError(f"Expected {expected_value}, got {token}")
-        return token
-
+        return token    
+    
     def parse_external_declaration(self):
         name = self.consume()
         if self.tokens[self.pos] == '{':
@@ -126,9 +179,92 @@ class Parser:
                 declarations.append(self.parse_ascii_declaration())
             elif self.tokens[self.pos] == 'identified_by':
                 declarations.append(self.parse_identified_by())
+            elif self.tokens[self.pos] == 'asn_length':
+                declarations.append(self.parse_asn_length_declaration())
+            elif self.tokens[self.pos] == 'bcd':
+                declarations.append(self.parse_bcd_declaration())
+            elif self.tokens[self.pos] == 'ebcdic':
+                declarations.append(self.parse_ebcdic_declaration())
+            elif self.tokens[self.pos] == 'msp_length':
+                declarations.append(self.parse_msp_length_declaration())
+            elif self.tokens[self.pos] == 'list':
+                declarations.append(self.parse_list_declaration())
             else:
                 declarations.append(self.parse_generic_declaration())
         return declarations
+
+    def parse_asn_length_declaration(self):
+        self.consume('asn_length')
+        name = self.consume()
+        self.consume(':')
+        terminator = self.parse_terminator()
+        options = None
+        if self.tokens[self.pos] == 'content_only':
+            self.consume('content_only')
+            options = 'content_only'
+        return Asn_LengthDeclaration(name, terminator, options)
+
+    def parse_bcd_declaration(self):
+        self.consume('bcd')
+        name = self.consume()
+        self.consume(':')
+        terminator = self.parse_terminator()
+        order = None
+        if self.tokens[self.pos] == 'msn_fd':
+            self.consume('msn_fd')
+            order = 'msn_fd'
+        elif self.tokens[self.pos] == 'lsn_fd':
+            self.consume('lsn_fd')
+            order = 'lsn_fd'
+        return BcdDeclaration(name, terminator, order)
+
+    def parse_ebcdic_declaration(self):
+        self.consume('ebcdic')
+        name = self.consume()
+        self.consume(':')
+        terminator = self.parse_terminator()
+        additional_attributes = []
+        while self.pos < len(self.tokens) and self.tokens[self.pos] != ';':
+            token = self.tokens[self.pos]
+            if token in ['character_encoding']:
+                additional_attributes.append(self.parse_additional_attribute())
+            else:
+                self.consume()
+        if self.pos < len(self.tokens) and self.tokens[self.pos] == ';':
+            self.consume(';')
+        return EbcdicDeclaration(name, terminator, additional_attributes)
+
+    def parse_msp_length_declaration(self):
+        self.consume('msp_length')
+        name = self.consume()
+        self.consume(':')
+        externalonly = self.consume('external_only')
+        self.consume(';')
+        return Msp_LengthDeclaration(name, externalonly)
+
+    def parse_list_declaration(self):
+        self.consume('list')
+        self.consume('<')
+        element_type = self.consume()
+        self.consume('>')
+        name = self.consume()
+        self.consume(':')
+        terminator = self.parse_terminator()
+        self.consume('element_count')
+        self.consume('(')
+        element_count = self.consume()
+        self.consume(')')
+        self.consume(';')
+        return ListDeclaration(name, terminator, element_type, element_count)
+
+    def parse_additional_attribute(self):
+        attribute_name = self.consume()
+        self.consume('(')
+        attribute_value = self.consume('"')
+        self.consume('"')
+        self.consume(')')
+        return f"{attribute_name}({attribute_value})"
+    
     def parse_set(self):
         self.consume('\n')
         if self.tokens[self.pos] == 'set':
@@ -162,7 +298,6 @@ class Parser:
                     self.consume(';')
                     self.consume('\n')
 
-        print(name, varname, field, query, query_nxt)
         return SetDeclaration(name, varname, field, query, query_nxt)
 
     def parse_identified_by(self):
@@ -311,7 +446,6 @@ def parse_multiple_lists(token_lists):
             continue
     print(asts)
     return asts
-
 # Text parsing functions
 def check_Ext_int(tokens, key):
     block = []
@@ -378,7 +512,6 @@ def getcontentfile(content):
         token1.append('\n')
     return token1
 
-# Go code generator
 def generate_go_code(external_declarations):
     go_code = "package main\n\n"
     for external_declaration in external_declarations:
@@ -432,11 +565,11 @@ def generate_go_code(external_declarations):
         go_code += "}\n\n"
     return go_code
 
-
 def symbol_to_hex(symbol):
     if isinstance(symbol, str) and symbol.startswith("0x"):
         return symbol
     return hex_map.get(symbol, None)
+
 def parse_ast(ast_str):
     external_declaration_pattern = r"ExternalDeclaration\(name=(\w+), declarations=\[(.*?)\]\)"
     ascii_declaration_pattern = r"AsciiDeclaration\(name=([^,]+), terminator=Terminator\(value=([^)]+)\), \s*attri_type=(str|\('int', 'base(\d+)'\)|\('long', 'base(\d+)'\)|\('short', 'base(\d+)'\)|\('bigint', 'base(\d+)'\))"
@@ -491,8 +624,6 @@ def parse_ast(ast_str):
         external_declarations.append(ExternalDeclaration(name=name, declarations=declarations))
     return external_declarations
 
-# Read the file and process
-
 file = 'sampleUltraFormat.txt'
 with open(file, 'r') as f:
     content = f.read()
@@ -524,4 +655,4 @@ def receive_tokens_ext():
     return go_code
 
 if __name__ == '__main__':
-    app.run(port=5011)'''
+    app.run(port=5011)'''               
