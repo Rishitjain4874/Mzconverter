@@ -154,7 +154,13 @@ class Parser:
     
     def parse_external_declaration(self):
         name = self.consume()
-        if self.tokens[self.pos] == '{':
+        if self.tokens[self.pos] == '\n':
+            self.consume('\n')
+            self.consume("{")
+            declarations = self.parse_declaration_list()
+            self.consume('}')
+            self.consume(';')
+        elif self.tokens[self.pos] == '{':
             self.consume('{')
             declarations = self.parse_declaration_list()
             self.consume('}')
@@ -591,6 +597,8 @@ def parse_ast(ast_str):
         declarations_str = match[1]
         if 'Terminator' in match[1].split("AsciiDeclaration")[0]:
             external_terminator = match[1].split("AsciiDeclaration")[0].replace(",","").replace("Terminator(value=","").replace(")","").replace(" ","")
+        else:
+            external_terminator = None 
         declarations = []
         for declaration_match in re.finditer(identified_by_pattern, declarations_str):
             tag = declaration_match.group(1)
@@ -631,36 +639,58 @@ def parse_ast(ast_str):
             declarations.append(declaration)
         external_declarations.append(ExternalDeclaration(name=name, declarations=declarations, external_terminator=external_terminator))
     return external_declarations
-'''
-file = 'UDLF files/Test3.udlf'
-with open(file, 'r') as f:
-    content = f.read()
-block_value_ext = check_Ext_int(getcontentfile(content), 'external')
-asts = parse_multiple_lists(block_value_ext)
-ast1 = ""
-for ast in asts:
-    ast1 = ast1 + str(ast) + "\n"
-ast2 = parse_ast(ast1)
-go_code = generate_go_code(ast2)
-print(go_code)
 
-'''
-app = Flask(__name__)
-@app.route('/', methods=['POST'])
-def receive_tokens_ext():
-    cont = request.data.decode('utf-8')
-    blocks = {'external':  check_Ext_int(getcontentfile(cont), 'external'),
-        'internal': check_Ext_int(getcontentfile(cont), 'internal'), 
-        'in_map':  check_Ext_int(getcontentfile(cont), 'in_map'), 
-        'out_map':  check_Ext_int(getcontentfile(cont), 'out_map'), 
-        'session':  check_Ext_int(getcontentfile(cont), 'session')}
-    asts = parse_multiple_lists(blocks['external'])
-    ast1 = ""
-    for ast in asts:
-        ast1 = ast1 + str(ast) + "\n"
-    ast2 = parse_ast(ast1)
-    go_code = generate_go_code(ast2)
-    return go_code
+def main_check_code(q, maxfile):
+    while q != maxfile:
+        print(f"\n\n FOR FILE {q}\n\n")
+        file = f'UDLF files/Test{q}.udlf'
+        with open(file, 'r') as f:
+            content = f.read()
+        block_value_ext = check_Ext_int(getcontentfile(content), 'external')
+        asts = parse_multiple_lists(block_value_ext)
+        ast1 = ""
+        for ast in asts:
+            ast1 = ast1 + str(ast) + "\n"
+        ast2 = parse_ast(ast1)
+        go_code = generate_go_code(ast2)
+        print(go_code)
+        print("\n\n^^^^^^^^^^^^^^^^^")
+        q += 1
 
-if __name__ == '__main__':
-    app.run(port=5011) 
+def flask_app():
+    app = Flask(__name__)
+    @app.route('/', methods=['POST'])
+    def receive_tokens_ext():
+        cont = request.data.decode('utf-8')
+        blocks = {'external':  check_Ext_int(getcontentfile(cont), 'external'),
+            'internal': check_Ext_int(getcontentfile(cont), 'internal'), 
+            'in_map':  check_Ext_int(getcontentfile(cont), 'in_map'), 
+            'out_map':  check_Ext_int(getcontentfile(cont), 'out_map'), 
+            'session':  check_Ext_int(getcontentfile(cont), 'session')}
+        asts = parse_multiple_lists(blocks['external'])
+        ast1 = ""
+        for ast in asts:
+            ast1 = ast1 + str(ast) + "\n"
+        ast2 = parse_ast(ast1)
+        go_code = generate_go_code(ast2)
+        return go_code
+    if __name__ == '__main__':
+        app.run(port=5011) 
+
+def main_test_check(q, maxfile):
+    while q != maxfile:
+        file = f'UDLF files/Test{q}.udlf'
+        with open(file, 'r') as f:
+            content = f.read()
+        block_value_ext = check_Ext_int(getcontentfile(content), 'external')
+        asts = parse_multiple_lists(block_value_ext)
+        ast1 = ""
+        for ast in asts:
+            ast1 = ast1 + str(ast) + "\n"
+        ast2 = parse_ast(ast1)
+        go_code = generate_go_code(ast2)
+        print(f'test {q} passed')
+        q += 1
+
+
+main_check_code(1, 16)
