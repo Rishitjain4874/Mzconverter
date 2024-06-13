@@ -11,10 +11,10 @@ class ASTNode:
         return self.__repr__()
 
 class ExternalDeclaration(ASTNode):
-    def __init__(self, name, declarations):
+    def __init__(self, name, declarations, external_terminator=None):
         self.name = name
         self.declarations = declarations
-
+        self.external_terminator = external_terminator
     def __repr__(self):
         return f"ExternalDeclaration(name={self.name}, declarations={self.declarations})"
 
@@ -161,7 +161,6 @@ class Parser:
             self.consume(';')
         elif self.tokens[self.pos] == ':':
             self.consume(':')
-            print('test123')
             declarations = self.parse_declaration_list()
             self.consume('}')
             self.consume(';')
@@ -547,7 +546,7 @@ def generate_go_code(external_declarations):
                     go_code += f"\t{declaration.name} int16 `mzConverter: terminated_by({terminator_value}), base({eval((attri_value))[1]})\"`\n"
                 elif 'bigint' in attri_value:
                     go_code += f"\t{declaration.name} big.Int `mzConverter: terminated_by({terminator_value}), base({eval((attri_value))[1]})\"`\n"
-
+              
             elif isinstance(declaration, GenericDeclaration):
                 go_code += f"\t{declaration.name} {declaration.type_name}\n"
             elif isinstance(declaration, Identifier):
@@ -565,6 +564,10 @@ def generate_go_code(external_declarations):
                             go_code += f"\t{declaration.tag} Int64 `mzConverter: terminated_by({terminator_value_str}), base({(eval(attri_value))[1]})\"`\n"
                         elif 'long' in attri_value:
                             go_code += f"\t{declaration.tag} Decimal.decimal `mzConverter: terminated_by({terminator_value_str}), base({eval((attri_value))[1]})\"`\n"
+        if external_declaration.external_terminator:
+            go_code += f"\t_endRecord string `mzConverter: terminated_by({external_declaration.external_terminator})\"`\n"
+        else:
+            pass
         go_code += "}\n\n"
     return go_code
 
@@ -574,7 +577,7 @@ def symbol_to_hex(symbol):
     return hex_map.get(symbol, None)
 
 def parse_ast(ast_str):
-    external_declaration_pattern = r"ExternalDeclaration\(name=(\w+), declarations=\[(.*?)\]\)"
+    external_declaration_pattern =  r"ExternalDeclaration\(name=(\w+), declarations=\[(.*?)\]\)"
     ascii_declaration_pattern = r"AsciiDeclaration\(name=([^,]+), terminator=Terminator\(value=([^)]+)\), \s*attri_type=(str|\('int', 'base(\d+)'\)|\('long', 'base(\d+)'\)|\('short', 'base(\d+)'\)|\('bigint', 'base(\d+)'\))"
     ascii_declaration_pattern1 = r"AsciiDeclaration\(name=([^,]+), \s*attri_type=(str|\('int', 'base\d+'\)|\('long', 'base\d+'\)), \s*align_value=([^,]+), \s*padded_value=([^,]+), \s*static_size_value=(\d+)\)"
     generic_declaration_pattern = r"GenericDeclaration\(type_name=(\w+), name=(\w+)\)"
@@ -586,6 +589,8 @@ def parse_ast(ast_str):
     for match in ast_matches:
         name = match[0]
         declarations_str = match[1]
+        if 'Terminator' in match[1].split("AsciiDeclaration")[0]:
+            external_terminator = match[1].split("AsciiDeclaration")[0].replace(",","").replace("Terminator(value=","").replace(")","").replace(" ","")
         declarations = []
         for declaration_match in re.finditer(identified_by_pattern, declarations_str):
             tag = declaration_match.group(1)
@@ -618,15 +623,15 @@ def parse_ast(ast_str):
             declaration = AsciiDeclaration(name=declaration_name, terminator=None, attri_type=attri_type, align_value=align_value, padded_value=padded_value, static_size_value=static_size_value)
             declarations.append(declaration)
         
+        
         for declaration_match in re.finditer(generic_declaration_pattern, declarations_str):
             type_name = declaration_match.group(1)
             declaration_name = declaration_match.group(2)
             declaration = GenericDeclaration(type_name=type_name, name=declaration_name)
             declarations.append(declaration)
-
-        external_declarations.append(ExternalDeclaration(name=name, declarations=declarations))
+        external_declarations.append(ExternalDeclaration(name=name, declarations=declarations, external_terminator=external_terminator))
     return external_declarations
-
+'''
 file = 'UDLF files/Test3.udlf'
 with open(file, 'r') as f:
     content = f.read()
@@ -658,4 +663,4 @@ def receive_tokens_ext():
     return go_code
 
 if __name__ == '__main__':
-    app.run(port=5011)  '''
+    app.run(port=5011) 
