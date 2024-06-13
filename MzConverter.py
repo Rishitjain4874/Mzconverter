@@ -450,7 +450,7 @@ def parse_multiple_lists(token_lists):
             ast = parser.parse()
             asts.append(ast)
         except Exception as e:
-            #print(f"Error parsing AST: {e}")
+            print(f"Error parsing AST: {e} in {tokens}")
             continue
     return asts
 # Text parsing functions
@@ -640,21 +640,31 @@ def parse_ast(ast_str):
     return external_declarations
 
 def main_check_code(q, maxfile):
+    failed_Cases = 0
+    failed_Cases_list = []
+    passed_Cases = 0
     while q != maxfile:
-        print(f"\n\n FOR FILE {q}\n\n")
-        file = f'UDLF files/Test{q}.udlf'
-        with open(file, 'r') as f:
-            content = f.read()
-        block_value_ext = check_Ext_int(getcontentfile(content), 'external')
-        asts = parse_multiple_lists(block_value_ext)
-        ast1 = ""
-        for ast in asts:
-            ast1 = ast1 + str(ast) + "\n"
-        ast2 = parse_ast(ast1)
-        go_code = generate_go_code(ast2)
-        print(go_code)
-        print("\n\n^^^^^^^^^^^^^^^^^")
+        try:
+            print(f"\n\n FOR FILE {q}\n\n")
+            file = f'UDLF files/Test{q}.udlf'
+            with open(file, 'r') as f:
+                content = f.read()
+            block_value_ext = check_Ext_int(getcontentfile(content), 'external')
+            asts = parse_multiple_lists(block_value_ext)
+            ast1 = ""
+            for ast in asts:
+                ast1 = ast1 + str(ast) + "\n"
+            ast2 = parse_ast(ast1)
+            go_code = generate_go_code(ast2)
+            print(go_code)
+            print("\n\n^^^^^^^^^^^^^^^^^")
+            passed_Cases += 1
+        except:
+            failed_Cases += 1
+            failed_Cases_list.append(q)
+            pass
         q += 1
+        print(f"Total Passed Cases: {passed_Cases}, Total Failed Cases: {failed_Cases}", f"Failed Cases: {failed_Cases_list}")
 
 def flask_app():
     app = Flask(__name__)
@@ -703,4 +713,4 @@ def main_check_test(q, maxfile):
     print(f"Total Passed Cases: {passed_Cases}, Total Failed Cases: {failed_Cases}")
     print(f"Failed Cases: {failed_Cases_list}")
 
-main_check_test(1,83)
+main_check_code(1,83)
