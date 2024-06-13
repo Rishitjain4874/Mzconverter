@@ -1,0 +1,38 @@
+external estelExternal{
+	ascii accountType					:  terminated_by("@");
+	ascii circleId 		    			:  terminated_by("@");
+	ascii companyCode       			:  terminated_by("@");
+	ascii customerAccountId 			:  terminated_by("@");
+	ascii subscriptionType  			:  terminated_by("@");
+	ascii agentCode 					:  terminated_by("@");
+	ascii amount 						:  terminated_by("@");
+	ascii channelId 					:  terminated_by("@");
+	ascii ChannelTransId 				:  terminated_by("@");
+	ascii customerId 					:  terminated_by("@");
+	ascii PaymentGatewayTransId 		:  terminated_by("@");
+	ascii posCode 						:  terminated_by("@");
+	ascii PlanID 						:  terminated_by("@");
+	ascii productName 					:  terminated_by("@");
+	ascii OrderReferenceNo 				:  terminated_by("@");
+	ascii serviceId 					:  terminated_by("@");
+	ascii serviceType					:  terminated_by("@");
+	ascii technicalId 					:  terminated_by("@");
+	ascii processFee					:  terminated_by("@");
+	ascii customerPreBal 				:  terminated_by("@");
+	ascii customerPostBal 				:  terminated_by("@");
+	ascii taxName						:  terminated_by("@");		
+    ascii taxValue						:  terminated_by("@");		
+    ascii CCtransactionReferenceNumber	:  terminated_by(0xA);
+};
+
+in_map in_map_estel : external(estelExternal), target_internal(estel){
+	automatic;
+};
+
+decoder estelDecoder : in_map (in_map_estel);
+
+out_map out_map_estel : external(estelExternal), internal(estel){
+	automatic;
+};
+
+encoder estelEncoder : out_map (out_map_estel);

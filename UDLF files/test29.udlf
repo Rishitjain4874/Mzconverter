@@ -1,0 +1,83 @@
+external AsntoCsv_ext{\u000d
+    ascii servedIMSI                                                 : terminated_by(",");\u000d
+    ascii userLocationInformation_CGI_CGI_mccmnc                     : terminated_by(",");\u000d
+    ascii userLocationInformation_CGI_CI                             : terminated_by(",");\u000d
+    ascii userLocationInformation_CGI_LAC                            : terminated_by(",");\u000d
+    ascii userLocationInformation_SAI_SAI_mccmnc                     : terminated_by(",");\u000d
+    ascii userLocationInformation_SAI_LAC                            : terminated_by(",");\u000d
+    ascii userLocationInformation_SAI_SAC                            : terminated_by(",");\u000d
+    ascii userLocationInformation_RAI_RAI_mccmnc                     : terminated_by(",");\u000d
+    ascii userLocationInformation_RAI_LAC                            : terminated_by(",");\u000d
+    ascii userLocationInformation_RAI_RAC                            : terminated_by(",");\u000d
+    ascii userLocationInformation_ECGI_ECGI_mccmnc                   : terminated_by(",");\u000d
+    ascii userLocationInformation_ECGI_ECI                           : terminated_by(",");\u000d
+    ascii userLocationInformation_TAI_TAI_mccmnc                     : terminated_by(",");\u000d
+    ascii userLocationInformation_TAI_TAC                            : terminated_by(",");\u000d
+    ascii userLocationInformation_LAI_LAI_mccmnc                     : terminated_by(",");\u000d
+    ascii userLocationInformation_LAI_LAC                            : terminated_by(",");  \u000d
+    ascii servedMSISDN                                               : terminated_by(",");\u000d
+    ascii rATType                                                    : terminated_by(",");\u000d
+    ascii recordOpeningTime                                          : terminated_by(",");\u000d
+    ascii listofservicedata_datavolumeFBCUplink                      : terminated_by(",");\u000d
+    ascii listofservicedata_datavolumeFBCDownlink                    : terminated_by(",");\u000d
+    ascii listofservicedata_ratingGroup                              : terminated_by(",");\u000d
+    ascii listofservicedata_userLocationInformation_ECGI_ECGI_mccmnc : terminated_by(",");\u000d
+    ascii listofservicedata_userLocationInformation_ECGI_ECI         : terminated_by(",");\u000d
+    ascii listofservicedata_serviceConditionChange                   : terminated_by(",");\u000d
+    ascii listofservicedata_timeOfReport                             : terminated_by(",");\u000d
+    ascii listofservicedata_duration                                 : terminated_by(",");\u000d
+    ascii duration                                                   : terminated_by(",");\u000d
+    ascii chargingID                                                 : terminated_by(",");\u000d
+    ascii causeForRecClosing                                         : terminated_by(",");\u000d
+    ascii localSequenceNumber                                        : terminated_by(",");\u000d
+    ascii tWANUserLocationInformation_bSSID                          : terminated_by(",");\u000d
+    ascii tWANUserLocationInformation_sSID                           : terminated_by(",");\u000d
+    ascii accessPointNameNI 						 				 : terminated_by(",");	\u000d
+	ascii apnSelectionMode 						 	 				 : terminated_by(",");\u000d
+    ascii cAMELChargingInformation	                                 : terminated_by(",");\u000d
+	ascii chargingCharacteristics 				 	 				 : terminated_by(",");	\u000d
+	ascii chChSelectionMode 						 				 : terminated_by(",");	\u000d
+    ascii cNOperatorSelectionEnt                                     : terminated_by(",");	\u000d
+    ascii servedPDPPDNAddress_sTSIAddress                            : terminated_by(",");\u000d
+    ascii servedPDPPDNAddressIPv4                                    : terminated_by(",");\u000d
+    ascii servedPDPPDNAddressIPv6                                    : terminated_by(",");\u000d
+    ascii p_GWAddressIPv4                                            : terminated_by(",");\u000d
+    ascii p_GWAddressIPv6                                            : terminated_by(",");\u000d
+	ascii dynamicAddressFlag 						 				 : terminated_by(",");	\u000d
+	ascii mSTimeZone 								 				 : terminated_by(",");	\u000d
+	ascii nodeID 									 				 : terminated_by(",");\u000d
+	ascii gsm0408Cause 							 	 				 : terminated_by(",");\u000d
+	ascii listofservicedata_chargingRuleBaseName 	 				 : terminated_by(",");\u000d
+	ascii listofservicedata_aRP 					 				 : terminated_by(",");\u000d
+	ascii listofservicedata_guaranteedBitrateDL 	 				 : terminated_by(",");\u000d
+	ascii listofservicedata_guaranteedBitrateUL 	 				 : terminated_by(",");\u000d
+	ascii listofservicedata_maxRequestedBandwithDL 	 				 : terminated_by(",");\u000d
+	ascii listofservicedata_maxRequestedBandwithUL 	 				 : terminated_by(",");\u000d
+	ascii listofservicedata_qCI 					 				 : terminated_by(",");\u000d
+	ascii listofservicedata_serviceIdentifier 	 	 				 : terminated_by(",");\u000d
+	ascii listofservicedata_userLocInfo_TAI_mccmnc   				 : terminated_by(",");\u000d
+	ascii p_GWPLMNIdentifier 						 				 : terminated_by(",");\u000d
+	ascii pDNConnectionID 						  	 				 : terminated_by(",");\u000d
+	ascii pdpPDNType 								 				 : terminated_by(",");\u000d
+	ascii recordType 								 				 : terminated_by(",");\u000d
+	ascii servedIMEISV 	 						 	 				 : terminated_by(",");\u000d
+	ascii ueLocalIpAddressiPBinV4Address						 	 : terminated_by(",");\u000d
+	ascii ueLocalIpAddressiPBinV6Address 				 			 : terminated_by(",");\u000d
+    ascii uePort                                                     : terminated_by(",");\u000d
+    ascii outputCode                                                 : terminated_by(",");\u000d
+    ascii outputType                                                 : terminated_by(",");\u000d
+	ascii servingNodePLMNIdentifier						 			 : terminated_by(0xA);                                                         \u000d
+};\u000d
+\u000d
+in_map asnTocsv_in_map : external(AsntoCsv_ext), target_internal(asn_To_csv_TI){\u000d
+    automatic;\u000d
+};\u000d
+\u000d
+decoder asnTocsvDec : in_map(asnTocsv_in_map);\u000d
+\u000d
+out_map asnTocsv_out_map : external(AsntoCsv_ext), internal(asn_To_csv_TI){\u000d
+   automatic;\u000d
+};\u000d
+\u000d
+encoder asnTocsv_Enc : out_map(asnTocsv_out_map);   \u000d
+  

@@ -1,0 +1,48 @@
+external BIExternal{
+	ascii callingNumBI   		: terminated_by(",");
+    ascii calledNumBI           : terminated_by(",");
+    ascii callStartDate         : terminated_by(",");
+    ascii callStartTime         : terminated_by(",");
+    ascii callEndDate           : terminated_by(",");
+    ascii callEndTime           : terminated_by(",");
+    ascii durationInS           : terminated_by(",");
+    ascii subsFirstCi           : terminated_by(",");
+    ascii subsLastCi            : terminated_by(",");
+    ascii callType              : terminated_by(",");
+    ascii Imei                  : terminated_by(",");
+    ascii Imsi                  : terminated_by(",");
+    ascii imsVisitedNetworkID   : terminated_by(",");
+    ascii firstRoamingCircleID  : terminated_by(",");
+    ascii locRoutingNumber      : terminated_by(",");
+    ascii cNumber               : terminated_by(",");
+    ascii paniHeader            : terminated_by(",");
+    ascii iCID                  : terminated_by(",");
+    ascii recordTypeBI          : terminated_by(",");
+    ascii operatorInfo          : terminated_by(",");
+    ascii callLocationType      : terminated_by(",");
+    ascii callHomeRoamCircleInfo: terminated_by(",");
+    ascii wlnWlsInfo            : terminated_by(",");
+    ascii sdcaFixedLevel        : terminated_by(",");
+    ascii translatedNumber      : terminated_by(",");
+    //new added
+    ascii homeCircleCode        : terminated_by(",");
+	ascii causeForForward       : terminated_by(",");
+    ascii causeForRecordClosing : terminated_by(",");
+	ascii onlineChargingFailure : terminated_by(",");
+	ascii sourceName            : terminated_by(",");
+	ascii otherpartyOperator    : terminated_by(",");
+	ascii otherpartyCircle      : terminated_by(",");
+    ascii endUserNAI            : terminated_by(0xA);
+};
+
+in_map bi_im : external (BIExternal) , internal(tasInternal){
+	automatic;
+};
+
+out_map bi_om : external (BIExternal) , internal(tasInternal){
+	automatic;
+};
+
+decoder BI_Decoder : in_map (bi_im);
+
+encoder BI_Encoder : out_map(bi_om);

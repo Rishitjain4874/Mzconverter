@@ -1,0 +1,1301 @@
+/*******To change delimitor in sub-fields*******/
+external Record
+{
+    ascii RecTerminator  : terminated_by(0xA);
+    
+};
+in_map Record_im : external(Record), target_internal(Record_TI){
+    automatic;
+};
+decoder RecordDec : in_map(Record_im);
+out_map Record_om : external(Record), internal(Record_TI){
+    automatic;
+};
+encoder RecordEnc : out_map(Record_om);
+/*******To change delimitor in sub-fields*******/
+
+/*******To decode header*******/
+external Header : identified_by (SONUSNetworks == "Sonus Networks, Inc.")
+{
+    ascii SONUSNetworks     : static_size(20);
+    ascii Reserved1         : static_size(8);
+    ascii OldCAMFileVersion : static_size(2);
+    ascii EventLogType      : static_size(2);
+    ascii Reserved2         : static_size(2);
+    ascii NewCAMFileVersion : static_size(8);
+    ascii Reserved3         : static_size(8);
+    ascii HexOffset         : static_size(4);
+    ascii SoftwareRevision  : static_size(13);
+    ascii Reserved4         : static_size(29);
+    ascii FileExtension     : static_size(3);
+    ascii FileCreationTime  : static_size(16);
+    ascii Reserved5         : static_size(12);
+    ascii HeaderTerminator  : terminated_by(0xA);//static_size(1);
+    //ascii space             :terminated_by(0xA);
+};
+in_map Header_im : external(Header), target_internal(Header_TI),discard_output{
+    automatic;
+};
+decoder HeaderDec : in_map(Header_im);
+out_map Header_om : external(Header), internal(Header_TI){
+    automatic;
+};
+encoder HeaderEnc : out_map(Header_om);
+/*******To decode header*******/
+
+/***************Stop Record*****************/
+external StopRecord : identified_by(RecordType == "STOP")
+{
+    set {
+        ErrDrop error : optional;
+    }; 
+    ascii RecordType                                            : terminated_by(",");
+    ascii GatewayName                                           : terminated_by(",");
+    ascii AccountingID                                          : terminated_by(",");
+    ascii StartTimeSystemTicks                                  : terminated_by(",");
+    ascii NodeTimeZone                                          : terminated_by(",");
+    ascii StartDate                                             : terminated_by(",");
+    ascii StartTime                                             : terminated_by(",");
+    ascii TicksFromSetupMsgToPolicyResponse                     : terminated_by(",");
+    ascii TicksFromSetupMsgToAlertProcProg                      : terminated_by(",");
+    ascii TicksFromSetupMsgToServiceEst                         : terminated_by(","),long(base10);
+    ascii DisconnectDate                                        : terminated_by(",");
+    ascii DisconnectTime                                        : terminated_by(",");
+    ascii TicksFromDisconnectToCallTermination                  : terminated_by(","),long(base10);
+    ascii CallServiceDuration                                   : terminated_by(","),long(base10);
+    ascii CallDisconnectReason                                  : terminated_by(",");
+    ascii ServiceDelivered                                      : terminated_by(",");
+    ascii CallDirection                                         : terminated_by(",");
+    ascii ServiceProvider                                       : terminated_by(",");
+    ascii TransitNetworkSelectionCode                           : terminated_by(",");
+    ascii CallingNumber                                         : terminated_by(",");
+    ascii CalledNumber                                          : terminated_by(",");
+    ascii ExtraCalledAddressDigits                              : terminated_by(",");
+    ascii NumberofCalledNumTranslations                         : terminated_by(",");
+    ascii CalledNumberBeforeTranslation1                        : terminated_by(",");
+    ascii TranslationType1                                      : terminated_by(",");
+    ascii CalledNumberBeforeTranslation2                        : terminated_by(",");
+    ascii TranslationType2                                      : terminated_by(",");
+    ascii BillingNumber                                         : terminated_by(",");
+    ascii RouteLabel                                            : terminated_by(",");
+    ascii RouteAttemptNumber                                    : terminated_by(",");
+    ascii RouteSelected                                         : terminated_by(",");
+    ascii EgressLocalSignalingIPAddress                         : terminated_by(",");
+    ascii EgressRemoteSignalingIPAddress                        : terminated_by(",");
+    ascii IngressTrunkGroupName                                 : terminated_by(",");
+    ascii IngressPSTNCircuitEndPoint                            : terminated_by(",");
+    ascii IngressIPCircuitEndPoint                              : terminated_by(",");
+    ascii EgressPSTNCircuitEndPoint                             : terminated_by(",");
+    ascii EgressIPCircuitEndPoint                               : terminated_by(",");
+    ascii IngressNumberOfAudioBytesSent                         : terminated_by(","); 
+    ascii IngressNumberOAudioPacketsSent                        : terminated_by(",");
+    ascii IngressNumberOfAudioBytesReceived                     : terminated_by(",");
+    ascii IngressNumberOfAudioPacketsReceived                   : terminated_by(",");
+    ascii OriginatingLineInformation                            : terminated_by(",");
+    ascii JurisdictionInformationParameter                      : terminated_by(",");
+    ascii CarrierCode                                           : terminated_by(",");
+    ascii CallGroupID                                           : terminated_by(",");
+    ascii ScriptLogData                                         : terminated_by(",");
+    ascii TicksFromSetupMsgToRxOfEXM                            : terminated_by(",");
+    ascii TicksFromSetupMsgToGenerationOfEXM                    : terminated_by(",");
+    ascii CallingPartyNatureOfAddress                           : terminated_by(",");
+    ascii CalledPartyNatureOfAddress                            : terminated_by(",");
+    ascii IngressProtocolVariantSpecificData                    : terminated_by(",");
+    ascii IngressSignalingType                                  : terminated_by(",");
+    ascii EgressSignalingType                                   : terminated_by(",");
+    ascii IngressFarEndSwitchType                               : terminated_by(",");
+    ascii EgressFarEndSwitchType                                : terminated_by(",");
+    ascii CarrierCodeWhoOwnsiTGFarEnd                           : terminated_by(",");       //name change
+    ascii CarrierCodeWhoOwnseTGFarEnd                           : terminated_by(",");
+    ascii CallingPartyCategory                                  : terminated_by(",");
+    ascii DialedNumber                                          : terminated_by(",");
+    ascii CarrierSelectionInformation                           : terminated_by(",");
+    ascii CalledNumberNumberingPlan                             : terminated_by(",");
+    ascii GenericAddressParameter                               : terminated_by(",");
+    ascii DisconnectInitiator                                   : terminated_by(",");
+    ascii IngressNumberOfPacketsRecordedAsLost                  : terminated_by(",");
+    ascii IngressInterarrivalPacketJitter                       : terminated_by(",");
+    ascii IngressLastMeasurementForLatency                      : terminated_by(",");
+    ascii EgressTrunkGroupName                                  : terminated_by(",");
+    ascii EgressProtocolVariantSpecificData                     : terminated_by(",");
+    ascii IncomingCallingNumber                                 : terminated_by(",");
+    ascii AMACallType                                           : terminated_by(",");
+    ascii MessageBillingIndicator                               : terminated_by(",");
+    ascii LATA                                                  : terminated_by(","); //name
+    ascii RouteIndexUsed                                        : terminated_by(",");
+    ascii CallingPartyPresentationRestriction                   : terminated_by(",");
+    ascii IncomingISUPChargeNumber                              : terminated_by(",");
+    ascii IncomingISUPNatureOfAddress                           : terminated_by(",");
+    ascii DialedNumberNatureOfAddress                           : terminated_by(",");
+    ascii IngressCodecInfo                                      : terminated_by(",");
+    ascii EgressCodecInfo                                       : terminated_by(",");
+    ascii IngressRTPPacketizationTime                           : terminated_by(",");
+    ascii GlobalCallID                                          : terminated_by(",");
+    ascii OriginatorEchoCancellation                            : terminated_by(",");
+    ascii TerminatorEchoCancellation                            : terminated_by(",");
+    ascii ChargeFlag                                            : terminated_by(",");
+    ascii AMASlpID                                              : terminated_by(",");
+    ascii AMABAFModule                                          : terminated_by(",");
+    ascii AMASetHexABIndication                                 : terminated_by(",");
+    ascii ServiceFeatureID                                      : terminated_by(",");
+    ascii FEParameter                                           : terminated_by(",");
+    ascii SatelliteIndicator                                    : terminated_by(",");
+    ascii PSXBillingInfo                                        : terminated_by(",");
+    ascii OriginatingTDMTrunkGroupType                          : terminated_by(",");
+    ascii TerminatingTDMTrunkGroupType                          : terminated_by(",");
+    ascii IngressTrunkMemberNumber                              : terminated_by(",");
+    ascii EgressTrunkGroupID                                    : terminated_by(",");
+    ascii EgressSwitchID                                        : terminated_by(",");
+    ascii IngressLocalATMAddress                                : terminated_by(",");
+    ascii IngressRemoteATMAddress                               : terminated_by(",");
+    ascii EgressLocalATMAddress                                 : terminated_by(",");
+    ascii EgressRemoteATMAddress                                : terminated_by(",");
+    ascii PSXCallType                                           : terminated_by(","); //name
+    ascii OutgoingRouteTrunkGroupID                             : terminated_by(",");
+    ascii OutgoingRouteMessageID                                : terminated_by(",");
+    ascii IncomingRouteID                                       : terminated_by(",");
+    ascii CallingName                                           : terminated_by(",");
+    ascii CallingNameType                                       : terminated_by(",");
+    ascii IncomingCallingPartyNumberingPlan                     : terminated_by(",");
+    ascii OutgoingCallingPartyNumberingPlan                     : terminated_by(",");
+    ascii CallingPartyBusinessGroupID                           : terminated_by(",");
+    ascii CalledPartyBusinessGroupID                            : terminated_by(",");
+    ascii CallingPartyPPDN                                      : terminated_by(",");
+    ascii TicksFromSetupMsgToLastRouteAttempt                   : terminated_by(",");
+    ascii BillingNumberNatureOfAddress                          : terminated_by(",");
+    ascii IncomingCallingNumberNatureofAddress                  : terminated_by(",");
+    ascii EgressTrunkMemberNumber                               : terminated_by(",");
+    ascii SelectedRouteType                                     : terminated_by(",");
+    ascii TelcordiaLongDurationRecordType                       : terminated_by(",");
+    ascii TicksFromPreviousRecord                               : terminated_by(",");
+    ascii CumulativeRouteIndex                                  : terminated_by(",");
+    ascii CallDisconnectReasonSentToIngress                     : terminated_by(",");
+    ascii CallDisconnectReasonSentToEgress                      : terminated_by(",");
+    ascii ISDNPRICallingPartySubaddress                         : terminated_by(",");
+    ascii OutgoingTrunkGroupNumberInEXM                         : terminated_by(",");
+    ascii IngressLocalSignalingIPAddress                        : terminated_by(",");
+    ascii IngressRemoteSignalingIPAddress                       : terminated_by(",");
+    ascii RecordSequenceNumber                                  : terminated_by(","),int(base10);
+    ascii TransmissionMediumRequirement                         : terminated_by(",");
+    ascii InformationTransferRate                               : terminated_by(",");
+    ascii UserInfoLayer1                                        : terminated_by(",");
+    ascii UnrecognizedRawISUPCallingPartyCategory               : terminated_by(",");
+    ascii FSDEgressReleaseLinkTrunking                          : terminated_by(",");
+    ascii FSDTwoBChannelTransfer                                : terminated_by(",");
+    ascii CallingPartyBusinessUnit                              : terminated_by(",");
+    ascii CalledPartyBusinessUnit                               : terminated_by(",");
+    ascii RedirectionFeatureSpecificData                        : terminated_by(",");
+    ascii FSDIngressReleaseLinkTrunking                         : terminated_by(","); //name
+    ascii PSXIndex                                              : terminated_by(",");
+    ascii PSXCongestionLevel                                    : terminated_by(",");
+    ascii PSXProcessingTime                                     : terminated_by(",");
+    ascii ScriptName                                            : terminated_by(",");
+    ascii IngressExternalAccountingData                         : terminated_by(",");
+    ascii EgressExternalAccountingData                          : terminated_by(",");
+    ascii EgressRTPPacketizationTime                            : terminated_by(",");
+    ascii EgressNumberOfAudioBytesSent                          : terminated_by(",");
+    ascii EgressNumberOfAudioPacketsSent                        : terminated_by(",");
+    ascii EgressNumberOfAudioBytesReceived                      : terminated_by(",");
+    ascii EgressNumberOfAudioPacketsReceived                    : terminated_by(",");
+    ascii EgressNumberOfPacketsRecordedAsLost                   : terminated_by(",");
+    ascii EgressInterarrivalPacketJitter                        : terminated_by(",");
+    ascii EgressLastMeasurementForLatency                       : terminated_by(",");
+    ascii IngressMaximumPacketOutage                            : terminated_by(",");
+    ascii EgressMaximumPacketOutage                             : terminated_by(",");
+    ascii IngressPacketPlayoutBufferQuality                     : terminated_by(",");
+    ascii EgressPacketPlayoutBufferQuality                      : terminated_by(",");
+    ascii AnswerSupervisionType                                 : terminated_by(",");
+    ascii IngressSipReferOrSipReplacesFeatureSpecificData       : terminated_by(",");
+    ascii EgressSipReferOrSipReplacesFeatureSpecificData        : terminated_by(",");
+    ascii NetworkTransfersFeatureSpecificData                   : terminated_by(",");
+    ascii CallCondition                                         : terminated_by(",");    
+    ascii TollIndicator                                         : terminated_by(",");
+    ascii GenericNumber                                         : terminated_by(",");
+    ascii GenericNumberPresentationRestrictionIndicator         : terminated_by(",");
+    ascii GenericNumberingPlan                                  : terminated_by(",");
+    ascii GenericNumberNatureOfAddress                          : terminated_by(",");
+    ascii GenericNumberType                                     : terminated_by(",");
+    ascii OriginatingTrunkType                                  : terminated_by(",");
+    ascii TerminatingTrunkType                                  : terminated_by(",");
+    ascii RemoteGSXBillingIndicator                             : terminated_by(",");
+    ascii VPNCallingPrivatePresenceNumber                       : terminated_by(",");
+    ascii VPNCallingPublicPresenceNumber                        : terminated_by(",");
+    ascii ExternalFurnishChargingInfo                           : terminated_by(",");
+    ascii IngressPolicingDiscards                               : terminated_by(",");
+    ascii EgressPolicingDiscards                                : terminated_by(",");
+    ascii AnnouncementId                                        : terminated_by(",");
+    ascii NetworkDataSourceInformation                          : terminated_by(",");
+    ascii NetworkDataPartitionID                                : terminated_by(",");
+    ascii NetworkDataNetworkID                                  : terminated_by(",");
+    ascii NetworkDataNCOS                                       : terminated_by(",");
+    ascii IngressSRTP                                           : terminated_by(",");
+    ascii EgressSRTP                                            : terminated_by(",");
+    ascii ISDNAccessIndicator                                   : terminated_by(",");
+    ascii CallDisconnectLocation                                : terminated_by(",");
+    ascii CallDisconnectLocationTransmittedToIngress            : terminated_by(",");
+    ascii CallDisconnectLocationTransmittedToEgress             : terminated_by(",");
+    ascii NetworkCallReferenceCallIdentity                      : terminated_by(",");
+    ascii NetworkCallReferenceSignalingPointCode                : terminated_by(",");
+    ascii IngressMIMEProtocolVariantSpecificData                : terminated_by(",");
+    ascii EgressMIMEProtocolVariantSpecificData                 : terminated_by(",");
+    ascii ModemToneType                                         : terminated_by(",");
+    ascii ModemToneSignalLevel                                  : terminated_by(",");
+    ascii VideoData                                             : terminated_by(",");
+    ascii VideoStatistics                                       : terminated_by(",");
+    ascii SVSCustomer                                           : terminated_by(",");
+    ascii SVSVendor                                             : terminated_by(",");
+    ascii CallToTestPSX                                         : terminated_by(",");
+    ascii PSXOverlapRouteRequests                               : terminated_by(",");
+    ascii CallSetupDelay                                        : terminated_by(",");
+    ascii OverloadStatus                                        : terminated_by(",");
+    ascii ReservedSp1                                            : terminated_by(",");
+    ascii Reserved1                                             : terminated_by(",");
+    ascii IngressDSPDataBitmap                                  : terminated_by(",");
+    ascii EgressDSPDataBitmap                                   : terminated_by(",");
+    ascii CallRecordedIndicator                                 : terminated_by(",");
+    ascii CallRecordedRTPTxIpAddress                            : terminated_by(",");
+    ascii CallRecordedRTPTxPortNumber                           : terminated_by(",");
+    ascii CallRecordedRTPRvIpAddress                            : terminated_by(",");
+    ascii CallRecordedRTPRvPortNumber                           : terminated_by(",");
+    ascii MLPPPrecedenceLevel                                   : terminated_by(",");
+    ascii Reserved2                                             : terminated_by(",");
+    ascii Reserved3                                             : terminated_by(",");
+    ascii Reserved4                                             : terminated_by(",");
+    ascii Reserved5                                             : terminated_by(",");
+    ascii Reserved6                                             : terminated_by(",");
+    ascii Reserved7                                             : terminated_by(",");
+    ascii Reserved8                                             : terminated_by(",");
+    //ascii Reserved9                                             : terminated_by(",");
+    ascii GlobalChargeReference                                 : terminated_by(",");
+    ascii Reserved10                                             : terminated_by(",");
+    ascii Reserved11                                            : terminated_by(",");
+    ascii Reserved12                                            : terminated_by(",");
+    ascii Reserved13                                            : terminated_by(",");
+    ascii Reserved14                                            : terminated_by(",");
+    ascii Reserved15                                            : terminated_by(",");
+    ascii Reserved16                                            : terminated_by(",");
+    ascii Reserved17                                            : terminated_by(",");
+    //ascii Reserved18                                             : terminated_by(",");
+    ascii IngressInboundRFactor                                 : terminated_by(",");
+    ascii IngressOutbountRFactor                                : terminated_by(",");
+    ascii EgressInboundRFactor                                  : terminated_by(",");
+    ascii EgressOutbountRFactor                                 : terminated_by(",");
+    ascii MediaStreamData                                       : terminated_by(",");
+    ascii MediaStreamStats                                      : terminated_by(",");
+    ascii TranscodedIndicator                                   : terminated_by(",");
+    ascii HDCodecRate                                           : terminated_by(",");
+    ascii RemoteIngressAudioRTCPLearnedMetrics                  : terminated_by(",");
+    ascii RemoteEgressAudioRTCPLearnedMetrics                   : terminated_by(",");
+    ascii ReservedForFinalRouteLabel                            : terminated_by(",");
+    ascii MTAInformation                                        : terminated_by(",");
+    ascii VBRCommonBillingData                                  : terminated_by(",");
+    ascii VBRRouteBillingData                                   : terminated_by(",");
+    ascii AccessNetworkChargingInformation                      : terminated_by(",");//shifted up
+    ascii AccessTransferSpecificData                            : terminated_by(",");
+    ascii EmergencyIndicator                                    : terminated_by(",");
+    ascii DtlsSrtpIngressStatusInfo                             : terminated_by(",");
+    ascii DtlsSrtpEgressStatusInfo                              : terminated_by(",");
+    ascii UERoamingStatus                                       : terminated_by(",");
+    //ascii AccessNetworkChargingInformation                      : terminated_by(",");
+    ascii IngressSignaledSessionBandwidthInkbps                 : terminated_by(",");
+    ascii IngressRxComputedSessionBandwidthInkbps               : terminated_by(",");
+    ascii IngressTxComputedSessionBandwidthInkbps               : terminated_by(",");
+    ascii IngressConfiguredBandwidthReductionFactor             : terminated_by(",");
+    ascii IngressEstimatedBandwidthReductionFactor              : terminated_by(",");
+    ascii EgressSignaledSessionBandwidthInkbps                  : terminated_by(",");
+    ascii EgressRxComputedSessionBandwidthInkbps                : terminated_by(",");
+    ascii EgressTxComputedSessionBandwidthInkbps                : terminated_by(",");
+    ascii EgressConfiguredBandwidthReductionFactor              : terminated_by(",");
+    ascii EgressEstimatedBandwidthReductionFactor               : terminated_by(",");
+    ascii AdditionalMediaStreamStatistics                       : terminated_by(",");
+    ascii IngressZoneName                                       : terminated_by(",");
+    ascii EgressZoneName                                        : terminated_by(",");
+    ascii IngressZoneId                                         : terminated_by(",");
+    ascii EgresssZoneId                                         : terminated_by(",");
+    ascii VideoCac                                              : terminated_by(",");
+    ascii IngressIpPrefixTgName                                 : terminated_by(",");
+    ascii TranscodeResourceType                                 : terminated_by(",");
+    ascii MRFINFORMATION                                        : terminated_by(",");
+    ascii ParentCallGCID                                        : terminated_by(",");
+    ascii CallRecorder1RTPTxIpAddress                           : terminated_by(",");
+    ascii CallRecorder1RTPTxPortNumber                          : terminated_by(",");
+    ascii CallRecorder1RTPRxIpAddress                           : terminated_by(",");
+    ascii CallRecorder1RTPRxPortNumber                          : terminated_by(",");
+    ascii CallRecorder2RTPTxIpAddress                           : terminated_by(",");
+    ascii CallRecorder2RTPTxPortNumber                          : terminated_by(",");
+    ascii CallRecorder2RTPRxIpAddress                           : terminated_by(",");
+    ascii CallRecorder2RTPRxPortNumber                          : terminated_by(",");
+    ascii CallRecorder3RTPTxIpAddress                           : terminated_by(",");
+    ascii CallRecorder3RTPTxPortNumber                          : terminated_by(",");
+    ascii CallRecorder3RTPRxIpAddress                           : terminated_by(",");
+    ascii CallRecorded3RTPRxPortNumber                          : terminated_by(",");
+    ascii SignallingOnlyMode                                    : terminated_by(",");
+    ascii AudioStreamStatis                                     : terminated_by(",");
+    ascii AudioStreamRTCPXRVoicemetricStats                     : terminated_by(",");
+    ascii MediaStreamSRTPStats                                  : terminated_by(",");
+    ascii DSPInsertionRejectionReason                           : terminated_by(",");
+    ascii CallEstablishedTime									: terminated_by(",");
+    ascii OverFlowPacketsCount									: terminated_by(",");
+    ascii IngressTrunkGroupforPSXRouting						: terminated_by(",");
+    ascii T140Information										: terminated_by(",");
+    ascii RemoteT140RTCPLearnedMetrics							: terminated_by(",");
+    ascii VtpInformation										: terminated_by(",");
+    ascii BeepToneInserted										: terminated_by(",");
+    ascii DirectionOfBeepTone									: terminated_by(",");
+    ascii StartTimeLocal										: terminated_by(",");
+    ascii DisconnectTimeLocal									: terminated_by(",");
+    ascii CallEstablishedTimeLocal								: terminated_by(",");
+    ascii Guid													: terminated_by(",");
+    ascii MediaIPSecInformation									: terminated_by(",");
+    ascii NoodeName												: terminated_by(",");
+    ascii PodName												: terminated_by(",");
+    ascii ContainerID											: terminated_by(",");
+    ascii IngressIdentityHeadersReceived						: terminated_by(",");
+    ascii EgressIdentityHeadersSent								: terminated_by(0xA);
+     
+    
+};
+in_map StopRecord_im : external(StopRecord), target_internal(StopRecord_TI){
+     automatic{
+         ErrDrop : using in_map ErrDrop_im;
+     };
+};
+decoder StopRecordDec : in_map(StopRecord_im);
+out_map StopRecord_om : external(StopRecord), internal(StopRecord_TI){
+    automatic;
+};
+encoder StopRecordEnc : out_map(StopRecord_om); 
+/***************Stop Record*****************/
+
+/***************Start Record*****************/
+external StartRecord : identified_by(RecordType == "START")
+{
+    set {
+        ErrDrop error : optional;
+    };
+    ascii RecordType                                            : terminated_by(",");
+    ascii GatewayName                                           : terminated_by(",");
+    ascii AccountingID                                          : terminated_by(",");
+    ascii StartTimeSystemTicks                                  : terminated_by(",");
+    ascii NodeTimeZone                                          : terminated_by(",");
+    ascii StartDate                                             : terminated_by(",");
+    ascii StartTime                                             : terminated_by(",");
+    ascii TimeElapsedFrmReceiptOfSetupMsgToPolicyServerSoftSwResp                     : terminated_by(",");
+    ascii TimeElapsedFrmReceiptOfSetupMsgToAlertingProcProg                           : terminated_by(",");
+    ascii TimeElapsedFrmReceiptOfSetupMsgToServiceEstablished                         : terminated_by(",");
+    ascii ServiceDelivered                                      : terminated_by(",");
+    ascii CallDirection                                         : terminated_by(",");
+    ascii ServiceProvider                                       : terminated_by(",");
+    ascii TransitNetworkSelectionCode                           : terminated_by(",");
+    ascii CallingNumber                                         : terminated_by(",");
+    ascii CalledNumber                                          : terminated_by(",");
+    ascii ExtraCalledAddressDigits                              : terminated_by(",");
+    ascii NumberofCalledNumTranslations                         : terminated_by(",");
+    ascii CalledNumberBeforeTranslation1                        : terminated_by(",");
+    ascii TranslationType1                                      : terminated_by(",");
+    ascii CalledNumberBeforeTranslation2                        : terminated_by(",");
+    ascii TranslationType2                                      : terminated_by(",");
+    ascii BillingNumber                                         : terminated_by(",");
+    ascii RouteLabel                                            : terminated_by(",");
+    ascii RouteAttemptNumber                                    : terminated_by(",");
+    ascii RouteSelected                                         : terminated_by(",");
+    ascii EgressLocalSignalingIPAddress                         : terminated_by(",");
+    ascii EgressRemoteSignalingIPAddress                        : terminated_by(",");
+    ascii IngressTrunkGroupName                                 : terminated_by(",");
+    ascii IngressPSTNCircuitEndPoint                            : terminated_by(",");
+    ascii IngressIPCircuitEndPoint                              : terminated_by(",");
+    ascii EgressPSTNCircuitEndPoint                             : terminated_by(",");
+    ascii EgressIPCircuitEndPoint                               : terminated_by(",");
+    ascii OriginatingLineInformation                            : terminated_by(",");
+    ascii JurisdictionInformationParameter                      : terminated_by(",");
+    ascii CarrierCode                                           : terminated_by(",");
+    ascii CallGroupID                                           : terminated_by(",");
+    ascii TicksFromSetupMsgToRxOfEXM                            : terminated_by(",");
+    ascii TicksFromSetupMsgToGenerationOfEXM                    : terminated_by(",");
+    ascii CallingPartyNatureOfAddress                           : terminated_by(",");
+    ascii CalledPartyNatureOfAddress                            : terminated_by(",");
+    ascii IngressProtocolVariantSpecificData                    : terminated_by(",");
+    ascii IngressSignalingType                                  : terminated_by(",");
+    ascii EgressSignalingType                                   : terminated_by(",");
+    ascii IngressFarEndSwitchType                               : terminated_by(",");
+    ascii EgressFarEndSwitchType                                : terminated_by(",");
+    ascii CarrierCodeWhoOwnsiTGFarEnd                           : terminated_by(","); //1,2 name
+    ascii CarrierCodeWhoOwnseTGFarEnd                           : terminated_by(",");
+    ascii CallingPartyCategory                                  : terminated_by(",");
+    ascii DialedNumber                                          : terminated_by(",");
+    ascii CarrierSelectionInformation                           : terminated_by(",");
+    ascii CalledNumberNumberingPlan                             : terminated_by(",");
+    ascii GenericAddressParameter                               : terminated_by(",");
+    ascii EgressTrunkGroupName                                  : terminated_by(",");
+    ascii EgressProtocolVariantSpecificData                     : terminated_by(",");
+    ascii IncomingCallingNumber                                 : terminated_by(",");
+    ascii AMACallType                                           : terminated_by(",");
+    ascii MessageBillingIndicator                               : terminated_by(",");
+    ascii LATA                                                  : terminated_by(",");
+    ascii RouteIndexUsed                                        : terminated_by(",");
+    ascii CallingPartyPresentationRestriction                   : terminated_by(",");
+    ascii IncomingISUPChargeNumber                              : terminated_by(",");
+    ascii IncomingISUPNatureOfAddress                           : terminated_by(",");
+    ascii DialedNumberNatureOfAddress                           : terminated_by(",");
+    ascii GlobalCallID                                          : terminated_by(",");
+    ascii ChargeFlag                                            : terminated_by(",");
+    ascii AMASlpID                                              : terminated_by(",");
+    ascii AMABAFModule                                          : terminated_by(",");
+    ascii AMASetHexABIndication                                 : terminated_by(",");
+    ascii ServiceFeatureID                                      : terminated_by(",");
+    ascii FEParameter                                           : terminated_by(",");
+    ascii SatelliteIndicator                                    : terminated_by(",");
+    ascii PSXBillingInfo                                        : terminated_by(",");
+    ascii OriginatingTDMTrunkGroupType                          : terminated_by(",");
+    ascii TerminatingTDMTrunkGroupType                          : terminated_by(",");
+    ascii IngressTrunkMemberNumber                              : terminated_by(",");
+    ascii EgressTrunkGroupID                                    : terminated_by(",");
+    ascii EgressSwitchID                                        : terminated_by(",");
+    ascii IngressLocalATMAddress                                : terminated_by(",");
+    ascii IngressRemoteATMAddress                               : terminated_by(","); 
+    ascii EgressLocalATMAddress                                 : terminated_by(",");
+    ascii EgressRemoteATMAddress                                : terminated_by(",");
+    ascii PSXCallType                                           : terminated_by(",");
+    ascii OutgoingRouteTrunkGroupID                             : terminated_by(",");
+    ascii OutgoingRouteMessageID                                : terminated_by(",");
+    ascii IncomingRouteID                                       : terminated_by(",");
+    ascii CallingName                                           : terminated_by(",");
+    ascii CallingNameType                                       : terminated_by(",");
+    ascii IncomingCallingPartyNumberingPlan                     : terminated_by(",");
+    ascii OutgoingCallingPartyNumberingPlan                     : terminated_by(",");
+    ascii CallingPartyBusinessGroupID                           : terminated_by(",");
+    ascii CalledPartyBusinessGroupID                            : terminated_by(",");
+    ascii CallingPartyPPDN                                      : terminated_by(",");
+    ascii TicksFromSetupMsgToLastRouteAttempt                   : terminated_by(",");
+    ascii BillingNumberNatureOfAddress                          : terminated_by(",");
+    ascii IncomingCallingNumberNatureofAddress                  : terminated_by(",");
+    ascii EgressTrunkMemberNumber                               : terminated_by(",");
+    ascii SelectedRouteType                                     : terminated_by(",");
+    ascii CumulativeRouteIndex                                  : terminated_by(",");
+    ascii ISDNPRICallingPartySubaddress                         : terminated_by(",");
+    ascii OutgoingTrunkGroupNumberInEXM                         : terminated_by(",");
+    ascii IngressLocalSignalingIPAddress                        : terminated_by(",");
+    ascii IngressRemoteSignalingIPAddress                       : terminated_by(",");
+    ascii RecordSequenceNumber                                  : terminated_by(",");
+    ascii TransmissionMediumRequirement                         : terminated_by(",");
+    ascii InformationTransferRate                               : terminated_by(",");
+    ascii UserInfoLayer1                                        : terminated_by(",");
+    ascii UnrecognizedRawISUPCallingPartyCategory               : terminated_by(",");
+    ascii FSDEgressReleaseLinkTrunking                          : terminated_by(",");
+    ascii FSDTwoBChannelTransfer                                : terminated_by(",");
+    ascii CallingPartyBusinessUnit                              : terminated_by(",");
+    ascii CalledPartyBusinessUnit                               : terminated_by(",");
+    ascii RedirectionFeatureSpecificData                        : terminated_by(",");
+    ascii IngressRLTFeatureSpecificData                         : terminated_by(",");
+    ascii PSXIndex                                              : terminated_by(",");
+    ascii PSXCongestionLevel                                    : terminated_by(",");
+    ascii PSXProcessingTime                                     : terminated_by(",");
+    ascii ScriptName                                            : terminated_by(",");
+    ascii IngressExternalAccountingData                         : terminated_by(",");
+    ascii EgressExternalAccountingData                          : terminated_by(",");
+    ascii AnswerSupervisionType                                 : terminated_by(",");
+    ascii IngressSipReferOrSipReplacesFeatureSpecificData       : terminated_by(",");
+    ascii EgressSipReferOrSipReplacesFeatureSpecificData        : terminated_by(",");
+    ascii NetworkTransfersFeatureSpecificData                   : terminated_by(",");
+    ascii CallCondition                                         : terminated_by(",");
+    ascii TollIndicator                                         : terminated_by(",");
+    ascii GenericNumber                                         : terminated_by(",");
+    ascii GenericNumberPresentationRestrictionIndicator         : terminated_by(",");
+    ascii GenericNumberingPlan                                  : terminated_by(",");
+    ascii GenericNumberNatureOfAddress                          : terminated_by(",");
+    ascii GenericNumberType                                     : terminated_by(",");
+    ascii OriginatingTrunkType                                  : terminated_by(",");
+    ascii TerminatingTrunkType                                  : terminated_by(",");//shifted from down
+    ascii RemoteGSXBillingIndicator                             : terminated_by(",");
+    ascii VPNCallingPrivatePresenceNumber                       : terminated_by(",");
+    ascii VPNCallingPublicPresenceNumber                        : terminated_by(",");
+    ascii ExternalFurnishChargingInfo                           : terminated_by(",");
+    ascii AnnouncementId                                        : terminated_by(",");
+    ascii NetworkDataSourceInformation                          : terminated_by(","); //1,2,3 name
+    ascii NetworkDataPartitionID                                : terminated_by(",");
+    ascii NetworkDataNetworkID                                  : terminated_by(",");
+    ascii NetworkDataNCOS                                       : terminated_by(",");
+    ascii ISDNAccessIndicator                                   : terminated_by(",");
+    ascii NetworkCallReferenceCallIdentity                      : terminated_by(",");
+    ascii NetworkCallReferenceSignalingPointCode                : terminated_by(",");
+    ascii IngressMIMEProtocolVariantSpecificData                : terminated_by(",");
+    ascii EgressMIMEProtocolVariantSpecificData                 : terminated_by(",");
+    ascii VideoCodecData                                        : terminated_by(",");
+    ascii SVSCustomer                                           : terminated_by(",");
+    ascii SVSVendor                                             : terminated_by(",");
+    //ascii RemoteGSXBillingIndicator                             : terminated_by(",");
+    ascii CallToTestPSX                                         : terminated_by(",");
+    ascii PSXOverlapRouteRequests                               : terminated_by(",");
+    ascii CallSetupDelay                                        : terminated_by(",");  
+    ascii OverloadStatus                                        : terminated_by(",");
+    ascii ReservedIngressBICCInfo                               : terminated_by(",");
+    ascii ReservedEgressBICCInfo                                : terminated_by(",");
+    ascii MLPPPrecedenceLevel                                   : terminated_by(",");
+    ascii ReservedMSRPServiceType                               : terminated_by(",");
+    ascii ReservedNPUKKSplRoutingInfo                           : terminated_by(",");
+    ascii ReservedNPUKKCustIdentification                       : terminated_by(",");
+    ascii ReservedNPUKKServiceType                              : terminated_by(",");
+    ascii ReservedNPSSPSplHandlingInfo                          : terminated_by(",");
+    ascii ReservedNPSSPServiceType                              : terminated_by(",");
+    ascii ReservedONIStr                                        : terminated_by(",");
+    ascii ReservedSuppressONI                                   : terminated_by(",");
+    ascii GlobalChargeReference                                 : terminated_by(",");
+    ascii ReservedForIPCallLimitAtIngressSIPPeer                : terminated_by(",");
+    ascii ReservedForIPCallLimitAtIngressIPTG                   : terminated_by(",");
+    ascii ReservedForIPBWLimitAtIngressIPTG                     : terminated_by(",");
+    ascii ReservedForIPCallLimitAtEgressSIPPeer                 : terminated_by(",");
+    ascii ReservedForIPCallLimitAtEgressIPTG                    : terminated_by(",");
+    ascii ReservedForIPBWLimitAtEgressIPTG                      : terminated_by(",");
+    ascii ReservedForPSXName                                    : terminated_by(",");
+    ascii ReservedForNoOfPSXTried                               : terminated_by(",");
+    ascii ReservedForFinalRouteLabel                            : terminated_by(",");
+    ascii MTAInformation                                        : terminated_by(",");
+    ascii AccessNetworkChargingInformation                      : terminated_by(",");
+    ascii AccessTransferSpecificData                            : terminated_by(",");
+    ascii EmergencyIndicator                                    : terminated_by(",");
+    ascii UERoamingStatus                                       : terminated_by(",");
+    ascii IngressZoneName                                       : terminated_by(",");
+    ascii EgressZoneName                                        : terminated_by(",");
+    ascii IngressZoneId                                         : terminated_by(",");
+    ascii EgressZoneId                                          : terminated_by(",");
+    ascii IngressIpPrefixTgName                                 : terminated_by(",");
+    ascii ParentCallGCID                                        : terminated_by(",");
+    ascii SignallingOnlyMode                                    : terminated_by(",");
+    ascii CallEstablishedTime                                   : terminated_by(",");
+	ascii IngressTrunkGroupForPSXRouting                        : terminated_by(",");
+	ascii StartTimeLocal                                        : terminated_by(",");
+	ascii CallEstablishedTimeLocal                              : terminated_by(",");
+	ascii GUID                                                  : terminated_by(",");
+	ascii NodeName                                              : terminated_by(",");
+	ascii PodName                                               : terminated_by(",");
+	ascii ContainerID                                           : terminated_by(0xA);
+    
+    
+};
+/*
+in_map StartRecord_im : external(StartRecord), target_internal(StartRecord_TI), discard_output{
+     automatic{
+         ErrDrop : using in_map ErrDrop_im;
+     };
+};*/
+in_map StartRecord_im : external(StartRecord), target_internal(StartRecord_TI){
+     automatic{
+         ErrDrop : using in_map ErrDrop_im;
+     };
+};
+decoder StartRecordDec : in_map(StartRecord_im);
+out_map StartRecord_om : external(StartRecord), internal(StartRecord_TI){
+    automatic;
+};
+encoder StartRecordEnc : out_map(StartRecord_om); 
+/***************Start Record*****************/
+
+
+/***************Attempt Record*****************/
+external AttemptRecord : identified_by(RecordType == "ATTEMPT")
+{
+    set {
+        ErrDrop error : optional;
+    }; 
+    ascii RecordType                                            : terminated_by(",");
+    ascii GatewayName                                           : terminated_by(",");
+    ascii AccountingID                                          : terminated_by(",");
+    ascii StartTimeSystemTicks                                  : terminated_by(",");
+    ascii NodeTimeZone                                          : terminated_by(",");
+    ascii StartDate                                             : terminated_by(",");
+    ascii StartTime                                             : terminated_by(",");
+    ascii TicksFromSetupMsgToPolicyResponse                     : terminated_by(",");
+    ascii TicksFromSetupMsgToAlertProcProg                      : terminated_by(",");
+    //ascii TicksFromSetupMsgToServiceEst                         : terminated_by(",");
+    ascii DisconnectDate                                        : terminated_by(",");//shifted up
+    ascii DisconnectTime                                        : terminated_by(",");
+    ascii TimeElapsedfromReceiptofDisconnecttoCompletionofCall  : terminated_by(",");
+    //ascii CallServiceDuration                                   : terminated_by(",");
+    ascii CallDisconnectReason                                  : terminated_by(",");
+    ascii ServiceDelivered                                      : terminated_by(",");
+    ascii CallDirection                                         : terminated_by(",");
+    ascii ServiceProvider                                       : terminated_by(",");
+    ascii TransitNetworkSelectionCode                           : terminated_by(",");
+    ascii CallingNumber                                         : terminated_by(",");
+    ascii CalledNumber                                          : terminated_by(",");
+    ascii ExtraCalledAddressDigits                              : terminated_by(",");
+    ascii NumberofCalledNumTranslations                         : terminated_by(",");
+    ascii CalledNumberBeforeTranslation1                        : terminated_by(",");
+    ascii TranslationType1                                      : terminated_by(",");
+    ascii CalledNumberBeforeTranslation2                        : terminated_by(",");
+    ascii TranslationType2                                      : terminated_by(",");
+    ascii BillingNumber                                         : terminated_by(",");
+    ascii RouteLabel                                            : terminated_by(",");
+    ascii RouteAttemptNumber                                    : terminated_by(",");
+    ascii RouteSelected                                         : terminated_by(",");
+    ascii EgressLocalSignalingIPAddress                         : terminated_by(",");
+    ascii EgressRemoteSignalingIPAddress                        : terminated_by(",");
+    ascii IngressTrunkGroupName                                 : terminated_by(",");
+    ascii IngressPSTNCircuitEndPoint                            : terminated_by(",");
+    ascii IngressIPCircuitEndPoint                              : terminated_by(",");
+    ascii EgressPSTNCircuitEndPoint                             : terminated_by(",");
+    ascii EgressIPCircuitEndPoint                               : terminated_by(",");
+    //ascii IngressNumberOfAudioBytesSent                         : terminated_by(","); 
+    //ascii IngressNumberOAudioPacketsSent                        : terminated_by(",");
+    //ascii IngressNumberOfAudioBytesReceived                     : terminated_by(",");
+    //ascii IngressNumberOfAudioPacketsReceived                   : terminated_by(",");
+    ascii OriginatingLineInformation                            : terminated_by(",");
+    ascii JurisdictionInformationParameter                      : terminated_by(",");
+    ascii CarrierCode                                           : terminated_by(",");
+    ascii CallGroupID                                           : terminated_by(",");
+    ascii ScriptLogData                                         : terminated_by(",");
+    ascii TicksFromSetupMsgToRxOfEXM                            : terminated_by(",");
+    ascii TicksFromSetupMsgToGenerationOfEXM                    : terminated_by(",");
+    ascii CallingPartyNatureOfAddress                           : terminated_by(",");
+    ascii CalledPartyNatureOfAddress                            : terminated_by(",");
+    ascii IngressProtocolVariantSpecificData                    : terminated_by(",");   
+    ascii IngressSignalingType                                  : terminated_by(",");
+    ascii EgressSignalingType                                   : terminated_by(",");
+    ascii IngressFarEndSwitchType                               : terminated_by(",");
+    ascii EgressFarEndSwitchType                                : terminated_by(",");
+    ascii CarrierCodeWhoOwnsiTGFarEnd                           : terminated_by(",");
+    ascii CarrierCodeWhoOwnseTGFarEnd                           : terminated_by(",");
+    ascii CallingPartyCategory                                  : terminated_by(",");
+    ascii DialedNumber                                          : terminated_by(",");
+    ascii CarrierSelectionInformation                           : terminated_by(",");
+    ascii CalledNumberNumberingPlan                             : terminated_by(",");
+    ascii GenericAddressParameter                               : terminated_by(",");
+    ascii DisconnectInitiator                                   : terminated_by(",");
+    //ascii IngressNumberOfPacketsRecordedAsLost                  : terminated_by(",");
+    //ascii IngressInterarrivalPacketJitter                       : terminated_by(",");
+    //ascii IngressLastMeasurementForLatency                      : terminated_by(",");
+    ascii EgressTrunkGroupName                                  : terminated_by(",");
+    ascii EgressProtocolVariantSpecificData                     : terminated_by(",");  //External required here
+    ascii IncomingCallingNumber                                 : terminated_by(",");
+    ascii AMACallType                                           : terminated_by(",");
+    ascii MessageBillingIndicator                               : terminated_by(",");
+    ascii LATA                                                  : terminated_by(",");
+    ascii RouteIndexUsed                                        : terminated_by(",");
+    ascii CallingPartyPresentationRestriction                   : terminated_by(",");
+    ascii IncomingISUPChargeNumber                              : terminated_by(",");
+    ascii IncomingISUPNatureOfAddress                           : terminated_by(",");
+    ascii DialedNumberNatureOfAddress                           : terminated_by(",");
+    ascii IngressCodecInfo                                      : terminated_by(",");
+    ascii EgressCodecInfo                                       : terminated_by(",");
+    ascii IngressRTPPacketizationTime                           : terminated_by(",");
+    ascii GlobalCallID                                          : terminated_by(",");
+	ascii TerminatedWithScriptExecution                         : terminated_by(",");
+    ascii OriginatorEchoCancellation                            : terminated_by(",");
+    ascii TerminatorEchoCancellation                            : terminated_by(",");
+    ascii ChargeFlag                                            : terminated_by(",");
+    ascii AMASlpID                                              : terminated_by(",");
+    ascii AMABAFModule                                          : terminated_by(",");
+    ascii AMASetHexABIndication                                 : terminated_by(",");
+    ascii ServiceFeatureID                                      : terminated_by(",");
+    ascii FEParameter                                           : terminated_by(",");
+    ascii SatelliteIndicator                                    : terminated_by(",");
+    ascii PSXBillingInfo                                        : terminated_by(",");
+    ascii OriginatingTDMTrunkGroupType                          : terminated_by(",");
+    ascii TerminatingTDMTrunkGroupType                          : terminated_by(",");
+    ascii IngressTrunkMemberNumber                              : terminated_by(",");
+    ascii EgressTrunkGroupID                                    : terminated_by(",");
+    ascii EgressSwitchID                                        : terminated_by(",");
+    ascii IngressLocalATMAddress                                : terminated_by(",");
+    ascii IngressRemoteATMAddress                               : terminated_by(",");
+    ascii EgressLocalATMAddress                                 : terminated_by(",");
+    ascii EgressRemoteATMAddress                                : terminated_by(",");
+    ascii PSXCallType                                           : terminated_by(",");
+    ascii OutgoingRouteTrunkGroupID                             : terminated_by(",");
+    ascii OutgoingRouteMessageID                                : terminated_by(",");
+    ascii IncomingRouteID                                       : terminated_by(",");
+    ascii CallingName                                           : terminated_by(",");
+    ascii CallingNameType                                       : terminated_by(",");
+    ascii IncomingCallingPartyNumberingPlan                     : terminated_by(",");
+    ascii OutgoingCallingPartyNumberingPlan                     : terminated_by(",");
+    ascii CallingPartyBusinessGroupID                           : terminated_by(",");
+    ascii CalledPartyBusinessGroupID                            : terminated_by(",");
+    ascii CallingPartyPPDN                                      : terminated_by(",");
+    ascii TicksFromSetupMsgToLastRouteAttempt                   : terminated_by(",");
+	//ascii DisconnectDate                                        : terminated_by(",");
+    ascii BillingNumberNatureOfAddress                          : terminated_by(",");
+    ascii IncomingCallingNumberNatureofAddress                  : terminated_by(",");
+    ascii EgressTrunkMemberNumber                               : terminated_by(",");
+    ascii SelectedRouteType                                     : terminated_by(",");
+    ascii CumulativeRouteIndex                                  : terminated_by(",");
+    ascii CallDisconnectReasonSentToIngress                     : terminated_by(",");
+    ascii CallDisconnectReasonSentToEgress                      : terminated_by(",");
+    ascii ISDNPRICallingPartySubaddress                         : terminated_by(",");
+    ascii OutgoingTrunkGroupNumberInEXM                         : terminated_by(",");
+    ascii IngressLocalSignalingIPAddress                        : terminated_by(",");
+    ascii IngressRemoteSignalingIPAddress                       : terminated_by(",");
+    ascii RecordSequenceNumber                                  : terminated_by(",");
+    ascii TransmissionMediumRequirement                         : terminated_by(",");
+    ascii InformationTransferRate                               : terminated_by(",");
+    ascii UserInfoLayer1                                        : terminated_by(",");
+    ascii UnrecognizedRawISUPCallingPartyCategory               : terminated_by(",");
+    ascii FSDEgressReleaseLinkTrunking                          : terminated_by(",");
+    ascii FSDTwoBChannelTransfer                                : terminated_by(",");
+    ascii CallingPartyBusinessUnit                              : terminated_by(",");
+    ascii CalledPartyBusinessUnit                               : terminated_by(",");
+    ascii FSDRedirecting                                        : terminated_by(",");
+    ascii FSDIngressReleaseLinkTrunking                         : terminated_by(",");
+    ascii PSXIndex                                              : terminated_by(",");
+    ascii PSXCongestionLevel                                    : terminated_by(",");
+    ascii PSXProcessingTime                                     : terminated_by(",");
+    ascii ScriptName                                            : terminated_by(",");
+    ascii IngressExternalAccountingData                         : terminated_by(",");
+    ascii EgressExternalAccountingData                          : terminated_by(",");
+    ascii EgressRTPPacketizationTime                            : terminated_by(",");
+    ascii AnswerSupervisionType                                 : terminated_by(",");
+    ascii IngressSipReferOrSipReplacesFeatureSpecificData       : terminated_by(",");
+    ascii EgressSipReferOrSipReplacesFeatureSpecificData        : terminated_by(",");
+    ascii NetworkTransfersFeatureSpecificData                   : terminated_by(",");
+    ascii CallCondition                                         : terminated_by(",");
+    ascii TollIndicator                                         : terminated_by(",");
+    ascii GenericNumber                                         : terminated_by(",");
+    ascii GenericNumberPresentationRestrictionIndicator         : terminated_by(",");
+    ascii GenericNumberingPlan                                  : terminated_by(",");
+    ascii GenericNumberNatureOfAddress                          : terminated_by(",");
+    ascii GenericNumberType                                     : terminated_by(",");
+    ascii FinalATTEMPTIndicator                                 : terminated_by(",");
+    ascii OriginatingTrunkType                                  : terminated_by(",");
+    ascii TerminatingTrunkType                                  : terminated_by(",");
+    ascii RemoteGSXBillingIndicator                             : terminated_by(",");
+	ascii ExtraDisconnectReason                                 : terminated_by(",");
+    ascii VPNCallingPrivatePresenceNumber                       : terminated_by(",");
+    ascii VPNCallingPublicPresenceNumber                        : terminated_by(",");
+    ascii ExternalFurnishChargingInfo                           : terminated_by(",");
+    ascii AnnouncementId                                        : terminated_by(",");
+    ascii NetworkDataSourceInformation                          : terminated_by(",");
+    ascii NetworkDataPartitionID                                : terminated_by(",");
+    ascii NetworkDataNetworkID                                  : terminated_by(",");
+    ascii NetworkDataNCOS                                       : terminated_by(",");
+    ascii ISDNAccessIndicator                                   : terminated_by(",");
+    ascii CallDisconnectLocation                                : terminated_by(",");
+    ascii CallDisconnectLocationTransmittedToIngress            : terminated_by(",");
+    ascii CallDisconnectLocationTransmittedToEgress             : terminated_by(",");
+    ascii NetworkCallReferenceCallIdentity                      : terminated_by(",");
+    ascii NetworkCallReferenceSignalingPointCode                : terminated_by(",");
+    ascii IngressMIMEProtocolVariantSpecificData                : terminated_by(",");
+    ascii EgressMIMEProtocolVariantSpecificData                 : terminated_by(",");
+    ascii VideoData                                             : terminated_by(",");
+    ascii SVSCustomer                                           : terminated_by(",");
+    ascii SVSVendor                                             : terminated_by(",");
+    ascii CallToTestPSX                                         : terminated_by(",");
+    ascii PSXOverlapRouteRequests                               : terminated_by(",");
+    ascii CallSetupDelay                                        : terminated_by(",");  //External required here
+    ascii OverloadStatus                                        : terminated_by(",");
+    ascii ReservedST1	                                        : terminated_by(",");
+    ascii Reserved1                                             : terminated_by(",");
+    ascii MLPPPrecedenceLevel                                   : terminated_by(",");
+    ascii Reserved2                                             : terminated_by(",");
+    ascii Reserved3                                             : terminated_by(",");
+    ascii Reserved4                                             : terminated_by(",");
+    ascii Reserved5                                              : terminated_by(",");
+    ascii Reserved6                                             : terminated_by(",");
+    ascii Reserved7                                             : terminated_by(",");
+    ascii Reserved8                                             : terminated_by(",");
+	ascii Reserved9                                             : terminated_by(",");
+    ascii GlobalChargeReference                                 : terminated_by(",");
+	ascii ReservedFor3xxContactInformation                      : terminated_by(",");
+	ascii ReservedForPSXName                                    : terminated_by(",");
+	ascii ReservedForNoOfPSXtried                               : terminated_by(",");	
+    ascii ReservedForFinalRouteLabel                            : terminated_by(",");
+    ascii MTAInformation                                        : terminated_by(",");
+    ascii VBRCommonBillingData                                  : terminated_by(",");
+    ascii VBRRouteBillingData                                   : terminated_by(",");
+    ascii AccessNetworkChargingInformation                      : terminated_by(",");//shifted up
+    ascii AccessTransferSpecificData                            : terminated_by(",");                                       //External
+    ascii EmergencyIndicator                                    : terminated_by(",");
+    ascii UERoamingStatus                                       : terminated_by(",");
+    //ascii AccessNetworkChargingInformation                      : terminated_by(",");
+    ascii AdditionalMediaStreamStatistics                       : terminated_by(",");
+    ascii IngressZoneName                                       : terminated_by(",");
+    ascii EgressZoneName                                        : terminated_by(",");
+    ascii IngressZoneId                                         : terminated_by(",");
+    ascii EgresssZoneId                                         : terminated_by(",");
+    ascii IngressIpPrefixTgName                                 : terminated_by(",");
+    //ascii AdditionalMediaStreamStatistics                       : terminated_by(",");
+	ascii ParentCallGCID                                        : terminated_by(",");
+    ascii SOSBC                                                 : terminated_by(","); 
+    ascii DSPInsertionRejectionreason                           : terminated_by(",");
+    //newly added
+    ascii CallEstablishedTime				: terminated_by(",");
+    ascii IngressTrunkGroupForPSXRouting	: terminated_by(",");
+    ascii StartTimeLocal					: terminated_by(",");
+    ascii DisconnectTimeLocal				: terminated_by(",");
+    ascii CallEstablishedTimeLocal			: terminated_by(",");
+    ascii GUID								: terminated_by(",");
+    ascii CACFailInfo						: terminated_by(",");
+    ascii NodeName							: terminated_by(",");
+    ascii PodName							: terminated_by(",");
+    ascii ContainerID						: terminated_by(",");
+    ascii IngressIdentityHeadersReceived	: terminated_by(",");
+    ascii EgressIdentityHeadersSent			: terminated_by(0xA); 
+};
+/*in_map AttemptRecord_im : external(AttemptRecord), target_internal(AttemptRecord_TI),discard_output{
+     automatic{
+         ErrDrop : using in_map ErrDrop_im;
+     };
+};*/
+in_map AttemptRecord_im : external(AttemptRecord), target_internal(AttemptRecord_TI){
+     automatic{
+         ErrDrop : using in_map ErrDrop_im;
+     };
+};
+decoder AttemptRecordDec : in_map(AttemptRecord_im);
+out_map AttemptRecord_om : external(AttemptRecord), internal(AttemptRecord_TI){
+    automatic;
+};
+encoder AttemptRecordEnc : out_map(AttemptRecord_om); 
+/***************Attempt Record*****************/
+
+/***************Intermediate Record*****************/
+external InterimRecord : identified_by(RecordType == "INTERMEDIATE")
+{
+    set {
+        ErrDrop error : optional;
+    }; 
+        ascii RecordType                                            : terminated_by(",");
+    ascii GatewayName                                           : terminated_by(",");
+    ascii AccountingID                                          : terminated_by(",");
+    ascii StartTimeSystemTicks                                  : terminated_by(",");
+    ascii NodeTimeZone                                          : terminated_by(",");
+    ascii StartDate                                             : terminated_by(",");
+    ascii StartTime                                             : terminated_by(",");
+    ascii TicksFromSetupMsgToPolicyResponse                     : terminated_by(",");
+    //ascii TicksFromSetupMsgToAlertProcProg                      : terminated_by(",");
+    ascii TicksFromSetupMsgToServiceEst                         : terminated_by(",");
+    ascii IntermediateDate                                        : terminated_by(",");
+    ascii IntermediateTime                                        : terminated_by(",");
+    //ascii TicksFromDisconnectToCallTermination                  : terminated_by(",");
+    ascii CallServiceDuration                                   : terminated_by(",");
+    //ascii CallDisconnectReason                                  : terminated_by(",");
+    ascii ServiceDelivered                                      : terminated_by(",");
+    ascii CallDirection                                         : terminated_by(",");
+    ascii ServiceProvider                                       : terminated_by(",");
+    ascii TransitNetworkSelectionCode                           : terminated_by(",");
+    ascii CallingNumber                                         : terminated_by(",");
+    ascii CalledNumber                                          : terminated_by(",");
+    ascii ExtraCalledAddressDigits                              : terminated_by(",");
+    ascii NumberofCalledNumTranslations                         : terminated_by(",");
+    ascii CalledNumberBeforeTranslation1                        : terminated_by(",");
+    ascii TranslationType1                                      : terminated_by(",");
+    ascii CalledNumberBeforeTranslation2                        : terminated_by(",");
+    ascii TranslationType2                                      : terminated_by(",");
+    ascii BillingNumber                                         : terminated_by(",");
+    ascii RouteLabel                                            : terminated_by(",");
+    ascii RouteAttemptNumber                                    : terminated_by(",");
+    ascii RouteSelected                                         : terminated_by(",");
+    ascii EgressLocalSignalingIPAddress                         : terminated_by(",");
+    ascii EgressRemoteSignalingIPAddress                        : terminated_by(",");
+    ascii IngressTrunkGroupName                                 : terminated_by(",");
+    ascii IngressPSTNCircuitEndPoint                            : terminated_by(",");
+    ascii IngressIPCircuitEndPoint                              : terminated_by(",");
+    ascii EgressPSTNCircuitEndPoint                             : terminated_by(",");
+    ascii EgressIPCircuitEndPoint                               : terminated_by(",");
+    //ascii IngressNumberOfAudioBytesSent                         : terminated_by(","); 
+    //ascii IngressNumberOAudioPacketsSent                        : terminated_by(",");
+    //ascii IngressNumberOfAudioBytesReceived                     : terminated_by(",");
+    //ascii IngressNumberOfAudioPacketsReceived                   : terminated_by(",");
+    //ascii OriginatingLineInformation                            : terminated_by(",");
+    //ascii JurisdictionInformationParameter                      : terminated_by(",");
+    ascii OriginatingLineInformation                            : terminated_by(",");
+    ascii JurisdictionInformationParameter                      : terminated_by(",");
+    ascii CarrierCode                                           : terminated_by(",");
+    ascii CallGroupID                                           : terminated_by(",");
+    ascii TicksFromSetupMsgToRxOfEXM                            : terminated_by(",");
+    ascii TicksFromSetupMsgToGenerationOfEXM                    : terminated_by(",");
+    ascii CallingPartyNatureOfAddress                           : terminated_by(",");
+    ascii CalledPartyNatureOfAddress                            : terminated_by(",");
+    ascii IngressProtocolVariantSpecificData                    : terminated_by(",");   //External required here
+    ascii IngressSignalingType                                  : terminated_by(",");
+    ascii EgressSignalingType                                   : terminated_by(",");
+    ascii IngressFarEndSwitchType                               : terminated_by(",");
+    ascii EgressFarEndSwitchType                                : terminated_by(",");
+    ascii CarrierCodeWhoOwnsiTGFarEnd                           : terminated_by(",");
+    ascii CarrierCodeWhoOwnseTGFarEnd                           : terminated_by(",");
+    ascii CallingPartyCategory                                  : terminated_by(",");
+    ascii DialedNumber                                          : terminated_by(",");
+    ascii CarrierSelectionInformation                           : terminated_by(",");
+    ascii CalledNumberNumberingPlan                             : terminated_by(",");
+    ascii GenericAddressParameter                               : terminated_by(",");
+    ascii EgressTrunkGroupName                                  : terminated_by(",");
+    ascii EgressProtocolVariantSpecificData                     : terminated_by(",");  //External required here
+    ascii IncomingCallingNumber                                 : terminated_by(",");
+    ascii IntermediateRecordReason                              : terminated_by(",");
+    ascii AMACallType                                           : terminated_by(",");
+    ascii MessageBillingIndicator                               : terminated_by(",");
+    ascii LATA                                                  : terminated_by(",");
+    ascii CallingPartyPresentationRestriction                   : terminated_by(",");
+    ascii IncomingISUPChargeNumber                              : terminated_by(",");
+    ascii IncomingISUPNatureOfAddress                           : terminated_by(",");
+    ascii DialedNumberNatureOfAddress                           : terminated_by(",");
+    ascii GlobalCallID                                          : terminated_by(",");
+    ascii ChargeFlag                                            : terminated_by(",");
+    ascii AMASlpID                                              : terminated_by(",");
+    ascii AMABAFModule                                          : terminated_by(",");
+    ascii AMASetHexABIndication                                 : terminated_by(",");
+    ascii ServiceFeatureID                                      : terminated_by(",");
+    ascii FEParameter                                           : terminated_by(",");
+    ascii SatelliteIndicator                                    : terminated_by(",");
+    ascii PSXBillingInfo                                        : terminated_by(",");
+    ascii OriginatingTDMTrunkGroupType                          : terminated_by(",");
+    ascii TerminatingTDMTrunkGroupType                          : terminated_by(",");
+    ascii IngressTrunkMemberNumber                              : terminated_by(",");
+    ascii EgressTrunkGroupID                                    : terminated_by(",");
+    ascii EgressSwitchID                                        : terminated_by(",");
+    ascii IngressLocalATMAddress                                : terminated_by(",");
+    ascii IngressRemoteATMAddress                               : terminated_by(",");
+    ascii EgressLocalATMAddress                                : terminated_by(",");
+    ascii EgressRemoteATMAddress                               : terminated_by(",");
+    ascii PolicyResponseCallType                                : terminated_by(",");
+    ascii OutgoingRouteID                                       : terminated_by(",");
+    ascii OutgoingMessageID                                     : terminated_by(",");
+    ascii IncomingRouteID                                       : terminated_by(",");
+    ascii CallingName                                           : terminated_by(",");
+    ascii CallingNameType                                       : terminated_by(",");
+    ascii IncomingCallingPartyNumberingPlan                     : terminated_by(",");
+    ascii OutgoingCallingPartyNumberingPlan                     : terminated_by(",");
+    ascii CallingPartyBusinessGroupID                           : terminated_by(",");
+    ascii CalledPartyBusinessGroupID                            : terminated_by(",");
+    ascii CallingPartyPPDN                                      : terminated_by(",");
+    ascii TicksFromSetupMsgToLastRouteAttempt                   : terminated_by(",");
+    ascii BillingNumberNatureOfAddress                          : terminated_by(",");
+    ascii IncomingCallingNumberNatureofAddress                  : terminated_by(",");
+    ascii EgressTrunkMemberNumber                               : terminated_by(",");
+    ascii SelectedRouteType                                     : terminated_by(",");
+    ascii TelcordiaLongDurationRecordType                       : terminated_by(",");
+    ascii TicksFromPreviousRecord                               : terminated_by(",");
+    ascii ISDNPRICallingPartySubaddress                         : terminated_by(",");
+    ascii OutgoingTrunkGroupNumberInEXM                         : terminated_by(",");
+    ascii IngressLocalSignalingIPAddress                        : terminated_by(",");
+    ascii IngressRemoteSignalingIPAddress                       : terminated_by(",");
+    ascii RecordSequenceNumber                                  : terminated_by(",");
+    ascii TransmissionMediumRequirement                         : terminated_by(",");
+    ascii InformationTransferRate                               : terminated_by(",");
+    ascii UserInfoLayer1                                        : terminated_by(",");
+    ascii UnrecognizedRawISUPCallingPartyCategory               : terminated_by(",");
+    ascii FSDEgressReleaseLinkTrunking                          : terminated_by(",");
+    ascii FSDTwoBChannelTransfer                                : terminated_by(",");
+    ascii CallingPartyBusinessUnit                              : terminated_by(",");
+    ascii CalledPartyBusinessUnit                               : terminated_by(",");
+    ascii FSDRedirecting                                        : terminated_by(",");
+    ascii FSDIngressReleaseLinkTrunking                         : terminated_by(",");
+    ascii PSXIndex                                              : terminated_by(",");
+    ascii PSXCongestionLevel                                    : terminated_by(",");
+    ascii PSXProcessingTime                                     : terminated_by(",");
+    ascii ScriptName                                            : terminated_by(",");
+    ascii IngressExternalAccountingData                         : terminated_by(",");
+    ascii EgressExternalAccountingData                          : terminated_by(",");
+    ascii AnswerSupervisionType                                 : terminated_by(",");
+    ascii IngressSipReferOrSipReplacesFeatureSpecificData       : terminated_by(",");
+    ascii EgressSipReferOrSipReplacesFeatureSpecificData        : terminated_by(",");
+    ascii NetworkTransfersFeatureSpecificData                   : terminated_by(",");
+    ascii CallCondition                                         : terminated_by(",");
+    ascii TollIndicator                                         : terminated_by(",");
+    ascii GenericNumber                                         : terminated_by(",");
+    ascii GenericNumberPresentationRestrictionIndicator         : terminated_by(",");
+    ascii GenericNumberingPlan                                  : terminated_by(",");
+    ascii GenericNumberNatureOfAddress                          : terminated_by(",");
+    ascii GenericNumberType                                     : terminated_by(",");
+    ascii OriginatingTrunkType                                  : terminated_by(",");
+    ascii TerminatingTrunkType                                  : terminated_by(",");
+    ascii RemoteSBCBillingIndicator				: terminated_by(",");
+    ascii VPNCallingPrivatePresenceNumber                       : terminated_by(",");
+    ascii VPNCallingPublicPresenceNumber                        : terminated_by(",");
+    ascii ExternalFurnishChargingInfo                           : terminated_by(",");
+    ascii AnnouncementId                                        : terminated_by(",");
+    ascii NetworkDataSourceInformation                          : terminated_by(",");
+    ascii NetworkDataPartitionID                                : terminated_by(",");
+    ascii NetworkDataNetworkID                                  : terminated_by(",");
+    ascii NetworkDateraNCOS                                     : terminated_by(",");
+    ascii ISDNAccessIndicator                                   : terminated_by(",");
+    ascii NetworkCallReferenceCallIdentity                      : terminated_by(",");
+    ascii NetworkCallReferenceSignalingPointCode                : terminated_by(",");
+    ascii IngressMIMEProtocolVariantSpecificData                : terminated_by(",");
+    ascii EgressMIMEProtocolVariantSpecificData                 : terminated_by(",");
+    ascii VideoData                                             : terminated_by(",");
+    ascii SVSCustomer                                           : terminated_by(",");
+    ascii SVSVendor                                            : terminated_by(",");
+    ascii CallToTestPSX                                         : terminated_by(",");
+    ascii PSXOverlapRouteRequests                               : terminated_by(",");
+    ascii RESERVEDIngressBiccInfo                               : terminated_by(",");
+    ascii RESERVEDEgressBiccInfo                                : terminated_by(",");
+    ascii MultiLevelPrecedence                                  : terminated_by(",");
+    ascii RESERVEDNPUKKSplRoutingInformation                    : terminated_by(",");
+    ascii RESERVEDNPUKKCustomerOrCarrierIdentification          : terminated_by(",");    
+    ascii RESERVEDNPUKKServiceTypeIdentifier                    : terminated_by(",");
+    ascii RESERVEDNPSSPSpecialHandlingInformation               : terminated_by(",");
+    ascii RESERVEDNPSSPServiceTypeIdentifier                    : terminated_by(",");
+    ascii RESERVEDTotalITXChargeUnits                           : terminated_by(",");    
+    ascii GlobalChargeReference                                 : terminated_by(",");
+    ascii RESERVEDPSXName                                       : terminated_by(",");    
+    ascii RESERVEDNoofPSXtried                                  : terminated_by(",");    
+    ascii RESERVEDFinalRouteLabel                               : terminated_by(",");    
+    ascii MTAInformationIn                                      : terminated_by(",");        
+    ascii AccessNetworkChargingInformation                      : terminated_by(",");    
+    ascii AccessTransferSpecificDataIN                          : terminated_by(",");    
+    ascii EmergencyIndicatorIN                                  : terminated_by(",");    
+    ascii UERoamingStatusIN                                     : terminated_by(",");    
+    ascii IngressZoneNameIN                                     : terminated_by(",");    
+    ascii EgressZoneNameIN                                      : terminated_by(",");    
+    ascii IngressZoneIdIN                                       : terminated_by(",");          
+    ascii EgressZoneIdIN                                        : terminated_by(",");    
+    ascii IngressIPPrefixFoundTGNameIN                          : terminated_by(",");    
+    ascii SOSBCIN						                        : terminated_by(",");
+    ascii CallEstablishedTime					                : terminated_by(",");
+    ascii IngressTrunkGroupForPSXRouting			            : terminated_by(",");
+    ascii StartTimeLocal					                    : terminated_by(",");
+    ascii IntermediateTimeLocal					                : terminated_by(",");
+    ascii CallEstablishedTimeLocal				                : terminated_by(",");
+    ascii GUID							                        : terminated_by(",");
+    ascii NodeName						                        : terminated_by(",");
+    ascii PodName						                        : terminated_by(",");
+    ascii ContainerID						                    : terminated_by(0xA);
+};
+in_map IntermediateRecord_im : external(InterimRecord), target_internal(IntermediateRecord_TI){
+     automatic{
+         ErrDrop : using in_map ErrDrop_im;
+     };
+};
+decoder IntermediateRecordDec : in_map(IntermediateRecord_im);
+out_map IntermediateRecord_om : external(InterimRecord), internal(IntermediateRecord_TI){
+    automatic;
+};
+encoder IntermediateRecordEnc : out_map(IntermediateRecord_om); 
+/***************Intermediate Record*****************/
+
+/***********To deocde trailer***********/
+external Trailer : identified_by(strREIndexOf(Trail, "closed\\." )>-1)
+{
+    ascii Trail : terminated_by(0xA);
+};
+in_map Trailer_im :external(Trailer), target_internal(Trailer_TI),discard_output{
+     automatic;
+};
+decoder Trailer_dec  :in_map (Trailer_im);
+out_map Trailer_out : external(Trailer) , internal (Trailer_TI)
+{
+    automatic ;
+};
+encoder Trailer_enc      :out_map(Trailer_out);
+/***********To deocde trailer***********/    
+ 
+internal RibbonUdr
+    {
+    int         iRecSeqNumber;
+    boolean     booFwdCallIndicator; 
+    string      sCallingNumber;
+    string      sCallingNumberBeforeMap;
+    string      sCalledNumber;
+    string      sCalledNumberBeforeMap;
+    string      sFwdNumber;
+    string      sRedirectNumber; 
+    string      sRedirectNumberBeforeMap;
+    string      sAggKey;
+    string      sDupKey;
+    date        dDupEventDateTime;
+    string      sInTrunkGroup; 
+    string      sOutTrunkGroup; 
+    boolean     booRepossingFlag;
+    string        sCallAnswerDateTime; 
+    //date        dCallAnswerTime;
+    string        sCallEndDateTime;
+    //date        dCallEndDate;
+    long        lCallDuration;
+    string      sCallingNOA;
+    string      sCalledNOA;
+    string      sDialedNOA;
+    string      sRedirectingNOA;
+    string      sCallType;
+    //long        lFinalParCallDuration;
+    string      sBparLRN;         
+    string      sOriginatingTGRP            ;
+    string      sICID;
+    int         iCallTermReason;
+    string      sMediaName;
+    //int         iRoleOfNode;
+    drudr       origRec;
+    //string      sFwdIndicator;
+    //string      sMediaType;
+    //string      sNumTypeCalling;
+    //string      sNumTypeCalled;
+    //long        lCallsTime;
+    //StopRecord_TI sUdr;
+    //date dStartDateTime;
+    //date dDisconnectDateTime;
+    //string sStartDateTime;
+    //string sDisconnectDateTime;
+    //date dConnectDateTime;
+    };
+
+session stichCallSession {
+    
+	RibbonUdr stichCallUDR;
+    boolean boosessionexists;
+    boolean booflushflag;
+	string INTrunkGroupName;
+	string OUTTrunkGroupName;
+    long lDuration;
+};
+
+
+/*****Error/drop block******/
+external ErrDrop :identified_by(strStartsWith(outputCode, "ERR") || strStartsWith(outputCode, "DRP")){
+    ascii outputCode : terminated_by(",");  
+    ascii outputType : terminated_by(",");
+};
+in_map ErrDrop_im : external(ErrDrop), target_internal(ErrDrop_TI) {
+    automatic;
+};
+decoder ErrDrop_dec  : in_map(ErrDrop_im);
+out_map ErrDrop_out : external(ErrDrop), internal (ErrDrop_TI)
+{
+    automatic;
+};
+encoder ErrDrop_enc      :out_map(ErrDrop_out);
+/*****Error/drop block******/
+
+/******Intec record starts*******/
+external inContentFormat_RibbonSBC
+{
+    ascii incomingSwitch         : align(left), padded_with(0x20), static_size(20);
+    ascii outgoingSwitch         : align(left), padded_with(0x20), static_size(20);
+    ascii eventStartDate         : align(left), padded_with(0x20), static_size(8);
+    ascii eventStartTime         : align(left), padded_with(0x20), static_size(8);
+    ascii eventDuration          : int(base10),align(right), padded_with("0"), static_size(10);
+    ascii aNum                   : align(left), padded_with(0x20), static_size(28); 
+    ascii bNum                   : align(left), padded_with(0x20), static_size(28); 
+    ascii incomingTrunk          : align(left), padded_with(0x20), static_size(20);
+    ascii outgoingTrunk          : align(left), padded_with(0x20), static_size(20);
+    ascii incomingProduct        : align(left), padded_with(0x20), static_size(14); 
+    ascii outgoingProduct        : align(left), padded_with(0x20), static_size(14);
+    ascii eventDirection         : align(left), padded_with(0x20), static_size(1);
+    ascii discreteRatingParam_1  : align(left), padded_with(0x20), static_size(15); 
+    ascii dataUnit               : align(left), padded_with(0x20), static_size(8);
+    ascii recSeqNum              : int(base10), align(left), padded_with(0x20), static_size(40);
+    ascii recType                : align(left), padded_with(0x20), static_size(2); 
+    ascii userSummarization      : align(left), padded_with(0x20), static_size(20);
+    ascii userData               : align(left), padded_with(0x20), static_size(30);
+    ascii userData_2             : align(left), padded_with(0x20), static_size(30);
+    ascii linkField              : align(left), padded_with(0x20), static_size(2);
+    ascii userData_3             : align(left), padded_with(0x20), static_size(80);
+    ascii lineFeed               : terminated_by(0xA), external_only;
+}; 
+in_map contentRibbonSBC_imap : external(inContentFormat_RibbonSBC), target_internal(inContentFormatRibbonSBC_TI){automatic;};
+decoder intercontentNokiaSBCdecoder      :   in_map(contentRibbonSBC_imap);
+out_map contentRibbonSBC_OutMap : internal(inContentFormatRibbonSBC_TI),external(inContentFormat_RibbonSBC) { 
+    automatic;
+};
+encoder contentRibbonSBC_Enc : out_map(contentRibbonSBC_OutMap);
+/******Intec record ends*******/
+
+
+/******BI record starts*******/
+external RSBCBI {
+    ascii triggerType                   : terminated_by(",");
+    ascii sessionID                     : terminated_by(",");
+    ascii callType                      : terminated_by(",");
+    ascii callingPartyNumber            : terminated_by(",");
+    ascii callingPartyNumberBeforeMap   : terminated_by(",");
+    ascii calledPartyNumber             : terminated_by(",");
+    ascii calledPartyNumberBeforeMap    : terminated_by(",");
+    ascii lrnCalledParty                : terminated_by(",");
+    ascii callDuration                  : terminated_by(",");
+    ascii callStartDateTime             : terminated_by(",");
+    ascii callEndDateTime               : terminated_by(",");
+    ascii inTrunkGroupName              : terminated_by(",");
+    ascii outTrunkGroupName             : terminated_by(",");
+    ascii switchID                      : terminated_by(",");
+    ascii roamingCircle                 : terminated_by(",");
+    ascii ICID                          : terminated_by(",");
+    ascii serviceType                   : terminated_by(",");
+    ascii callTerminationReason         : terminated_by(",");
+    ascii redirectionNumber             : terminated_by(",");
+    ascii redirectionNumberBeforeMap    : terminated_by(0xA);
+};
+in_map RSBCBI_inmap : external(RSBCBI), target_internal(RSBCBI_ti){
+    automatic;
+};
+decoder RSBCBI_Dec : in_map(RSBCBI_inmap);
+out_map RSBCBI_outmap : external(RSBCBI), internal(RSBCBI_ti) {
+    automatic;    
+};
+encoder RSBCBI_Enc : out_map(RSBCBI_outmap);
+/******BI record ends*******/
+
+/***********SwitchOverRecord*******/
+external SwitchOverRecord: identified_by(RecordType == "SWITCHOVER")
+{
+    ascii RecordType               : terminated_by(",");
+    ascii GatewayName              : terminated_by(",");
+    ascii AccountingID             : terminated_by(",");
+    ascii NodeTimeZone            : terminated_by(",");
+    ascii StartTimeMMDDYYYY     : terminated_by(",");
+    ascii StartTimeHHMMSSs     : terminated_by(",");
+    ascii RecordSequenceNumber	: terminated_by(",");
+    ascii BootTimeLocal      : terminated_by(",");
+    ascii SLBRegisteredInstanceID    : terminated_by(",");
+    ascii OriginalActivePodName : terminated_by(0xA);
+};
+in_map SwitchOver_im : external(SwitchOverRecord), target_internal(SwitchOverRecord_TI), discard_output{
+    automatic;
+};
+decoder SwitchOverRecDec : in_map(SwitchOver_im);
+out_map SwitchOver_out : external(SwitchOverRecord), internal(SwitchOverRecord_TI){
+    automatic;
+};
+encoder SwitchOverRecEnc : out_map(SwitchOver_out);
+/***********SwitchOverRecord*******/
+
+/***********RebootRecord*******/
+external RebootRecord : identified_by(RecordType == "REBOOT")
+{
+    ascii RecordType              : terminated_by(",");
+    ascii GatewayName             : terminated_by(",");
+    ascii AccountingID            : terminated_by(",");
+    ascii NodeTimeZone           : terminated_by(",");
+    ascii StartTimeMMDDYYYY    : terminated_by(",");
+    ascii StartTimeHHMMSSs    : terminated_by(",");
+    ascii RecordSequenceNumber   : terminated_by(",");
+    ascii BootTimeLocal      : terminated_by(",");
+    ascii RACAssignedRole     : terminated_by(0xA);
+};
+in_map RebootRecord_im : external(RebootRecord), target_internal(RebootRecord_TI), discard_output{
+    automatic;
+};
+decoder RebootRecDec : in_map(RebootRecord_im);
+out_map RebootRecord_out :external(RebootRecord), internal(RebootRecord_TI){
+    automatic;
+};
+encoder RebootRecEnc : out_map(RebootRecord_out);
+/********RebootRecord************/
+
+
+/********SWChangeRecord************/
+external SWChangeRecord : identified_by(RecordType == "SW_CHANGE")
+{
+    ascii RecordType               : terminated_by(",");
+    ascii GatewayName              : terminated_by(",");
+    ascii NodeTimeZone             : terminated_by(",");
+    ascii RecordDate               : terminated_by(",");
+    ascii RecordTime               : terminated_by(",");
+    ascii OldSoftwareVersion       : terminated_by(",");
+    ascii NewSoftwareVersion       : terminated_by(",");
+    ascii RecordSequenceNumber	   : terminated_by(",");
+    ascii RecordTimeLocal           : terminated_by(0xA);
+};
+in_map SWChangeRecord_im : external(SWChangeRecord), target_internal(SWChangeRecord_TI), discard_output{
+    automatic;
+};
+decoder SWChangeRecDec : in_map(SWChangeRecord_im);
+out_map SWChangeRecord_out :external(SWChangeRecord), internal(SWChangeRecord_TI){
+    automatic;
+};
+encoder SWChangeRecEnc : out_map(SWChangeRecord_out);  
+/********SWChangeRecord************/
+
+/********Final decoder*****************/
+decoder FinalDec : in_map(Header_im),in_map(StartRecord_im), in_map(StopRecord_im),in_map(AttemptRecord_im),
+                    in_map(IntermediateRecord_im),in_map (Trailer_im),in_map(SwitchOver_im), in_map(RebootRecord_im), 
+                    in_map(SWChangeRecord_im);
+encoder FinalEnc : out_map(Header_om),out_map(StartRecord_om), out_map(StopRecord_om), out_map(AttemptRecord_om),
+                    out_map(IntermediateRecord_om),out_map(Trailer_out),out_map(SwitchOver_out), out_map(RebootRecord_out), 
+                    out_map(SWChangeRecord_out);
+/********Final decoder*****************/

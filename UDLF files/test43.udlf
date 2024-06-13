@@ -1,0 +1,107 @@
+external mi_ext : terminated_by(0xA){
+     set {
+        errorBlockmi errMi : optional;  
+    };
+    ascii id                             : terminated_by(",");
+    ascii req_id                         : terminated_by(",");
+    ascii req_api_url	                 : terminated_by(",");
+    ascii agg_ent_code                   : terminated_by(",");
+    ascii resp_http_status               : terminated_by(",");
+    ascii resp_code                      : terminated_by(",");
+    ascii resource_owner                 : terminated_by(",");
+    ascii req_timestamp                  : terminated_by(",");
+    ascii resp_timestamp                 : terminated_by(",");
+    ascii backend_resp_http_status       : terminated_by(",");
+    ascii agg_name                       : terminated_by(",");
+    ascii ent_name                       : terminated_by(",");
+    ascii source_ip                      : terminated_by(",");
+    ascii correlation_id                 : terminated_by(",");
+    ascii state                          : terminated_by(0xA);
+        
+};
+
+
+external FileHeader {
+   ascii header : terminated_by(0xA);
+};
+
+in_map Header_in : external( FileHeader ), 
+   target_internal( Header ), discard_output { 
+        automatic; 
+};
+
+in_map errorBlockmi_InMap : external (errorBlockmi), target_internal(errorBlockmi){automatic;};
+
+in_map mi_in_map : external(mi_ext),target_internal(mi_target_internal)
+{
+    automatic{
+        errorBlockmi : using in_map Error_Map;
+        
+    };
+};
+
+decoder Header : in_map( Header_in ); 
+decoder Records : in_map( mi_in_map );
+  
+out_map mi_OutMap : external (mi_ext), internal(mi_target_internal){automatic;};
+encoder mi_Enc : out_map(mi_OutMap);
+decoder mi_dec {
+   decoder Header;
+   decoder Records *;  
+};
+//decoder dec_mi : in_map(mi_in_map);
+//mi cdr decoder ends
+
+external errorBlockmi : identified_by(strStartsWith(errorCode, "DRP")|| strStartsWith(errorCode, "ERR")) {
+     ascii errorCode          : terminated_by(",");
+     ascii errorMessage       : terminated_by(",");
+ };
+
+in_map Error_Map : external(errorBlockmi),target_internal(ErrorBlock) {
+     automatic;
+ };
+
+
+internal miInternal{
+    string product;
+    string requestId;
+    string reqTimestamp;
+    long chargingStartTimeForDup;
+    drudr origRec;
+    mi_target_internal targetUdr;
+};
+
+external IntecFormat_Mi{
+    ascii incomingSwitch         : align(left), padded_with(0x20), static_size(20);
+    ascii outgoingSwitch         : align(left), padded_with(0x20), static_size(20);
+    ascii eventStartDate         : align(left), padded_with(0x20), static_size(8);
+    ascii eventStartTime         : align(left), padded_with(0x20), static_size(8);
+    ascii eventDuration          : align(right), padded_with("0"), static_size(10);
+    ascii aNum                   : align(left), padded_with(0x20), static_size(28); 
+    ascii bNum                   : align(left), padded_with(0x20), static_size(28);
+    ascii incomingTrunk          : align(left), padded_with(0x20), static_size(20);
+    ascii outgoingTrunk          : align(left), padded_with(0x20), static_size(20);
+    ascii incomingProduct        : align(left), padded_with(0x20), static_size(14); 
+    ascii outgoingProduct        : align(left), padded_with(0x20), static_size(14);
+    ascii eventDirection         : align(left), padded_with(0x20), static_size(1);
+    ascii discreteRatingParam_1  : align(left), padded_with(0x20), static_size(15); 
+    ascii dataUnit               : align(left), padded_with(0x20), static_size(8);
+    ascii recSeqNum              : align(left), padded_with(0x20), static_size(40);
+    ascii recType                : align(left), padded_with(0x20), static_size(2); 
+    ascii userSummarization      : align(left), padded_with(0x20), static_size(20);
+    ascii userData               : align(left), padded_with(0x20), static_size(30);
+    ascii userData_2             : align(left), padded_with(0x20), static_size(30);
+    ascii linkField              : align(left), padded_with(0x20), static_size(2);
+    ascii userData_3             : align(left), padded_with(0x20), static_size(80); 
+    ascii lineFeed               : terminated_by(0xA), external_only;
+};
+
+in_map IntecRec_im : external(IntecFormat_Mi) , target_internal(IntecRec_TI){
+    automatic;
+};
+decoder IntecRec_Dec : in_map(IntecRec_im);
+
+out_map IntecRec_ot : external(IntecFormat_Mi), internal(IntecRec_TI){
+    automatic;
+};
+encoder IntecRec_Enc : out_map(IntecRec_ot);

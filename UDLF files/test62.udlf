@@ -1,0 +1,28 @@
+external AutoPayExt : terminated_by(0xA)
+{
+ascii COMPANY_CODE		 :	 terminated_by("|");
+ascii CLIENT_CODE		 :	 terminated_by("|");
+ascii UMRN		         :	 terminated_by("|");
+ascii UMRN_DATE		 	 :	 terminated_by("|");
+ascii APPLICATION_DATE	 :	 terminated_by("|");
+ascii PAYMENT_METHOD	 :	 terminated_by("|");
+ascii ACCOUNT_NO		 :	 terminated_by("|");
+ascii CUST_SERVICEID	 :	 terminated_by("|");
+ascii BANK_NAME			 :	 terminated_by("|");
+ascii IFSC_CODE			 :	 terminated_by("|");
+ascii MICR_CODE			 :	 terminated_by("|");
+ascii AMOUNT_LIMIT		 :	 terminated_by("|");
+ascii CURR_KEY			 :	 terminated_by("|");
+ascii FROM_DATE			 :	 terminated_by("|");
+ascii TO_DATE			 :	 terminated_by("|");
+ascii MANDATE_LOCATION	 :	 terminated_by("|");
+ascii REQ_STATUS		 :	 terminated_by("|");
+ascii REJECTION_REASON	 :	 terminated_by(0XA);
+};
+
+
+in_map in_AutoPayExt : external (AutoPayExt),target_internal(AutoPayInt){automatic;};
+decoder AutoPayExtdec : in_map(in_AutoPayExt);
+out_map out_AutoPayExt : external(AutoPayExt),internal(AutoPayInt){automatic;};
+encoder AutoPayExtenc : out_map(out_AutoPayExt);
+

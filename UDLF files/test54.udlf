@@ -1,0 +1,49 @@
+external IPSM_ONL : terminated_by(0xA)
+{
+
+        ascii TimeStampSubmit    : terminated_by(",");
+        ascii Anumber            : terminated_by(",");
+        ascii Bnumber            : terminated_by(",");
+        ascii PVisitedNetworkID  : terminated_by(",");
+        ascii ImsChargingID      : terminated_by(",");
+        ascii SessionID          : terminated_by(",");
+        ascii PAccessNetworkInfo : terminated_by(",");
+        ascii RoamGT             : terminated_by(",");
+        ascii Lrn                : terminated_by(",");
+        ascii Imei               : terminated_by(",");
+        ascii CurrentPartial     : terminated_by(",");
+        ascii HomeGT             : terminated_by(",");
+        ascii OriginatingImsi    : terminated_by(",");
+        ascii DeliveryStatus     : terminated_by(",");
+        ascii CdrType            : terminated_by(",");
+        ascii RecordSeqNum       : terminated_by(",");
+        ascii RequestType        : terminated_by(",");
+        ascii CheckSameDay       : terminated_by(",");   
+        ascii Circle             : terminated_by(0xA);
+    
+};
+
+in_map ipsm_im : external (IPSM_ONL) , target_internal(IPSM_ONL_TI){
+	automatic;
+};
+out_map ipsm_om : external (IPSM_ONL) , internal(IPSM_ONL_TI){
+	automatic;
+
+};
+
+decoder ipsm_Decoder : in_map (ipsm_im);
+
+encoder ipsm_Encoder : out_map(ipsm_om);
+
+
+internal IPSM_UDR{
+    string Filename;
+    int TotRec;
+    boolean DupRec;
+    IPSM_ONL_TI origRec;
+};
+
+session UDRsession{
+    string sessionId;
+    boolean isSessionInit;
+};

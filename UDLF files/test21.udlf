@@ -1,0 +1,23 @@
+external seExternal{
+
+	ascii sequenceNo 				       :  terminated_by(",");
+	ascii callingParty                     :  terminated_by(",");
+	ascii planId					       :  terminated_by(",");
+    ascii bpId					           :  terminated_by(",");
+    ascii planRefKey                       :  terminated_by(",");
+	ascii newPlanRefKey                    :  terminated_by(",");
+	ascii productOrderId 				   :  terminated_by(",");
+    ascii planEffectiveDate				   :  terminated_by(0xA);
+};
+
+in_map in_map_se : external(seExternal), target_internal(se_TI){
+	automatic;
+};
+
+decoder seDecoder : in_map (in_map_se);
+
+out_map out_map_se : external(seExternal), internal(se_TI){
+	automatic;
+};
+
+encoder seEncoder : out_map (out_map_se);

@@ -1,0 +1,1275 @@
+
+//MGCF Raw File Header
+external File_Header_Ext{
+    Filename filename;
+    CreationTime creationTime;
+    DctID dctID;
+    DctVer dctVer;
+    DctDef dctDef;
+};
+
+external Filename : identified_by(tag == "FILENAME") {
+   ascii tag        :  terminated_by("="), encode_value("FILENAME"), external_only;
+   ascii value      : terminated_by(0xA);
+};
+
+external CreationTime : identified_by(tag == "CREATION_TIME") {
+    ascii tag        :  terminated_by("="), encode_value("CREATION_TIME"), external_only;
+    ascii value      : terminated_by(0xA);
+};
+external DctID : identified_by(tag == "DCT_ID") {
+    ascii tag        :  terminated_by("="), encode_value("DCT_ID"), external_only;
+    ascii value      : terminated_by(0xA);
+};
+
+external DctVer : identified_by(tag == "DCT_VERSION") {
+    ascii tag        :  terminated_by("="), encode_value("DCT_VERSION"), external_only;
+    ascii value      : terminated_by(0xA);
+};
+
+external DctDef : identified_by(tag == "DCT_DEF") {
+    ascii tag        :  terminated_by("="), encode_value("DCT_DEF"), external_only;
+    DctDefValue value;
+};
+
+external DctDefValue  {
+    ascii CDR_TYPE           : terminated_by(":");
+    ascii DCT_NAME           : terminated_by(":");
+    ascii HAS_FILEHDR        : terminated_by(":");
+    ascii HAS_FILETRAILER    : terminated_by(":");
+    ascii HAS_RECHDR         : terminated_by(":");
+    ascii HAS_FIELDLABEL     : terminated_by(":");
+    ascii DELIMITERS         : terminated_by(":");
+    ascii ENUM_FMTTYPE       : terminated_by(":");
+    ascii FMT_METHOD         : terminated_by(":");
+    ascii trailingBytes      : terminated_by(0xA);
+    //Column names not decoded, ignored...
+};
+//End of Header part
+
+//Error block
+external errorBlockMGCF : identified_by(strStartsWith(errorCode, "DRP")) {
+    ascii errorCode      : terminated_by(";");
+    ascii errorMessage   : terminated_by(";");
+};
+
+external VCDR {
+    set {
+        errorBlockMGCF error : optional;
+    };    
+    VCDR_Ext vcdr;
+};
+
+//VCDR starts
+external VCDR_Ext{
+    ascii CDRSequenceNumber : terminated_by(","),int(base10);
+    ascii CDRMajorVersion : terminated_by(","),int(base10);
+    ascii CDRMinorVersion : terminated_by(","),int(base10);
+    ascii LongCallDurationIndicator: terminated_by(","),int(base10);
+    ascii OriginatingDateTime : terminated_by(","); //,long(base10);//date in unix format,type as long for indentification of dupUDR
+    ascii AnswerDateTime : terminated_by(",");
+    ascii DisconnectDateandTime : terminated_by(",");
+    ascii CallingPartyID : terminated_by(",");
+    ascii ChargeNumber : terminated_by(",");
+    ascii DialedNumber : terminated_by(",");
+    ascii CalledPartyID: terminated_by(",");
+    ascii TranslatedNumber : terminated_by(",");
+    ascii DigitType: terminated_by(",");
+    ascii ServiceFeatureCode : terminated_by(",");
+    ascii CallID : terminated_by(","),long(base10);
+    ascii OrigIncomingSignals: terminated_by(","),long(base10);
+    ascii OrigOutgoingSignals : terminated_by(","),long(base10);
+    ascii TermIncomingSignals : terminated_by(","),long(base10);
+    ascii TermOutgoingSignals : terminated_by(","),long(base10);
+    ascii InternalReleaseCause: terminated_by(","),int(base10);
+    ascii OrigSignalRelCause: terminated_by(","),long(base10);
+    ascii TermInternalRelCause: terminated_by(","),int(base10);
+    ascii TermSignalRelCause: terminated_by(","),int(base10);
+    ascii TimeGuardFlag: terminated_by(",");
+    ascii ShortCalledPartyOffhook: terminated_by(",");
+    ascii OrignateCarrierTime : terminated_by(",");
+    ascii CarrierConnectTime : terminated_by(",");
+    ascii DisconnectDirection: terminated_by(",");
+    ascii LongCallTime: terminated_by(",");
+    ascii LastLongCallTime : terminated_by(","); //,long(base10);
+    ascii ShortOnhookDuration : terminated_by(",");
+    ascii OrigLineorTrunkType : terminated_by(","),int(base10);
+    ascii OriginatingMG : terminated_by(","),int(base10);
+    ascii OriginatingSpan : terminated_by(","),int(base10);
+    ascii OriginatingChannel : terminated_by(","),int(base10);
+    ascii OrigTrunkGroup : terminated_by(","),int(base10);
+    ascii OrigTrunkGroupCircuitID : terminated_by(","),int(base10);
+    ascii TermLineorTrunkType: terminated_by(","),int(base10);
+    ascii TerminatingMG : terminated_by(","),int(base10);
+    ascii TerminatingSpan : terminated_by(","),int(base10);
+    ascii TerminatingChannel : terminated_by(","),int(base10);
+    ascii TermTrunkGroup : terminated_by(","),int(base10);
+    ascii TermTrunkGroupCircuitID : terminated_by(","),int(base10);
+    ascii OrigTerminationType : terminated_by(",");
+    ascii TermTerminationType : terminated_by(",");
+    ascii OrigCarrierNetworkNo : terminated_by(",");
+    ascii OrigRoutingIndicator : terminated_by(",");
+    ascii OrigCarrierType : terminated_by(",");
+    ascii OrigCarrierID : terminated_by(",");
+    ascii TermCarrierNetworkNo : terminated_by(",");
+    ascii TermRoutingIndicator : terminated_by(",");
+    ascii TermCarrierType : terminated_by(",");
+    ascii TermCarrierID : terminated_by(",");
+    ascii OrigANICPNIndicator : terminated_by(",");
+    ascii TermANICPNIndicator : terminated_by(",");
+    ascii OrigScreeningClass : terminated_by(","),int(base10);
+    ascii OrigSubscriberGroup : terminated_by(","),int(base10);
+    ascii TermSubscriberGroup : terminated_by(","),int(base10);
+    ascii AMATestCallIndicator : terminated_by(","),int(base10);
+    ascii AMATranslationIndex : terminated_by(","),int(base10);
+    ascii OrigAMACarrierIndex : terminated_by(","),int(base10);
+    ascii OrigAMAProfileIndex : terminated_by(","),int(base10);
+    ascii TermAMACarrierIndex : terminated_by(","),int(base10);
+    ascii TermAMAProfileIndex : terminated_by(","),int(base10);
+    ascii OrigLineInfo : terminated_by(",");
+    ascii TermTandemTrunkGroup : terminated_by(","),int(base10);
+    ascii FreephoneNumber : terminated_by(",");
+    ascii CallType : terminated_by(","),int(base10);
+    ascii TermCarrierSelectionInfo : terminated_by(",");
+    ascii CarrierServiceArrangement : terminated_by(",");
+    ascii OriginationLATA : terminated_by(","),int(base10);
+    ascii TerminatingCountryCode : terminated_by(",");
+    ascii BearerCapTransferCap : terminated_by(","), int(base10);
+    ascii BearerCapCodeStandard : terminated_by(",");
+    ascii BearerCapTransferRate : terminated_by(",");
+    ascii BearerCapTransferMode : terminated_by(",");
+    ascii CallerNumberPortedID : terminated_by(",");
+    ascii CalledNumberPortedID : terminated_by(",");
+    ascii OriginationLRN : terminated_by(",");
+    ascii OrigLRNSource : terminated_by(",");
+    ascii TerminationLRN : terminated_by(",");
+    ascii TermLRNSource : terminated_by(",");
+    ascii LNPDipIndication : terminated_by(",");
+    ascii LastResort : terminated_by(",");
+    ascii OrigCODECSource : terminated_by(",");
+    ascii OrigCODECProfile : terminated_by(","),int(base10);
+    ascii OrigCODECEntry : terminated_by(","),int(base10);
+    ascii TermCODECSource : terminated_by(",");
+    ascii TermCODECProfile : terminated_by(","),int(base10);
+    ascii TermCODECEntry : terminated_by(","),int(base10);
+    ascii EchoCancelRequestStatus : terminated_by(",");
+    ascii OrigForwardCallIndicator : terminated_by(","),int(base10);
+    ascii OrigBackwardCallIndicator : terminated_by(","),int(base10);
+    ascii TermForwardCallIndicator : terminated_by(","),int(base10);
+    ascii TermBackwardCallIndicator : terminated_by(","),int(base10);
+    ascii OutpulsedNumber : terminated_by(","); //,long(base10);
+    ascii PrefixDialedDigits : terminated_by(","),int(base10);
+    ascii CallingPartyIndicator : terminated_by(","),int(base10);
+    ascii OrigCountryCode : terminated_by(","),int(base10);
+    ascii FinalSwitchID : terminated_by(","),int(base10);
+    ascii CompleteCode : terminated_by(","),int(base10);
+    ascii CalledPrefixDigit : terminated_by(","),int(base10);
+    ascii AnswerType : terminated_by(","),int(base10);
+    ascii QueuingIndicator : terminated_by(",");
+    ascii OrigECindicator : terminated_by(",");
+    ascii TermECindicator : terminated_by(",");
+    ascii OrigCarrierSelectionInfo : terminated_by(",");
+    ascii FinalTrunkGroupNumber : terminated_by(","),int(base10);
+    ascii PINDigits : terminated_by(",");
+    ascii AccountCode : terminated_by(",");
+    ascii BillingNumber : terminated_by(",");
+    ascii UniversalAccessNumber : terminated_by(",");
+    ascii ReOriginatioinIndicator : terminated_by(","),int(base10);
+    ascii RedirectionSwitchID : terminated_by(","),int(base10);
+    ascii RouteAttemptnumber : terminated_by(","),int(base10);
+    ascii RedirectionNumber : terminated_by(",");
+    ascii RedirectionType : terminated_by(",");
+    ascii RouteListIdentifier : terminated_by(","),int(base10);
+    ascii TimeChangeIndicator : terminated_by(","),int(base10);
+    ascii OrigSwitchID : terminated_by(","),int(base10);
+    ascii OrigSwitchTrunkGroup : terminated_by(","),int(base10);
+    ascii ANIprefix : terminated_by(",");
+    ascii ANISuffix : terminated_by(",");
+    ascii OrigSubGroupType : terminated_by(",");
+    ascii TermSubGroupType : terminated_by(",");
+    ascii AuthCode : terminated_by(",");
+    ascii FAI : terminated_by(",");
+    ascii LastSuccessRouteList : terminated_by(","),int(base10);
+    ascii MeterPulseType : terminated_by(",");
+    ascii PulseInterval : terminated_by(","),int(base10);
+    ascii NumberOfPulses : terminated_by(","),int(base10);
+    ascii ChargingMethod : terminated_by(",");
+    ascii ChargeBand : terminated_by(","),int(base10);
+    ascii MeterPulseRate : terminated_by(","),int(base10);
+    ascii UnitsCharged : terminated_by(","),long(base10);
+    ascii CallDuration : terminated_by(","),long(base10);
+    ascii CallingSubscriberCategory : terminated_by(","),int(base10);
+    ascii OrigTrunkGroupCLLI : terminated_by(",");
+    ascii TermTrunkGroupCLLI : terminated_by(",");
+    ascii BillType : terminated_by(","),int(base10);
+    ascii BillTypeIndicator : terminated_by(","),int(base10);
+    ascii OriginalCallID : terminated_by(",");
+    ascii OriginalSwitchID : terminated_by(","),int(base10);
+    ascii OrigGradeOfService : terminated_by(",");
+    ascii OrigSessionStartTime : terminated_by(",");
+    ascii OrigLocalControlPathIP : terminated_by(",");
+    ascii OrigRemoteControlPublicIP : terminated_by(",");
+    ascii OrigRemoteControlPrivateIP : terminated_by(",");
+    ascii OrigRemoteUserID : terminated_by(",");
+    ascii OrigLocalRTPIP : terminated_by(",");
+    ascii OrigRemoteRTPIP : terminated_by(",");
+    ascii OrigRemoteRTCPIP : terminated_by(",");
+    ascii OrigSendingPayloadTypes : terminated_by(",");
+    ascii OrigRTPPacketsSent : terminated_by(",");
+    ascii OrigRTPOctetsSent : terminated_by(",");
+    ascii OrigRTPPacketsReceived : terminated_by(",");
+    ascii OrigRTPOctetsReceived : terminated_by(",");
+    ascii OrigTransmitPacketsLost : terminated_by(",");
+    ascii OrigTransmitPLPercentage : terminated_by(",");
+    ascii OrigReceivingPacketsLost : terminated_by(",");
+    ascii OrigReceivingPLPercentage : terminated_by(",");
+    ascii OrigTransmitJitterMax : terminated_by(",");
+    ascii OrigTransmitJitterMean : terminated_by(",");
+    ascii OrigReceivingJitterMax : terminated_by(",");
+    ascii OrigReceivingJitterMean : terminated_by(",");
+    ascii OrigRoundTripTimeMax : terminated_by(",");
+    ascii OrigRoundTripTimeMean : terminated_by(",");
+    ascii TermGradeOfService : terminated_by(",");
+    ascii TermSessionStartTime : terminated_by(",");
+    ascii TermLocalControlPathIP : terminated_by(",");
+    ascii TermRemoteControlPublicIP : terminated_by(",");
+    ascii TermRemoteControlPrivateIP : terminated_by(",");
+    ascii TermRemoteUserID : terminated_by(",");
+    ascii TermLocalRTPIP : terminated_by(",");
+    ascii TermRemoteRTPIP : terminated_by(",");
+    ascii TermRemoteRTCPIP : terminated_by(",");
+    ascii TermSendingPayloadTypes : terminated_by(",");
+    ascii TermRTPPacketsSent : terminated_by(",");
+    ascii TermRTPOctetsSent : terminated_by(",");
+    ascii TermRTPPacketsReceived : terminated_by(",");
+    ascii TermRTPOctetsReceived : terminated_by(",");
+    ascii TermTransmitPacketsLost : terminated_by(",");
+    ascii TermTransmitPLPercentage : terminated_by(",");
+    ascii TermReceivingPacketsLost : terminated_by(",");
+    ascii TermReceivingPLPercentage : terminated_by(",");
+    ascii TermTransmitJitterMax : terminated_by(",");
+    ascii TermTransmitJitterMean : terminated_by(",");
+    ascii TermReceivingJitterMax : terminated_by(",");
+    ascii TermReceivingJitterMean : terminated_by(",");
+    ascii TermRoundTripTimeMax : terminated_by(",");
+    ascii TermRoundTripTimeMean : terminated_by(",");
+    ascii INAPServiceKey : terminated_by(",");
+    ascii GAPNumber : terminated_by(",");
+    ascii AMA_SLP_ID : terminated_by(",");
+    ascii OTG : terminated_by(",");
+    ascii DTG : terminated_by(",");
+    ascii OrgLocNetworkPacketLossRate : terminated_by(",");
+    ascii OrgLocJitterBuffDiscardRate : terminated_by(",");
+    ascii OrgLocBurstLossDensity : terminated_by(",");
+    ascii OrgLocGapLossDensity : terminated_by(",");
+    ascii OrgLocBurstDuration : terminated_by(",");
+    ascii OrgLocGapDuration : terminated_by(",");
+    ascii OrgLocRTCPRoundTripDelay : terminated_by(",");
+    ascii OrgLocEndSystemDelay : terminated_by(",");
+    ascii OrgLocSignalLevel : terminated_by(",");
+    ascii OrgLocNoiseLevel : terminated_by(",");
+    ascii OrgLocResidualEchoRtnLoss : terminated_by(",");
+    ascii OrgLocRFactor : terminated_by(",");
+    ascii OrgLocExternalRFactor : terminated_by(",");
+    ascii OrgLocEstimatedMOSLQ : terminated_by(",");
+    ascii OrgLocEstimatedMOSCQ : terminated_by(",");
+    ascii TrmLocNetworkPacketLossRate : terminated_by(",");
+    ascii TrmLocJitterBuffDiscardRate : terminated_by(",");
+    ascii TrmLocBurstLossDensity : terminated_by(",");
+    ascii TrmLocGapLossDensity : terminated_by(",");
+    ascii TrmLocBurstDuration : terminated_by(",");
+    ascii TrmLocGapDuration : terminated_by(",");
+    ascii TrmLocRTCPRoundTripDelay : terminated_by(",");
+    ascii TrmLocEndSystemDelay : terminated_by(",");
+    ascii TrmLocSignalLevel : terminated_by(",");
+    ascii TrmLocNoiseLevel : terminated_by(",");
+    ascii TrmLocResidualEchoRtnLoss : terminated_by(",");
+    ascii TrmLocRFactor : terminated_by(",");
+    ascii TrmLocExternalRFactor : terminated_by(",");
+    ascii TrmLocEstimatedMOSLQ : terminated_by(",");
+    ascii TrmLocEstimatedMOSCQ : terminated_by(",");
+    ascii OrgRemNetworkPacketLossRate : terminated_by(",");
+    ascii OrgRemJitterBuffDiscardRate : terminated_by(",");
+    ascii OrgRemBurstLossDensity : terminated_by(",");
+    ascii OrgRemGapLossDensity : terminated_by(",");
+    ascii OrgRemBurstDuration : terminated_by(",");
+    ascii OrgRemGapDuration : terminated_by(",");
+    ascii OrgRemRTCPRoundTripDelay : terminated_by(",");
+    ascii OrgRemEndSystemDelay : terminated_by(",");
+    ascii OrgRemSignalLevel : terminated_by(",");
+    ascii OrgRemNoiseLevel : terminated_by(",");
+    ascii OrgRemResidualEchoRtnLoss : terminated_by(",");
+    ascii OrgRemRFactor : terminated_by(",");
+    ascii OrgRemExternalRFactor : terminated_by(",");
+    ascii OrgRemEstimatedMOSLQ : terminated_by(",");
+    ascii OrgRemEstimatedMOSCQ : terminated_by(",");
+    ascii TrmRemNetworkPacketLossRate : terminated_by(",");
+    ascii TrmRemJitterBuffDiscardRate : terminated_by(",");
+    ascii TrmRemBurstLossDensity : terminated_by(",");
+    ascii TrmRemGapLossDensity : terminated_by(",");
+    ascii TrmRemBurstDuration : terminated_by(",");
+    ascii TrmRemGapDuration : terminated_by(",");
+    ascii TrmRemRTCPRoundTripDelay  : terminated_by(",");
+    ascii TrmRemEndSystemDelay : terminated_by(",");
+    ascii TrmRemSignalLevel : terminated_by(",");
+    ascii TrmRemNoiseLevel : terminated_by(",");
+    ascii TrmRemResidualEchoRtnLoss : terminated_by(",");
+    ascii TrmRemRFactor : terminated_by(",");
+    ascii TrmRemExternalRFactor : terminated_by(",");
+    ascii TrmRemEstimatedMOSLQ : terminated_by(",");
+    ascii TrmRemEstimatedMOSCQ : terminated_by(",");
+    ascii FCIBilling : terminated_by(",");
+    ascii OriginalCalledPartyNumber : terminated_by(",");
+    ascii RoutingNetworkNumber : terminated_by(",");
+    ascii OrigTrunkContext : terminated_by(",");
+    ascii DestTrunkContext : terminated_by(",");
+    ascii OrigRFCI : terminated_by(",");
+    ascii OrigRFCISubflow1 : terminated_by(",");
+    ascii OrigRFCISubflow2 : terminated_by(",");
+    ascii OrigRFCISubflow3 : terminated_by(",");
+    ascii OrigtrfoSuccess : terminated_by(",");
+    ascii OrigtrfoFail : terminated_by(",");
+    ascii OrigtrfoBreak : terminated_by(",");
+    ascii TermRFCI : terminated_by(",");
+    ascii TermRFCISubflow1 : terminated_by(",");
+    ascii TermRFCISubflow2 : terminated_by(",");
+    ascii TermRFCISubflow3 : terminated_by(",");
+    ascii TermtrfoSuccess : terminated_by(",");
+    ascii TermtrfoFail : terminated_by(",");
+    ascii TermtrfoBreak : terminated_by(",");
+    ascii PCVIcidValue : terminated_by(",");
+    ascii PCVGenerate : terminated_by(",");
+    ascii PCVOrigIOI : terminated_by(",");
+    ascii PCVTermIOI : terminated_by(",");
+    ascii IncomingALCEnabled : terminated_by(",");
+    ascii OutgoingALCEnabled : terminated_by(",");
+    ascii IncomingANREnabled : terminated_by(",");
+    ascii OutgoingANREnabled : terminated_by(",");
+    ascii PublicCallingIdentity : terminated_by(",");
+    ascii OutgoingJIP : terminated_by(",");
+    ascii IncomingCustomerGroup : terminated_by(",");
+    ascii OutpulseCustomerGroup : terminated_by(",");
+    ascii OrigVPN : terminated_by(",");
+    ascii TermVPN : terminated_by(",");
+    ascii FinalTrunkGroupMember : terminated_by(",");
+    ascii SCPRouteIndex : terminated_by(",");
+    ascii RedirectRouteIndex : terminated_by(",");
+    ascii SwitchID : terminated_by(",");
+    ascii SwitchIDTrunkGroupID : terminated_by(",");
+    ascii QueryPseudoCIC : terminated_by(",");
+    ascii CallingPartyNOA : terminated_by(","),int(base10);
+    ascii SCPCauseCode : terminated_by(",");
+    ascii OrigSIPCallID : terminated_by(",");
+    ascii TermSIPCallID : terminated_by(",");
+    ascii OrigISUPOPC : terminated_by(",");
+    ascii TermISUPDPC : terminated_by(",");
+    ascii OriginatingTGRP : terminated_by(0xA);
+};
+
+//VCDR ends
+
+//Trailer part starts
+external File_Trailer_Ext{
+    CloseTime closeTime;
+    SeqnumFirst seqnumFirst;
+    SeqnumLast seqnumLast;
+    RecordCount recordCount;
+    ascii Checksum : terminated_by(0xA);
+    
+};
+
+external CloseTime : identified_by(tag=="CLOSE_TIME") {
+    ascii tag    :  terminated_by("="), encode_value("CLOSE_TIME"), external_only;
+    ascii value  : terminated_by(0xA);
+};
+
+
+external SeqnumFirst : identified_by(tag=="SEQNUM_FIRST") {
+    ascii tag    :  terminated_by("="), encode_value("SEQNUM_FIRST"), external_only;
+    ascii value  : terminated_by(0xA);
+};
+
+external SeqnumLast : identified_by(tag=="SEQNUM_LAST") {
+    ascii tag    :  terminated_by("="), encode_value("SEQNUM_LAST"), external_only;
+    ascii value  : terminated_by(0xA);
+};
+
+external RecordCount : identified_by(tag=="RECORD_COUNT") {
+    ascii tag    :  terminated_by("="), encode_value("RECORD_COUNT"), external_only;
+    ascii value  : terminated_by(0xA);
+};
+//Trailer ends
+
+in_map Header_inMap : external(File_Header_Ext), target_internal(file_header_TI), discard_output {automatic;};
+
+decoder header_decoder : in_map(Header_inMap);
+
+
+
+
+
+
+in_map Trailer_inMap : external(File_Trailer_Ext), target_internal(file_trailer_TI), discard_output {automatic;};
+
+decoder trailer_decoder : in_map(Trailer_inMap);
+
+
+
+
+
+
+//Final decoder n encoder for VCDR 
+
+in_map VCDR_im : external(VCDR), target_internal(VCDR_TI) {
+    automatic : use_external_names;
+};
+
+out_map VCDR_om : external(VCDR), internal(VCDR_TI) {
+    automatic;
+};
+
+decoder VCDR_Dec : in_map(VCDR_im);
+encoder VCDR_Enc : out_map(VCDR_om);
+
+
+//decoder VCDR_ASCII_Decoder : in_map(Header_inMap), in_map(VCDR_im), in_map(Trailer_inMap);
+
+decoder VCDR_ASCII_Decoder {
+decoder header_decoder ;
+decoder VCDR_Dec *;
+decoder trailer_decoder ;
+};
+
+
+
+
+
+//Decoding and encoding part of VCDR ends
+
+
+//Error block for SBC
+external errorBlockSBC : identified_by(strStartsWith(errorCode, "DRP") || strStartsWith(errorCode, "ERR")) {
+    ascii errorCode      : terminated_by(";");
+    ascii errorMessage   : terminated_by(";");
+};
+
+external SBCCDR {
+    set {
+        errorBlockSBC error : optional;
+    };    
+    SBC_Ext vcdr;
+};
+
+//SBCCDR starts
+external SBC_Ext{
+    ascii StartTime              : terminated_by(";");
+    ascii StartTimeSec           : terminated_by(";");
+    ascii CallDurationHHMMSS     : terminated_by(";");
+    ascii CallSource             : terminated_by(";");
+    ascii CallSourceq931sigPort  : terminated_by(";");
+    ascii CallDest               : terminated_by(";");
+    ascii TerminatorLine         : terminated_by(";");//, long(base10);
+    ascii CallSourceCustId       : terminated_by(";");
+    ascii CalledPartyOnDest      : terminated_by(";");
+    ascii CalledPartyFromSrc     : terminated_by(";");
+    ascii CallType               : terminated_by(";");
+    ascii Reserved12             : terminated_by(";");
+    ascii DisconnectErrorType    : terminated_by(";");
+    ascii CallErrorNum           : terminated_by(";"), int(base10);
+    ascii CallErrorStr           : terminated_by(";");
+    ascii FaxPages               : terminated_by(";");//, long(base10);
+    ascii Faxpriority            : terminated_by(";");
+    ascii Ani                    : terminated_by(";");
+    ascii MediaType              : terminated_by(";");
+    ascii DataVolumeTxSrc        : terminated_by(";");//, long(base10);
+    ascii DataVoulmeTxDst        : terminated_by(";");//, long(base10);
+    ascii CdrSeqNum              : terminated_by(";"), long(base10);
+    ascii TranscoderId           : terminated_by(";");//, long(base10);
+    ascii CallId                 : terminated_by(";");
+    ascii CallHoldTime           : terminated_by(";");
+    ascii CallSourceRegID        : terminated_by(";");
+    ascii CallSourceUPort        : terminated_by(";");//, int(base10);
+    ascii CallDestRegID          : terminated_by(";");
+    ascii CallDestUPort          : terminated_by(";");//, int(base10);
+    ascii IsdnCauseCode          : terminated_by(";"), int(base10);
+    ascii CalledPartyAfterSrcCallingPlan : terminated_by(";");
+    ascii CallErrorDestNum       : terminated_by(";"), int(base10);
+    ascii CallErrorDestStr       : terminated_by(";");
+    ascii CallErrorEventStr      : terminated_by(";");
+    ascii NewAni                 : terminated_by(";");
+    ascii CallDuration           : terminated_by(";"), int(base10);
+    ascii EgressCallidTerminationEndpoint : terminated_by(";");
+    ascii Protocal               : terminated_by(";");
+    ascii CdrType                : terminated_by(";");
+    ascii HuntingAttempt         : terminated_by(";"), int(base10);
+    ascii CallerTrunkGroup       : terminated_by(";");
+    ascii CallPPD                : terminated_by(";"), int(base10);
+    ascii H323DestRasError       : terminated_by(";");//, long(base10);
+    ascii H323Desth225Error      : terminated_by(";"); //, long(base10);
+    ascii SipDestRespcode        : terminated_by(";");//, int(base10);
+    ascii DestTrunkGroup         : terminated_by(";");
+    ascii CallDurationFractional : terminated_by(";");
+    ascii TimeZone               : terminated_by(";");
+    ascii MswName                : terminated_by(";");
+    ascii CalledPartyAfterTransitRoute  : terminated_by(";");
+    ascii CalledPartyOnDestNumType      : terminated_by(";");//, int(base10);
+    ascii CalledPartyFromSrcNumType     : terminated_by(";");//, int(base10);
+    ascii CallSourceRealmName    : terminated_by(";");
+    ascii CallDestRealmName      : terminated_by(";");
+    ascii CallDestCrname         : terminated_by(";");
+    ascii CallDestCustId         : terminated_by(";");
+    ascii CallZoneData           : terminated_by(";");
+    ascii CallingPartyOnDestNumType  : terminated_by(";");//, int(base10);
+    ascii CallingPartyFromSrcNumType : terminated_by(";");//, int(base10);
+    ascii OriginalIsdnCauseCode  : terminated_by(";");//, int(base10);
+    ascii PacketsReceivedOnSrcLeg : terminated_by(";");//, int(base10);
+    ascii PacketsLostOnSrcLeg    : terminated_by(";");//, int(base10);
+    ascii PacketsDiscardedOnSrcLeg : terminated_by(";");//, int(base10);
+    ascii PdvOnSrcLeg            : terminated_by(";");//, int(base10);
+    ascii CodecOnSrcLeg          : terminated_by(";");
+    ascii LatencyOnSrcLeg        : terminated_by(";");//, int(base10);
+    ascii RfactorOnSrcLeg        : terminated_by(";");//, int(base10);
+    ascii PacketsReceivedOnDestLeg : terminated_by(";");//, int(base10);
+    ascii PacketsLostOnDestLeg   : terminated_by(";");//, int(base10);
+    ascii PacketsDiscardedOnDestLeg : terminated_by(";");//, int(base10);
+    ascii PdvOnDestLeg           : terminated_by(";");//, int(base10);
+    ascii CodecOnDestLeg         : terminated_by(";");
+    ascii LatencyOnDestLeg       : terminated_by(";");//, int(base10);
+    ascii RfactorOnDestLeg       : terminated_by(";");//, int(base10);
+    ascii SipSrcRespcode         : terminated_by(";");//, int(base10);
+    ascii PeerProtocol           : terminated_by(";");
+    ascii SrcPrivateIp           : terminated_by(";");
+    ascii DestPrivateIp          : terminated_by(";");
+    ascii SrcIgrepName           : terminated_by(";");
+    ascii DestIgrepName          : terminated_by(";");
+    ascii DiversionInfo          : terminated_by(";");
+    ascii CustomContactTag       : terminated_by(";");
+    ascii E911Cell               : terminated_by(";");
+    ascii Reserved84             : terminated_by(";");
+    ascii Reserved85             : terminated_by(";");
+    ascii CallReleaseSource      : terminated_by(";");
+    ascii HuntAttemptIncludingLCF : terminated_by(";");//, int(base10);
+    ascii CallGappingError       : terminated_by(";");//, int(base10);
+    ascii ErrorCodeInReasonHeader : terminated_by(";");//, int(base10);
+    ascii OclObjectType          : terminated_by(";");
+    ascii OclObjectidDtnRegidRealmname   : terminated_by(";");
+    ascii OclObjectIdDtnRealmUport       : terminated_by(";");
+    ascii OclPolicyName          : terminated_by(";");
+    ascii SrcPrivatePort         : terminated_by(";");//, int(base10);
+    ascii DestPrivatePort        : terminated_by(";");//, int(base10);
+    ascii SrcRealmMediaIp        : terminated_by(";");
+    ascii SrcRealmMediaPort      : terminated_by(";");//, int(base10);
+    ascii DestRealmMediaIp       : terminated_by(";");
+    ascii DestRealmMediaPort     : terminated_by(";");//, int(base10);
+    ascii SrcTrunkContext        : terminated_by(";");
+    ascii DestTrunkContext       : terminated_by(";");
+    ascii Leg1_PCV               : terminated_by(";");
+    ascii Leg2_PCV               : terminated_by(";");
+    ascii Leg1_PANI              : terminated_by(";");
+    ascii Leg2_PANI              : terminated_by(";");
+    ascii CallConnectTimeMS      : terminated_by(";");
+    ascii CallEndTimeMS          : terminated_by(";");
+    ascii RoutingNumber          : terminated_by(";");
+    ascii NoOfMLines             : terminated_by(";");//, int(base10);
+    ascii FromUriUserPart        : terminated_by(";");
+    ascii NewFromUriUserPart     : terminated_by(";");
+    ascii PaidUriUserPart        : terminated_by(";");
+    ascii NewPaidUriUserPart     : terminated_by(";");
+    ascii Privacy                : terminated_by(";");
+    ascii RequestUriUserPart     : terminated_by(";");
+    ascii NewRequestUriUserPart  : terminated_by(";");
+    ascii LocalReferStatus       : terminated_by(";");//, int(base10);
+    ascii SipDestRespReason      : terminated_by(";");
+    ascii SipSrcRespReason       : terminated_by(";");
+    ascii ChargeNumber           : terminated_by(";");
+    ascii ChargeNumberNOA        : terminated_by(";");
+    ascii ChargeNumberNPI        : terminated_by(";");//, int(base10);
+    ascii SegmentStartTimeMS     : terminated_by(";");
+    ascii SegmentDurationFractional: terminated_by(";");
+    ascii Leg1LossRate           : terminated_by(";");//, int(base10);
+    ascii Leg1DiscardRate        : terminated_by(";");//, int(base10);
+    ascii Leg1BurstDensity       : terminated_by(";");//, int(base10);
+    ascii Leg1GapDensity         : terminated_by(";");//, int(base10);
+    ascii Leg1BurstDuration      : terminated_by(";");//, int(base10);
+    ascii Leg1GapDuration        : terminated_by(";");//, int(base10);
+    ascii Leg1RoundTripDelay     : terminated_by(";");//, int(base10);
+    ascii Leg1ESDelay            : terminated_by(";");//, int(base10);
+    ascii Leg1GMin               : terminated_by(";");//, int(base10);
+    ascii Leg1JBAdaptive         : terminated_by(";");//, int(base10);
+    ascii Leg1JBRate             : terminated_by(";");//, int(base10);
+    ascii Leg1RFFactor           : terminated_by(";");//, int(base10);
+    ascii Leg1MCQ                : terminated_by(";");//, int(base10);
+    ascii Leg1JBNominal          : terminated_by(";");//, int(base10);
+    ascii Leg1JBMaxDelay         : terminated_by(";");//, int(base10);
+    ascii Leg1JBAbsMaxDelay      : terminated_by(";");//, int(base10);
+    ascii Leg2LossRate           : terminated_by(";");//, int(base10);
+    ascii Leg2DiscardRate        : terminated_by(";");//, int(base10);
+    ascii Leg2BurstDensity       : terminated_by(";");//, int(base10);
+    ascii Leg2GapDensity         : terminated_by(";");//, int(base10);
+    ascii Leg2BurstDuration      : terminated_by(";");//, int(base10);
+    ascii Leg2GapDuration        : terminated_by(";");//, int(base10);
+    ascii Leg2RoundTripDelay     : terminated_by(";");//, int(base10);
+    ascii Leg2ESDelay            : terminated_by(";");//, int(base10);
+    ascii Leg2GMin               : terminated_by(";");//, int(base10);
+    ascii Leg2JBAdaptive         : terminated_by(";");//, int(base10);
+    ascii Leg2JBRate             : terminated_by(";");//, int(base10);
+    ascii Leg2RFFactor           : terminated_by(";");//, int(base10);
+    ascii Leg2MCQ                : terminated_by(";");//, int(base10);
+    ascii Leg2JBNominal          : terminated_by(";");//, int(base10);
+    ascii Leg2JBMaxDelay         : terminated_by(";");//, int(base10);
+    ascii Leg2JBAbsMaxDelay      : terminated_by(";");//, int(base10);
+    ascii Reserved157            : terminated_by(";");
+    ascii Reserved158            : terminated_by(";");
+    ascii SrcCipherSuite         : terminated_by(";");
+    ascii DestCipherSuite        : terminated_by(";");
+    ascii SrcPacketOutsideReplyWindow : terminated_by(";");//, int(base10);
+    ascii SrcPacketAuthFailure   : terminated_by(";");//, int(base10);
+    ascii SrcPacketCipherFailure : terminated_by(";");//, int(base10);
+    ascii DestPacketOutsideReplyWindow : terminated_by(";");//, int(base10);
+    ascii DestPacketAuthFailure  : terminated_by(";");//, int(base10);
+    ascii DestPacketCipherFailure : terminated_by(";");//, int(base10);
+    ascii Reserved167            : terminated_by(";");
+    ascii Reserved168            : terminated_by(";");
+    ascii Reserved169            : terminated_by(";");
+    ascii Reserved170            : terminated_by(";");
+    ascii Reserved171            : terminated_by(";");
+    ascii Reserved172            : terminated_by(";");
+    ascii Reserved173            : terminated_by(";");
+    ascii Reserved174            : terminated_by(";");
+    ascii Reserved175            : terminated_by(";");
+    ascii Reserved176            : terminated_by(";");
+    ascii EmbeddedDSPInsertionReason : terminated_by(";");
+    ascii OutgoingToUri          : terminated_by(";");
+    ascii IncomingRequestUri     : terminated_by(";");
+    ascii IncomingRsaIpAddress   : terminated_by(";");
+    ascii SBCIserverVersion      : terminated_by(";");
+    ascii OutgoingRequestUri     : terminated_by(";");
+    ascii outgoingFromUri        : terminated_by(";");
+    ascii Reserved184            : terminated_by(";");
+    ascii Reserved185            : terminated_by(";");
+    ascii Reserved186            : terminated_by(";");
+    ascii SrcPolicedPacket       : terminated_by(";");
+    ascii DestpolicedPacket      : terminated_by(";");
+    ascii FullPaidHdr            : terminated_by(";");
+    ascii SourcePTime            : terminated_by(";");
+    ascii DestinationPTime       : terminated_by(";");
+    ascii FmmCallInvokedProfiles : terminated_by(";");
+    ascii Reserved193            : terminated_by(";");
+    ascii Reserved194            : terminated_by(";");
+    ascii Reserved195            : terminated_by(";");
+    ascii Reserved196            : terminated_by(";");
+    ascii Reserved197            : terminated_by(";");
+    ascii Reserved198            : terminated_by(";");
+    ascii ReinviteRejectCount    : terminated_by(";");//, int(base10);
+    ascii OrganizationHdr        : terminated_by(";");
+    ascii SdpmediaOfferCodec     : terminated_by(";");
+    ascii SdpMediaAnswerCodec    : terminated_by(";");
+    ascii VideoCac               : terminated_by(0xA);   
+};
+
+in_map SBCCDR_inmap : external(SBCCDR), target_internal(SBCCDR_TI) {
+    automatic : use_external_names;
+};
+
+out_map SBCCDR_outmap : external(SBCCDR), internal(SBCCDR_TI) {
+    automatic;
+};
+
+decoder SBCCDR_Dec : in_map(SBCCDR_inmap);
+encoder SBCCDR_Enc : out_map(SBCCDR_outmap);
+//SBC Records Ends
+
+//Internal mgcf CDR used for mapping and businessLogic
+internal mgcfInternal {
+    string eventDateTime;
+    long eventDuration;
+    string callingPartyNum;
+    string calledPartyNum;
+    int origLineOrTrunkType;
+    int termLineOrTrunkType;
+    string origTrunkGrpCLLI;
+    string termTrunkGrpCLLI;
+    int origTrunkGrp;
+    int termTrunkGrp;
+    long longDurCallInd;
+    long callId;
+    long eventStartDateTime; //for duplicate record check
+    string disconnectDateTime;
+    int bearerCapability;
+    int answerType;
+    int recordSeqNum;
+    string longCallTime;
+    date eventDate;
+    string inRecordType; // added for audit framework.
+    string outRecordType; // added for audit framework.
+    string terminatingLRN; //Added for LRN 
+    string outpulsedNumber; 
+    string calledPartyID; //added for obtaining LRN changed 20150826
+    int termSignalRelCause; // added for Route Manager
+    string originatingTGRP; //added for NLD onnet setlement 20151015
+    string origSessionStartTime; //added in Route manager for unanswered call 20151130
+    string orignateCarrierTime; //added in Route manager for unanswered call to replace origSessionStartTime 20160909
+    long dupEventStartDateTime;  //added new field for Duplicate record check 20160812
+    string outplusedCallingNum; //Added field for capturing New field Outplused Calling Number 20170601
+    string chargingIndicator; //Added for mapping ICID on 20170807
+    string incomingTrunk;
+    string outgoingTrunk;
+    string incomingProduct;
+    string outgoingProduct;
+    string incomingSwitch;
+    string outgoingSwitch;
+    string inEventMappingCode;
+    string outEventMappingCode;
+    string AccIncomingSwitch;
+    string AccOutgoingSwitch;
+    string NldIncomingSwitch;
+    string NldOutgoingSwitch;
+    string sOrigCircleCode;
+    string sTermCircleCode;
+    string sOrigCircleId;
+    string sTermCircleId;
+    boolean isForIntecIncSwitch;
+    boolean isForIntecOutSwitch;
+    string aNum;
+    string bNum;
+    string sDailedNum;
+    string aRMNum;
+    string bRMNum;
+    string RMMsrnProduct;
+    string IldMsrnProduct;
+    boolean isVOWIFI;
+    boolean isVOLTE;
+    VCDR_Ext mgcfUdr;
+};
+
+
+//Session UDR for Aggregation
+session genBand_LongCall {
+    long totalCallDur;
+    date origDateTime;
+    boolean missingPartial;
+    boolean startPartialReceived;
+    boolean lastPartialReceived;
+    map<date, date> timeMap;
+    mgcfInternal udr;
+};
+
+//Session UDR for Aggregation
+session genBand_LongCall_Cum {
+    long totalCallDur;
+    date origDateTime;
+    boolean missingPartial;
+    long lastPartialDuration;
+    map<long, date> timeMap;
+    mgcfInternal udr;
+};
+
+//Internal sbc CDR used for mapping and businessLogic
+internal sbcInternal {
+    string eventDateTime;
+    string eventDuration;
+    string callingPartyNum;
+    string calledPartyNum;
+    string callDestRegid;
+    string callSourceRegid;
+    string disconnectErrType;
+    string callId;
+    long eventStartDateTime; //for duplicate record check
+    string disconnectDateTime;
+    long recordSeqNum;
+    date eventDate;
+    int callErrNum;
+    string callErrDesp;
+    string inRecordType; // added for audit framework.
+    string outRecordType; // added for audit framework.
+    int isdnCauseCode; //added for mapping of route Manager.
+    string callHoldTime; //added for mapping of route Manager.
+    int huntingAttempt; //added for mapping of route Manager.
+    int callPPD; //added for mapping of route Manager.
+    string startTime; //added for unanswerd  call in RouteManager 20151130
+    string calledPartyOnSrc;  // added for MSRN number in SBC
+    long dupEventStartDateTime;
+    string calledPartyAfSrcCallPlan;  //Added for obtaining Prefix for COS : Changes for ILD Hubbing 20170225
+    string chargingIndicator; //Added for mapping ICID on 20170807
+    string incomingTrunk;
+    string inEventMappingCode;
+    string outgoingTrunk;
+    string outEventMappingCode;
+    string incomingSwitch;
+    string outgoingSwitch;
+    string incomingProduct;
+    string outgoingProduct;
+    string aNum;
+    string bNum;
+    string aRMNum;
+    string bRMNum;
+    string RMincomingProduct;
+    string RMoutgoingProduct;
+    SBC_Ext sbcUdr;
+};
+
+
+encoder MGCF_SBC_Common : out_map(VCDR_om) , out_map(SBCCDR_outmap);
+
+
+//Intec record starts
+external inContentFormat_GenBand {
+
+    ascii incomingSwitch         : align(left), padded_with(0x20), static_size(20);
+    ascii outgoingSwitch         : align(left), padded_with(0x20), static_size(20);
+    ascii eventStartDate         : align(left), padded_with(0x20), static_size(8);
+    ascii eventStartTime         : align(left), padded_with(0x20), static_size(8);
+    ascii eventDuration          : align(right), padded_with("0"), static_size(10);
+    ascii aNum                   : align(left), padded_with(0x20), static_size(28); //, int(base10);
+    ascii bNum                   : align(left), padded_with(0x20), static_size(28); //, int(base10);
+    ascii incomingTrunk          : align(left), padded_with(0x20), static_size(20);
+    ascii outgoingTrunk          : align(left), padded_with(0x20), static_size(20);
+    ascii incomingProduct        : align(left), padded_with(0x20), static_size(14); 
+    ascii outgoingProduct        : align(left), padded_with(0x20), static_size(14);
+    ascii eventDirection         : align(left), padded_with(0x20), static_size(1);
+    ascii discreteRatingParam_1  : align(left), padded_with(0x20), static_size(15); 
+    ascii dataUnit               : align(left), padded_with(0x20), static_size(8);
+    ascii recSeqNum              : long(base10), align(left), padded_with(0x20), static_size(40);
+    ascii recType                : align(left), padded_with(0x20), static_size(2); 
+    ascii userSummarization      : align(left), padded_with(0x20), static_size(20);
+    ascii userData               : align(left), padded_with(0x20), static_size(30);
+    ascii userData_2             : align(left), padded_with(0x20), static_size(30);
+    ascii linkField              : align(left), padded_with(0x20), static_size(2);// Added new field for Idenfication of splited record @Build 5  
+    ascii inEventMappingCode     : align(left), padded_with(0x20), static_size(20); // Added new field 
+    ascii outEventMappingCode    : align(left), padded_with(0x20), static_size(20); // Added new field
+    ascii userData_3             : align(left), padded_with(0x20), static_size(80); //Added for mapping ICID on 20170807
+    ascii lineFeed               : terminated_by(0xA), external_only;
+}; 
+
+
+
+in_map contentGenBand_imap : external(inContentFormat_GenBand), target_internal(inContentFormatGenBand_TI){automatic;};
+
+decoder inContentFormatGenBand_Dec : in_map(contentGenBand_imap);
+
+out_map contentGenBand_OutMap : internal(inContentFormatGenBand_TI),external(inContentFormat_GenBand) { 
+    automatic;
+};
+
+encoder contentGenBand_Enc : out_map(contentGenBand_OutMap);
+
+//Intec record ends
+
+//acc/nld interconnect format starts
+external accIntecFormat_GenBand {
+
+    ascii incomingSwitch         : align(left), padded_with(0x20), static_size(20);
+    ascii outgoingSwitch         : align(left), padded_with(0x20), static_size(20);
+    ascii eventStartDate         : align(left), padded_with(0x20), static_size(8);
+    ascii eventStartTime         : align(left), padded_with(0x20), static_size(8);
+    ascii eventDuration          : align(right), padded_with("0"), static_size(10);
+    ascii aNum                   : align(left), padded_with(0x20), static_size(28); //, int(base10);
+    ascii bNum                   : align(left), padded_with(0x20), static_size(28); //, int(base10);
+    ascii incomingTrunk          : align(left), padded_with(0x20), static_size(20);
+    ascii outgoingTrunk          : align(left), padded_with(0x20), static_size(20);
+    ascii incomingProduct        : align(left), padded_with(0x20), static_size(14); 
+    ascii outgoingProduct        : align(left), padded_with(0x20), static_size(14);
+    ascii eventDirection         : align(left), padded_with(0x20), static_size(1);
+    ascii discreteRatingParam_1  : align(left), padded_with(0x20), static_size(15); 
+    ascii dataUnit               : align(left), padded_with(0x20), static_size(8);
+    ascii recSeqNum              : long(base10), align(left), padded_with(0x20), static_size(40);
+    ascii recType                : align(left), padded_with(0x20), static_size(2); 
+    ascii userSummarization      : align(left), padded_with(0x20), static_size(20);
+    ascii userData               : align(left), padded_with(0x20), static_size(30);
+    ascii userData_2             : align(left), padded_with(0x20), static_size(30);
+    ascii linkField              : align(left), padded_with(0x20), static_size(2);// Added new field for Idenfication of splited record @Build 5  
+    ascii userData_3             : align(left), padded_with(0x20), static_size(80); //Added for mapping ICID on 20170807
+    ascii lineFeed               : terminated_by(0xA), external_only;
+}; 
+
+
+
+in_map accIncontentGenBand_imap : external(accIntecFormat_GenBand), target_internal(accIncontentGenBand_TI){automatic;};
+
+decoder accIncontentGenBand_Dec : in_map(accIncontentGenBand_imap);
+
+out_map accIncontentGenBand_OutMap : internal(accIncontentGenBand_TI),external(accIntecFormat_GenBand) { 
+    automatic;
+};
+
+encoder accIncontentGenBand_Enc : out_map(accIncontentGenBand_OutMap);
+//acc/nld interconnect format ends
+
+//Route Manager Record Start
+external RouteManager_Ext {
+    ascii In_Network_Element         : terminated_by(",");
+    ascii Out_Network_Element        : terminated_by(",");
+    ascii In_Route                   : terminated_by(",");
+    ascii Out_Route                  : terminated_by(",");
+    ascii In_Event_Mapping_Code      : terminated_by(",");
+	ascii Out_Event_Mapping_Code     : terminated_by(",");
+    ascii In_Cdr_Group               : terminated_by(",");
+    ascii Out_Cdr_Group              : terminated_by(",");
+    ascii B_Number                   : terminated_by(",");
+    ascii C_Number                   : terminated_by(",");
+    ascii No_Of_Event                : terminated_by(",");
+    ascii Valid_From                 : terminated_by(",");
+    ascii A_Number                   : terminated_by(",");
+    ascii Termination_Cause          : terminated_by(","),int(base10);
+    ascii In_Event_Identifier        : terminated_by(",");
+    ascii Out_Event_Identifier       : terminated_by(",");
+    ascii In_UOM1                    : terminated_by(",");
+    ascii In_Volume1                 : terminated_by(",");
+    ascii Out_UOM1                   : terminated_by(",");
+    ascii Out_Volume1                : terminated_by(",");
+    ascii In_Quality_Units1          : terminated_by(",");
+    ascii In_Quality_UOM1            : terminated_by(",");
+    ascii In_Quality_Units2          : terminated_by(",");
+    ascii In_Quality_UOM2            : terminated_by(",");
+    ascii In_Quality_Units3          : terminated_by(",");
+    ascii In_Quality_UOM3            : terminated_by(",");
+    ascii In_Quality_Units6          : terminated_by(",");
+    ascii In_Quality_UOM6            : terminated_by(",");
+    ascii Out_Quality_Units1         : terminated_by(",");
+    ascii Out_Quality_UOM1           : terminated_by(",");
+    ascii Out_Quality_Units2         : terminated_by(",");
+    ascii Out_Quality_UOM2           : terminated_by(",");
+    ascii Out_Quality_Units3         : terminated_by(",");
+    ascii Out_Quality_UOM3           : terminated_by(",");
+    ascii Out_Quality_Units4         : terminated_by(",");
+    ascii Out_Quality_UOM4           : terminated_by(",");
+    ascii Out_Quality_Units5         : terminated_by(",");
+    ascii Out_Quality_UOM5           : terminated_by(",");
+    ascii Out_Quality_Units6         : terminated_by(",");
+    ascii Out_Quality_UOM6           : terminated_by(",");
+    ascii Out_Quality_Units7         : terminated_by(",");
+    ascii Out_Quality_UOM7           : terminated_by(",");
+    ascii Out_Quality_Units8         : terminated_by(",");
+    ascii Out_Quality_UOM8           : terminated_by(0xA);
+    
+};
+
+internal rmExtra
+{
+    boolean isMGCF;
+    ascii sipId;
+    ascii inRecordType;
+};
+
+external RouteManager_ToAgg{
+    ascii In_Network_Element         : terminated_by(",");
+    ascii Out_Network_Element        : terminated_by(",");
+    ascii In_Route                   : terminated_by(",");
+    ascii Out_Route                  : terminated_by(",");
+    ascii In_Event_Mapping_Code      : terminated_by(",");
+	ascii Out_Event_Mapping_Code     : terminated_by(",");
+    ascii In_Cdr_Group               : terminated_by(",");
+    ascii Out_Cdr_Group              : terminated_by(",");
+    ascii B_Number                   : terminated_by(",");
+    ascii C_Number                   : terminated_by(",");
+    ascii No_Of_Event                : terminated_by(",");
+    ascii Valid_From                 : terminated_by(",");
+    ascii A_Number                   : terminated_by(",");
+    ascii Termination_Cause          : terminated_by(","),int(base10);
+    ascii In_Event_Identifier        : terminated_by(",");
+    ascii Out_Event_Identifier       : terminated_by(",");
+    ascii In_UOM1                    : terminated_by(",");
+    ascii In_Volume1                 : terminated_by(",");
+    ascii Out_UOM1                   : terminated_by(",");
+    ascii Out_Volume1                : terminated_by(",");
+    ascii In_Quality_Units1          : terminated_by(",");
+    ascii In_Quality_UOM1            : terminated_by(",");
+    ascii In_Quality_Units2          : terminated_by(",");
+    ascii In_Quality_UOM2            : terminated_by(",");
+    ascii In_Quality_Units3          : terminated_by(",");
+    ascii In_Quality_UOM3            : terminated_by(",");
+    ascii In_Quality_Units6          : terminated_by(",");
+    ascii In_Quality_UOM6            : terminated_by(",");
+    ascii Out_Quality_Units1         : terminated_by(",");
+    ascii Out_Quality_UOM1           : terminated_by(",");
+    ascii Out_Quality_Units2         : terminated_by(",");
+    ascii Out_Quality_UOM2           : terminated_by(",");
+    ascii Out_Quality_Units3         : terminated_by(",");
+    ascii Out_Quality_UOM3           : terminated_by(",");
+    ascii Out_Quality_Units4         : terminated_by(",");
+    ascii Out_Quality_UOM4           : terminated_by(",");
+    ascii Out_Quality_Units5         : terminated_by(",");
+    ascii Out_Quality_UOM5           : terminated_by(",");
+    ascii Out_Quality_Units6         : terminated_by(",");
+    ascii Out_Quality_UOM6           : terminated_by(",");
+    ascii Out_Quality_Units7         : terminated_by(",");
+    ascii Out_Quality_UOM7           : terminated_by(",");
+    ascii Out_Quality_Units8         : terminated_by(",");
+    ascii sipId : terminated_by(",");
+    ascii Out_Quality_UOM8           : terminated_by(0xA);
+  
+  //  RouteManager_Ext rmExt;
+    
+    };
+    
+in_map RouteManager_ToAgg_imap : external(RouteManager_ToAgg), target_internal(RouteManager_ToAgg_TI){automatic : use_external_names;};
+
+decoder RouteManager_ToAgg_Dec : in_map(RouteManager_ToAgg_imap);
+
+out_map RouteManager_ToAgg_OutMap : internal(RouteManager_ToAgg_TI),external(RouteManager_ToAgg) { 
+    automatic;
+};
+
+encoder RouteManager_ToAgg_Enc : out_map(RouteManager_ToAgg_OutMap);
+
+in_map RouteManager_imap : external(RouteManager_Ext), internal (rmExtra),target_internal(RouteManager_TI){automatic;};
+
+decoder RouteManager_Dec : in_map(RouteManager_imap);
+
+out_map RouteManager_OutMap : internal(RouteManager_TI),external(RouteManager_Ext) { 
+    automatic;
+};
+
+encoder RouteManager_Enc : out_map(RouteManager_OutMap);
+
+//Route Manager encoding/decoding ends
+
+//For DuplicateBatch Event
+event errorDupFile {
+    string message;
+};
+
+
+//Log File Encoder : 20151023
+external logFile {
+    ascii aNum              : terminated_by("|");
+    ascii calledPartyId     : terminated_by("|");
+    ascii DailedNum         : terminated_by("|");
+    ascii callStartTime     : terminated_by("|");
+    ascii callEndTime       : terminated_by("|");
+    ascii callDuration      : terminated_by("|");
+    ascii origTrunkGroup    : terminated_by("|");
+    ascii termTrunkGroup    : terminated_by("|");
+    ascii origLineTrunkType : terminated_by("|");
+    ascii termLineTrunkType : terminated_by("|");
+    ascii answerType        : terminated_by("|");
+    ascii originatingTGRP   : terminated_by("|");
+    ascii longCallDurInd    : terminated_by("|");
+    ascii callId            : terminated_by("|");
+    ascii recSeqNum         : terminated_by(0xA);
+};
+
+
+in_map logFile_im : external (logFile) , target_internal(logFile_TI){
+    automatic; 
+};
+
+out_map logFile_om : external (logFile) , internal(logFile_TI){
+    automatic;  
+};
+
+encoder logFile_Encoder : out_map(logFile_om);
+
+decoder logFile_Decoder : in_map(logFile_im);
+
+//external for NPO MGCF :20151224
+external npoMgcf_Ext{
+    ascii CDRSequenceNumber		  : terminated_by(",");
+	ascii OriginatingDateTime     : terminated_by(","); 
+	ascii AnswerDateTime          : terminated_by(",");
+    ascii DisconnectedDateTime    : terminated_by(","); 
+	ascii CallingPartyID          : terminated_by(",");
+	ascii DialedNumber			  : terminated_by(",");	
+	ascii TranslatedNumber		  : terminated_by(",");	
+	ascii InternalReleaseCause    : terminated_by(","); 
+	ascii OrigSignalRelCause      : terminated_by(","); 
+	ascii TermInternalRelCause    : terminated_by(","); 
+	ascii TermSignalRelCause      : terminated_by(","); 
+	ascii OrignateCarrierTime     : terminated_by(","); 
+	ascii CarrierConnectTime      : terminated_by(","); 
+	ascii DisconnectDirection     : terminated_by(","); 
+	ascii ShortOnHookDuration     : terminated_by(","); 
+	ascii OrigLineOrTrunkType     : terminated_by(","); 
+	ascii OriginatingMG           : terminated_by(","); 
+	ascii OriginatingSpan         : terminated_by(","); 
+	ascii OriginatingChannel      : terminated_by(","); 
+	ascii OrigTrunkGroup          : terminated_by(","); 
+	ascii OrigTrunkGroupCircuitID : terminated_by(","); 
+	ascii TermLineorTrunkType     : terminated_by(","); 
+	ascii TerminatingMG           : terminated_by(","); 
+	ascii TerminatingSpan         : terminated_by(","); 
+	ascii TerminatingChannel      : terminated_by(","); 
+	ascii TermTrunkGroup          : terminated_by(","); 
+	ascii TermTrunkGroupCircuitID : terminated_by(","); 
+	ascii OrigTerminationType     : terminated_by(","); 
+	ascii TermTerminationType     : terminated_by(","); 
+	ascii OriginationLRN          : terminated_by(","); 
+	ascii OrigLRNSource           : terminated_by(","); 
+	ascii TerminationLRN          : terminated_by(","); 
+	ascii TermLRNSource           : terminated_by(","); 
+	ascii OrigTrunkGroupCLLI      : terminated_by(","); 
+	ascii TermTrunkGroupCLLI      : terminated_by(","); 
+	ascii OrigSIPCallID           : terminated_by(","); 
+	ascii TermSIPCallID           : terminated_by(","); 
+	ascii OrigISUPOPC             : terminated_by(","); 
+	ascii TermISUPDPC             : terminated_by(","); 
+	ascii OriginatingTGRP         : terminated_by(",");
+	ascii OutpulsedNumber         : terminated_by(",");
+	ascii RouteListIdentifier     : terminated_by(",");
+	ascii LastSuccessRouteList    : terminated_by(",");
+	ascii CallDuration            : terminated_by(",");
+	ascii OrgLocRFactor           : terminated_by(",");
+	ascii OrigLocExternalRFactor  : terminated_by(",");
+	ascii OrigLocEstimatedMOSLQ   : terminated_by(",");
+	ascii OrigLocEstimatedMOSCQ   : terminated_by(",");
+	ascii TrmLocaRFactor          : terminated_by(",");
+	ascii TrmLocExternalRFactor   : terminated_by(",");
+	ascii TrmLocEstimatedMOSLQ    : terminated_by(",");
+	ascii TrmLocEstimatedMOSCQ    : terminated_by(",");
+    ascii OrigCC                  : terminated_by(",");
+    ascii TermCC                  : terminated_by(0xA);
+};
+
+//external for NPO SBC 20151224
+external npoSbc_Ext{
+	ascii StartTime				: terminated_by(",");
+	ascii CallDuration          : terminated_by(",");
+	ascii CallSource            : terminated_by(",");
+	ascii CallDest              : terminated_by(",");
+	ascii CalledPartyOnDest     : terminated_by(",");
+	ascii CalledPartyFromSrc    : terminated_by(",");
+	ascii CallType              : terminated_by(",");
+	ascii DisconnectErrorType   : terminated_by(",");
+	ascii ANI                   : terminated_by(",");
+	ascii CallId                : terminated_by(",");
+	ascii CallSourceRegId       : terminated_by(",");
+	ascii Callsourceuport       : terminated_by(",");
+	ascii Calldestuport         : terminated_by(",");
+	ascii CallDestRegId         : terminated_by(",");
+	ascii IsdnCauseCode         : terminated_by(",");
+	ascii NewAni                : terminated_by(",");
+	ascii CallPdd               : terminated_by(",");
+	ascii CalDurationFractional : terminated_by(",");
+	ascii MswName               : terminated_by(",");
+	ascii PdvonSrcLeg           : terminated_by(",");
+	ascii CodeConSrcLeg         : terminated_by(",");
+	ascii LatencyOnSrcLeg       : terminated_by(",");
+	ascii RfactoronSrcLeg       : terminated_by(",");
+	ascii PdvonDestLeg          : terminated_by(",");
+	ascii CodeConDestLeg        : terminated_by(",");
+	ascii LatencyOnDestLeg      : terminated_by(",");
+	ascii RFactoronDestLeg      : terminated_by(",");
+	ascii SrcPrivateip          : terminated_by(",");
+	ascii DestPrivateip         : terminated_by(",");
+	ascii SipSrcRespCode        : terminated_by(",");
+	ascii CallReleaseSource     : terminated_by(",");
+    ascii OrigCC                : terminated_by(",");
+    ascii TermCC                : terminated_by(0xA);
+};
+
+in_map npoMgcf_imap : external (npoMgcf_Ext) , target_internal(npoMgcf_Ext_TI){
+    automatic; 
+};
+
+out_map npoMgcf_outmap : external (npoMgcf_Ext) , internal(npoMgcf_Ext_TI){
+    automatic;  
+};
+
+encoder npoMgcf_Encoder : out_map(npoMgcf_outmap);
+
+decoder npoMgcf_Decoder : in_map(npoMgcf_imap);
+
+in_map npoSbc_imap : external (npoSbc_Ext) , target_internal(npoSbc_Ext_TI){
+    automatic; 
+};
+
+out_map npoSbc_outmap : external (npoSbc_Ext) , internal(npoSbc_Ext_TI){
+    automatic;  
+};
+
+encoder npoSbc_Encoder : out_map(npoSbc_outmap);
+
+decoder npoSbc_Decoder : in_map(npoSbc_imap);
+
+external BiMgcf_Ext {
+    ascii MGOriginatingDtTm    : terminated_by(",");
+    ascii MGAnswerDtTm         : terminated_by(",");
+    ascii MGDiscnctDtTm        : terminated_by(",");
+    ascii MGCallingPrtyID      : terminated_by(",");
+    ascii MGDialledNo          : terminated_by(",");
+    ascii MGCallDuration       : terminated_by(",");
+    ascii MGOrigSwitchID       : terminated_by(",");
+    ascii MGOrigTrunkGroup     : terminated_by(",");
+    ascii MGTermTrunkGroup     : terminated_by(",");
+    ascii MGOrigTrunkGroupCLLI : terminated_by(",");
+    ascii MGTermTrunkGroupCLLI : terminated_by(",");
+    ascii MGOrigCodecProf      : terminated_by(",");
+    ascii MGTermCodecProf      : terminated_by(",");
+    ascii MGOrigSIPCallID      : terminated_by(",");
+    ascii MGTermSIPCallID      : terminated_by(",");
+    ascii MGFileName           : terminated_by(0xA);
+};
+
+in_map biMgcf_imap : external (BiMgcf_Ext) , target_internal(biMgcf_Ext_TI){
+    automatic; 
+};
+
+out_map biMgcf_outmap : external (BiMgcf_Ext) , internal(biMgcf_Ext_TI){
+    automatic;  
+};
+
+encoder biMgcf_Encoder : out_map(biMgcf_outmap);
+
+decoder biMgcf_Decoder : in_map(biMgcf_imap);
+
+external BiSbc_Ext {
+ascii SBstarttime                     : terminated_by(",");
+ascii SBcallconnecttimems             : terminated_by(",");
+ascii SBcallendtimems                 : terminated_by(",");
+ascii SBani                           : terminated_by(",");
+ascii SBcalledpartyondest             : terminated_by(",");
+ascii SBcalledpartyfromsrc            : terminated_by(",");
+ascii SBcallduration                  : terminated_by(",");
+//ascii SBcallduration                : terminated_by(",");
+ascii SBcalldurationfractional        : terminated_by(",");
+ascii SBmswname                       : terminated_by(",");
+ascii SBcallsourceregid               : terminated_by(",");
+ascii SBcallsourceuport               : terminated_by(",");
+ascii SBcalldestregid                 : terminated_by(",");
+ascii SBcalldestuport                 : terminated_by(",");
+ascii SBcalltype                      : terminated_by(",");
+ascii SBdisconnecterrortype           : terminated_by(",");
+ascii egresscallidterminationendpoint : terminated_by(",");
+ascii Callid                          : terminated_by(",");
+ascii RawCDRFileName                  : terminated_by(0xA);
+};
+
+in_map biSbc_imap : external (BiSbc_Ext) , target_internal(biSbc_Ext_TI){
+    automatic; 
+};
+
+out_map biSbc_outmap : external (BiSbc_Ext) , internal(biSbc_Ext_TI){
+    automatic;  
+};
+
+encoder biSbc_Encoder : out_map(biSbc_outmap);
+
+decoder biSbc_Decoder : in_map(biSbc_imap);
+
+session rmSession{
+    boolean sessionExists;
+    RouteManager_ToAgg_TI rmExt;
+}; 
+
+internal SourceFileNm {
+    string sourceFileName;    
+};
+
+
+internal ILDNumberNormalization 
+{
+    int numberOfDigitsToRemove;
+    string prefixString;
+    string tag;
+    string productGroup;
+    string normalizedNumber;
+    string performLRNLookup;
+    boolean normalizationSucceded;
+};
+
+internal SearchNode {
+    int minLength;
+    string regEx;
+    map<string, SearchNode> NextNode;
+    map<string, map<string,any>> colValues;
+};

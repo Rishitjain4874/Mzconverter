@@ -1,0 +1,137 @@
+external TanlaRec : terminated_by(0xA){
+    set {
+        errorBlock err : optional;  
+    };
+    ascii ANumber                   : terminated_by(",");
+    ascii BNumber                   : terminated_by(",");
+    ascii SubmitTimeStamp           : terminated_by(",");
+    ascii DeliveryTimeStamp         : terminated_by(",");
+    ascii SrcOperatorName           : terminated_by(",");
+    ascii DstOperatorName           : terminated_by(",");
+    ascii SrcHubName                : terminated_by(",");
+    ascii LRN                       : terminated_by(",");
+    ascii CLGGT                     : terminated_by(",");
+    ascii CLDGT                     : terminated_by(",");
+    ascii VLRAddress                : terminated_by(",");
+    ascii IMSI                      : terminated_by(",");
+    ascii TypeofMsg                 : terminated_by(",");
+    ascii MsgStatus                 : terminated_by(",");
+    ascii CauseCode                 : terminated_by(",");
+    ascii SourceAccID               : terminated_by(",");
+    ascii DestinationAccID          : terminated_by(",");
+    ascii MsgLength                 : terminated_by(",");
+    ascii MsgID                     : terminated_by(","),long(base10);
+    ascii DCS                       : terminated_by(",");
+    ascii UDH                       : terminated_by(",");
+    ascii TotalNoOfparts            : terminated_by(",");
+    ascii PARTNO                    : terminated_by(",");
+    ascii ston                      : terminated_by(",");
+    ascii SNPI                      : terminated_by(",");
+    ascii Dton                      : terminated_by(",");
+    ascii Dnpi                      : terminated_by(",");
+    ascii Header                    : terminated_by(",");
+    ascii BnumberMccMnc             : terminated_by(0xA);
+};
+
+
+external errorBlock : identified_by(strStartsWith(errorCode, "ERR") || (strStartsWith(errorCode, "DRP"))) {
+    ascii errorCode : terminated_by(",");
+    ascii errorMessage : terminated_by(",");
+};
+
+
+in_map errorBlock_InMap : external (errorBlock), target_internal(errorBlock_TI){automatic;};
+in_map TanRec_InMap : external(TanlaRec), target_internal(TanlaRec_TI){
+   //automatic : use_external_names;
+   automatic{
+       errorBlock : using in_map errorBlock_InMap;
+    };
+};
+decoder TanRec_Dec : in_map(TanRec_InMap);
+
+out_map TanRec_OutMap : external(TanlaRec), internal(TanlaRec_TI){
+   automatic;
+};
+    
+encoder TanRec_Enc : out_map(TanRec_OutMap);
+
+
+internal RecInternal{
+    string  sCallingNum;
+    string  sCalledNum;
+    string  sDuration;
+    string  sEvntStartTm;
+    string  sEvntstartDt;
+    //long    lDeliveryTS;
+    string  sCallingGT;
+    string  sCalledGT;
+    string  sCircle;
+    string  sIMSI;
+    string  sLRN;
+    string  sMsgStatus;
+    long  sRecSeqNo;
+    string  sAnumOp;
+    string  sBnumOp;
+    string  sSMSType;
+    int     iMsgLn;
+    string  sDestAddr;
+    string  sSrcAccID;
+    string  sDestAccID;
+    string  sInTrunk;
+    string  sOutTrunk;
+    string  sCallingOp;
+    string  sCalledOp;
+    long    lDateTime;
+    string  sHeader;    
+    TanlaRec_TI tanUdr;
+    string sAnumLRN;
+    long chargingStartTimeForDup;
+    string sNewCalledOp;
+    IntecRec_TI intRec;
+    string BPartyMccMnc;
+};
+
+external IntecRec_ISMS{
+    ascii incomingSwitch         : align(left), padded_with(0x20), static_size(20);
+    ascii outgoingSwitch         : align(left), padded_with(0x20), static_size(20);
+    ascii eventStartDate         : align(left), padded_with(0x20), static_size(8);
+    ascii eventStartTime         : align(left), padded_with(0x20), static_size(8);
+    ascii eventDuration          : align(right), padded_with("0"), static_size(10);
+    ascii aNum                   : align(left), padded_with(0x20), static_size(28); 
+    ascii bNum                   : align(left), padded_with(0x20), static_size(28);
+    ascii incomingTrunk          : align(left), padded_with(0x20), static_size(20);
+    ascii outgoingTrunk          : align(left), padded_with(0x20), static_size(20);
+    ascii incomingProduct        : align(left), padded_with(0x20), static_size(14); 
+    ascii outgoingProduct        : align(left), padded_with(0x20), static_size(14);
+    ascii eventDirection         : align(left), padded_with(0x20), static_size(1);
+    ascii discreteRatingParam_1  : align(left), padded_with(0x20), static_size(15); 
+    ascii dataUnit               : align(left), padded_with(0x20), static_size(8);
+    ascii recSeqNum              : long(base10), align(left), padded_with(0x20),static_size(40);
+    ascii recType                : align(left), padded_with(0x20), static_size(2); 
+    ascii userSummarization      : align(left), padded_with(0x20), static_size(20);
+    ascii userData               : align(left), padded_with(0x20), static_size(30);
+    ascii userData_2             : align(left), padded_with(0x20), static_size(30);
+    ascii linkField              : align(left), padded_with(0x20), static_size(2);
+    ascii userData_3             : align(left), padded_with(0x20), static_size(80); 
+    ascii lineFeed               : terminated_by(0xA), external_only;
+};
+  
+
+
+in_map IntecRec_im : external(IntecRec_ISMS) , target_internal(IntecRec_TI){
+    automatic;
+};
+decoder IntecRec_Dec : in_map(IntecRec_im);
+
+out_map IntecRec_ot : external(IntecRec_ISMS), internal(IntecRec_TI){
+    automatic;
+};
+encoder IntecRec_Enc : out_map(IntecRec_ot);
+
+
+internal SearchNode {
+    int minLength;
+    string regEx;
+    map<string, SearchNode> NextNode;
+    map<string, map<string,any>> colValues;
+};

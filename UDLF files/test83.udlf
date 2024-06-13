@@ -1,0 +1,131 @@
+external Header : identified_by (ACCOUNTID == "ACCOUNTID"), terminated_by(0xA)
+{
+    ascii ACCOUNTID         : terminated_by(",");
+    ascii PPACC             : terminated_by(",");
+    ascii SERVICEID         : terminated_by(",");
+    ascii TOPUPBAL          : terminated_by(",");
+    ascii CURRENTEXPDATE    : terminated_by(",");
+    ascii LASTUSAGEDATE     : terminated_by(",");
+    ascii STARTDATE         : terminated_by(0xA);
+};
+
+in_map Header_im : external(Header), target_internal(Header_TI),discard_output{
+    automatic;
+};
+
+decoder HeaderDec : in_map(Header_im);
+out_map Header_om : external(Header), internal(Header_TI){
+    automatic;
+};
+encoder HeaderEnc : out_map(Header_om);
+
+
+external extZeroCust_Records : terminated_by(0xA)
+{
+    ascii accountID           : terminated_by(",");
+    ascii ppacc               : terminated_by(",");
+	ascii serviceID           : terminated_by(",");
+	ascii topUpBal            : terminated_by(",");
+	ascii currentExpDate      : terminated_by(",");
+	ascii lastUsageDate       : terminated_by(",");
+	ascii startDate           : terminated_by(0xA);
+};
+
+in_map extZeroCust_Records_in_map : external(extZeroCust_Records), target_internal(extZeroCust_Records_ti)
+{
+    automatic : use_external_names;
+};
+
+decoder ZeroCust_RecDec : in_map(extZeroCust_Records_in_map) ;
+
+out_map extZeroCust_Records_out_map : external(extZeroCust_Records), internal(extZeroCust_Records_ti){
+    automatic;
+};
+
+encoder ZeroCust_RecEnc : out_map(extZeroCust_Records_out_map);
+
+decoder FinalDec : in_map(Header_im),in_map(extZeroCust_Records_in_map);
+encoder FinalEnc : out_map(Header_om),out_map(extZeroCust_Records_out_map);
+
+
+internal ZERO_USAGE_UDR{
+    string Filename;
+    int TotCount;
+    extZeroCust_Records_ti origRec;
+};
+
+external SuccessUdr
+{
+    ascii fileName      : terminated_by(",");
+    ascii accountId     : terminated_by(",");
+    ascii serviceId     : terminated_by(0xA);
+};
+
+in_map SuccessUdr_inmap : external(SuccessUdr), target_internal(Success_Udr){
+    automatic;
+};
+
+out_map SuccessUdr_outmap : external(SuccessUdr), internal(Success_Udr){
+    automatic;
+};
+
+encoder SuccessUdr_Enc : out_map(SuccessUdr_outmap);
+decoder SuccessUdr_Dec : in_map(SuccessUdr_inmap);
+
+external FailureUdr
+{
+    ascii fileName      : terminated_by(",");
+    ascii accountId     : terminated_by(",");
+    ascii reasonCode    : terminated_by(0xA);
+};
+
+in_map FailureUdr_inmap : external(FailureUdr), target_internal(Failure_Udr){
+    automatic;
+};
+
+out_map FailureUdr_outmap : external(FailureUdr), internal(Failure_Udr){
+    automatic;
+};
+
+encoder FailureUdr_Enc : out_map(FailureUdr_outmap);
+decoder FailureUdr_Dec : in_map(FailureUdr_inmap);
+
+internal AuditUdr
+{
+    date AuditDate;
+    
+};
+external AuditUdr
+{
+    ascii FileName                          : terminated_by(",");
+    ascii WorkflowName                      : terminated_by(",");
+    ascii Input                             : terminated_by(","),bigint(base10);
+    ascii Success                           : terminated_by(","),bigint(base10);
+    ascii ActivePlanFoundFailure            : terminated_by(","),bigint(base10);
+    ascii MonetaryBalanceMismatchFailure    : terminated_by(","),bigint(base10);  
+    ascii ZeroBalanceCustomerFailure        : terminated_by(","),bigint(base10);
+    ascii ExceptionFailure                  : terminated_by(","),bigint(base10);
+    ascii InvalidRecordFailure              : terminated_by(","),bigint(base10);
+    ascii MonetaryNotificationNullFailure   : terminated_by(","),bigint(base10);
+    ascii TopUpBalanceNullFailure           : terminated_by(","),bigint(base10);
+    ascii TotalRecordCount                  : terminated_by(","),bigint(base10);
+    ascii startTime                         : terminated_by(",");
+    ascii endTime                           : terminated_by(0xA);
+};
+
+in_map AuditUdr_inmap : external(AuditUdr), internal(AuditUdr), target_internal(Audit_Udr){
+    automatic;
+};
+
+out_map AuditUdr_outmap : external(AuditUdr), internal(Audit_Udr){
+    automatic;
+};
+
+encoder AuditUdr_Enc : out_map(AuditUdr_outmap);
+decoder AuditUdr_Dec : in_map(AuditUdr_inmap);
+
+internal FinalFileUDR {
+    boolean booEndFile;
+    int totalRecordCnt;
+   Audit_Udr AuditUdr;
+};

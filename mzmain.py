@@ -450,9 +450,8 @@ def parse_multiple_lists(token_lists):
             ast = parser.parse()
             asts.append(ast)
         except Exception as e:
-            print(f"Error parsing AST: {e} in {tokens}")
+            #print(f"Error parsing AST: {e}")
             continue
-    print(asts)
     return asts
 # Text parsing functions
 def check_Ext_int(tokens, key):
@@ -677,20 +676,31 @@ def flask_app():
     if __name__ == '__main__':
         app.run(port=5011) 
 
-def main_test_check(q, maxfile):
+def main_check_test(q, maxfile):
+    passed_Cases = 0
+    failed_Cases = 0
+    failed_Cases_list = []
     while q != maxfile:
-        file = f'UDLF files/Test{q}.udlf'
-        with open(file, 'r') as f:
-            content = f.read()
-        block_value_ext = check_Ext_int(getcontentfile(content), 'external')
-        asts = parse_multiple_lists(block_value_ext)
-        ast1 = ""
-        for ast in asts:
-            ast1 = ast1 + str(ast) + "\n"
-        ast2 = parse_ast(ast1)
-        go_code = generate_go_code(ast2)
-        print(f'test {q} passed')
+        try:
+            file = f'UDLF files/Test{q}.udlf'
+            with open(file, 'r') as f:
+                content = f.read()
+            block_value_ext = check_Ext_int(getcontentfile(content), 'external')
+            asts = parse_multiple_lists(block_value_ext)
+            ast1 = ""
+            for ast in asts:
+                ast1 = ast1 + str(ast) + "\n"
+            ast2 = parse_ast(ast1)
+            go_code = generate_go_code(ast2)
+            print(f'test {q} passed')
+            passed_Cases += 1
+        except:
+            print(f'test {q} failed')
+            failed_Cases += 1
+            failed_Cases_list.append(q)
+            pass
         q += 1
+    print(f"Total Passed Cases: {passed_Cases}, Total Failed Cases: {failed_Cases}")
+    print(f"Failed Cases: {failed_Cases_list}")
 
-
-main_check_code(1, 16)
+main_check_test(1,83)

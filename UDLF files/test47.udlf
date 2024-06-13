@@ -1,0 +1,30 @@
+//Start : IPSM for BI
+external biIPSMFormat_Ext {
+	ascii callingNumber        : terminated_by(",");
+	ascii calledNumber         : terminated_by(",");
+	ascii submitDate           : terminated_by(",");
+	ascii submitTime           : terminated_by(",");
+	ascii originatorCellId     : terminated_by(",");
+	ascii callType             : terminated_by(",");
+	ascii IMEI                 : terminated_by(",");
+	ascii IMSI                 : terminated_by(",");
+	ascii smscAddress          : terminated_by(",");
+	ascii visitedNetwrkIdentier: terminated_by(",");
+    ascii visitedCircle        : terminated_by(",");
+	ascii terminatingLRN       : terminated_by(",");
+    ascii paniHeader           : terminated_by(",");//added for the paniHeader in IPSM BI--29/7/2016
+    ascii iCID                 : terminated_by(0xA);//added IMS_Charging_Identifier--02-08-2016
+};
+
+in_map BIIPSM_Inmap : external(biIPSMFormat_Ext), target_internal(biIPSM_ti){
+    automatic;
+};
+
+decoder BIIPSM_Dec : in_map(BIIPSM_Inmap);
+
+out_map BIIPSM_OutMap : internal(biIPSM_ti),external(biIPSMFormat_Ext) { 
+    automatic;
+};
+
+encoder BIIPSM_Enc : out_map(BIIPSM_OutMap);
+

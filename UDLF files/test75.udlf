@@ -1,0 +1,140 @@
+external header: identified_by(headerVal == "80")
+{
+    ascii headerVal : terminated_by("|");
+    ascii datetime : terminated_by(0xA);
+};
+
+in_map header_in_map : external(header), target_internal(header), discard_output {
+    automatic;
+};
+
+decoder headerDec: in_map(header_in_map);
+ 
+external tailer: identified_by(tailerVal == "90")
+{
+    ascii tailerVal: terminated_by("|");
+    ascii recordCount: terminated_by("|");
+    ascii datetime: terminated_by(0xA);   
+};
+
+in_map tailer_in_map : external(tailer), target_internal(tailer), discard_output {
+    automatic;
+};
+
+decoder trailerDec: in_map(tailer_in_map);
+
+external extPDR_Records{
+    set {
+         errorBlockPDR error : optional;
+     }; 
+    ascii RecordType 		  			: terminated_by("|"),long(base10);
+	ascii SourceTransactionID 			: terminated_by("|");
+	ascii CustomerId 		  			: terminated_by("|");
+	ascii CustomerType 		  			: terminated_by("|"),long(base10);
+	ascii AccountID 		  			: terminated_by("|");
+	ascii ContractID 		  			: terminated_by("|");
+	ascii ServiceIdentifier   			: terminated_by("|");
+	ascii CircleID 			  			: terminated_by("|");
+	ascii ServiceType 		  			: terminated_by("|");
+	ascii ServiceSubType 	  			: terminated_by("|");
+	ascii TransactionDateTime 			: terminated_by("|");
+	ascii OrderReferenceNumber			: terminated_by("|");
+	ascii PaymentTransactionReferenceID : terminated_by("|");
+	ascii PaymentGatewayReference	    : terminated_by("|");
+	ascii TransactionReferenceID	 	: terminated_by("|");
+	ascii VoucherSerialNumber		    : terminated_by("|");
+	ascii offerId						: terminated_by("|");
+	ascii offerName					    : terminated_by("|");
+	ascii PlanID 						: terminated_by("|");
+	ascii SubscriptionID			    : terminated_by("|");
+	ascii SubscriptionType				: terminated_by("|"),long(base10);
+	ascii SubscriptionValidityFromDate  : terminated_by("|");
+	ascii SubscriptionValidityEndDate 	: terminated_by("|");
+	ascii currency					    : terminated_by("|");
+	ascii GrossAmount 					: terminated_by("|"),double;
+	ascii NetAmount					    : terminated_by("|"),double;
+	ascii DealerPriceAmount 			: terminated_by("|"),double;
+	ascii TradeDiscountAmount 			: terminated_by("|"),double;
+	ascii BaseAmount 					: terminated_by("|"),double;
+	ascii ProcessingFee 				: terminated_by("|"),double;
+	ascii BonusAmount					: terminated_by("|"),double;
+	ascii ServiceTax 					: terminated_by("|"),double;
+	ascii EducationCess					: terminated_by("|"),double;
+	ascii SecondaryHigherEducationCess  : terminated_by("|"),double;
+	ascii KrishiKalaynCess 				: terminated_by("|"),double;
+	ascii KeralaCess 					: terminated_by("|"),double;
+	ascii EntertainmentTax 				: terminated_by("|"),double;
+	ascii VatAmount 					: terminated_by("|"),double;
+	ascii SurchargeAmount 				: terminated_by("|"),double;
+	ascii SGSTAmount 					: terminated_by("|"),double;
+	ascii CGSTAmount 					: terminated_by("|"),double;
+	ascii IGSTAmount 					: terminated_by("|"),double;
+	ascii TotalTaxAmount 				: terminated_by("|"),double;
+	ascii Quantity 						: terminated_by("|");
+	ascii QuantityUOM 					: terminated_by("|");
+	ascii CorprateUsageGroupID 			: terminated_by("|");
+	ascii FamiliyFriendsID 				: terminated_by("|");
+	ascii ChannelID 					: terminated_by("|");
+	ascii PosID 						: terminated_by("|");
+	ascii ModeOfPayment 				: terminated_by("|");
+	ascii ModeOfSale 					: terminated_by("|");
+	ascii DistributorID 				: terminated_by("|");
+	ascii MerchantID 					: terminated_by(0xA);
+};
+
+//Error block for SDR
+external errorBlockPDR : identified_by(strStartsWith(errorCode, "ERR")) {
+    ascii errorCode      : terminated_by("|");
+    ascii errorFileName  : terminated_by("|");
+    ascii errorMessage   : terminated_by("|");
+};
+
+
+
+in_map extPDR_Records_in_map : external(extPDR_Records), target_internal(extPDR_Record_ti)
+{
+    automatic : use_external_names;
+};
+
+decoder PDR_RecDec : in_map(extPDR_Records_in_map) ;
+
+decoder PDR_Dec {
+    decoder headerDec;
+    decoder PDR_RecDec *;
+    decoder trailerDec;
+};
+
+out_map extPDR_Records_out_map : external(extPDR_Records), internal(extPDR_Record_ti){
+    automatic;
+};
+
+encoder PDR_RecEnc : out_map(extPDR_Records_out_map);
+
+internal AuditUdr
+{
+    date AuditDate;
+};
+
+external AuditUdr
+{
+    ascii FileName         : terminated_by(",");
+    ascii WorkflowName     : terminated_by(",");
+    ascii Input            : terminated_by(","),bigint(base10);
+    ascii Success          : terminated_by(","),bigint(base10);
+    ascii ZoneFailure      : terminated_by(","),bigint(base10);
+    ascii BPIDFailure      : terminated_by(","),bigint(base10);  
+    ascii TotalRecordCount : terminated_by(","),bigint(base10);
+    ascii startTime        : terminated_by(",");
+    ascii endTime          : terminated_by(0xA);
+};
+
+in_map AuditUdr_inmap : external(AuditUdr), internal(AuditUdr), target_internal(Audit_Udr){
+    automatic;
+};
+
+out_map AuditUdr_outmap : external(AuditUdr), internal(Audit_Udr){
+    automatic;
+};
+
+encoder AuditUdr_Enc : out_map(AuditUdr_outmap);
+decoder AuditUdr_Dec : in_map(AuditUdr_inmap);

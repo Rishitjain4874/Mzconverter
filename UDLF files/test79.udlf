@@ -1,0 +1,39 @@
+external sapccBits_Ext {
+    ascii version           : terminated_by(",");
+    ascii bitType           : terminated_by(",");
+    ascii remainingFields   : terminated_by(0xA);
+};
+
+in_map sapccBits_InMap : external(sapccBits_Ext), target_internal(sapccBits_TI){
+    automatic;
+};
+
+out_map sapccBits_OutMap : external(sapccBits_Ext), internal(sapccBits_TI){
+    automatic;
+};
+
+decoder sapccBits_Dec : in_map(sapccBits_InMap);
+encoder sapccBits_Enc : out_map(sapccBits_OutMap);
+
+
+external auditMergeBits_Ext {
+    ascii startTime : terminated_by(",");
+    ascii endTime : terminated_by(",");
+    ascii wfName : terminated_by(",");   
+    ascii fileSize : terminated_by(",");
+    ascii recCount : terminated_by(",");
+    ascii inputFileName : terminated_by(",");
+    ascii outputRecCount : terminated_by(",");
+    ascii outputFileName : terminated_by(0xA);
+};
+
+in_map auditMergeBits_InMap : external(auditMergeBits_Ext), target_internal(auditMergeBits_TI){
+    automatic;
+};
+
+out_map auditMergeBits_OutMap : external(auditMergeBits_Ext), internal(auditMergeBits_TI){
+    automatic;
+};
+
+decoder auditMergeBits_Dec : in_map(auditMergeBits_InMap);
+encoder auditMergeBits_Enc : out_map(auditMergeBits_OutMap);

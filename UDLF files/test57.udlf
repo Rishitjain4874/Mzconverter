@@ -1,0 +1,222 @@
+/*********************CTAS CDR VERSION 2.0.0********************/
+
+external CTAS_V {
+    set {
+        errorBlockCTAS_V20 errV20 : optional;  
+    }; 
+	ascii cdrGenNb                         :   int(base10),terminated_by(0x2C);
+	ascii cdrVerNb                         :   terminated_by(0x2C);
+	ascii siteName                         :   terminated_by(0x2C);
+	ascii origCalledNb                     :   terminated_by(0x2C);
+	ascii modifCalledNb                    :   terminated_by(0x2C);
+	ascii origCallingNb                    :   terminated_by(0x2C);
+	ascii modifCallingNb                   :   terminated_by(0x2C);
+	ascii callInitTime                     :   terminated_by(0x2C);
+	ascii callStartTime                    :   terminated_by(0x2C);
+	ascii callEndTime                      :   terminated_by(0x2C);
+	ascii callChargeableDur                :   int(base10), terminated_by(0x2C);
+	ascii callAnsweredStatus               :   terminated_by(0x2C);
+	ascii callDisconnectSrc                :   terminated_by(0x2C);
+	ascii networkCallDisconnectReasonHeader:   terminated_by(0x2C);
+	ascii intCallDisconnectReasonCode      :   terminated_by(0x2C);
+	ascii networkCallDisconnectCause       :   terminated_by(0x2C);
+	ascii servedCallLeg                    :   terminated_by(0x2C);
+	ascii imsICID                          :   terminated_by(0x2C);
+	ascii imsCallID                        :   terminated_by(0x2C);
+	ascii pServedUser                      :   terminated_by(0x2C);
+	ascii roSessionId                      :   terminated_by(0x2C);
+	ascii negotiatedMedia1                 :   terminated_by(0x2C);
+	ascii negotiatedMedia2                 :   terminated_by(0x2C);
+	ascii clearCode                        :   terminated_by(0x2C);
+	ascii longCallCdrInd                   :   int(base10), terminated_by(0x2C);
+	ascii pVisitedNetworkId                :   terminated_by(0x2C);
+	ascii pAccessNetworkInfo               :   terminated_by(0x2C);
+	ascii nbPortabilityRouteInfo           :   terminated_by(0x2C);
+	ascii enterpriseId                     :   terminated_by(0x2C);
+	ascii cugId                            :   terminated_by(0x2C);
+	ascii cugType                          :   terminated_by(0x2C);
+	ascii reqUriTgrpId                     :   terminated_by(0x2C);
+	ascii contactHeaderTgrpId              :   terminated_by(0x2C);
+	ascii callFwdIndicator                 :   int(base10), terminated_by(0x2C);
+	ascii callFwdType                      :   terminated_by(0x2C);
+	ascii callFwdAssociatedPartyAddr       :   terminated_by(0x2C);
+	ascii nbOfCallFwdDiversions            :   terminated_by(0x2C);
+	ascii confIndicator                    :   terminated_by(0x2C);
+	ascii confCorrId                       :   terminated_by(0x2C);
+	ascii onNetOffNetCallInd               :   terminated_by(0x2C);
+    ascii pilotNumber                      :   terminated_by(0x2C);
+    ascii serviceType                      :   int(base10), terminated_by(0x2C);
+    ascii callCUGClassIdentification       :   terminated_by(0x2C);
+    ascii outgoingCallIndicator            :   terminated_by(0x2C);
+    ascii callSetupResult                  :   terminated_by(0x2C);
+    ascii callSetupTime                    :   terminated_by(0x2C);
+    ascii callDisconnectDirection          :   terminated_by(0x2C);
+    ascii callMediaType                    :   int(base10), terminated_by(0x2C);
+    ascii byteInviteTimeDiff               :   terminated_by(0x2C);
+    ascii callSetupTimeDuration            :   terminated_by(0x2C);
+    ascii circleName                       :   terminated_by(0x2C);
+    ascii reservedField1                   :   terminated_by(0x2C);
+    ascii reservedField2                   :   terminated_by(0x2C);
+    ascii reservedField3                   :   terminated_by(0x2C);
+    ascii reservedField4                   :   terminated_by(0x2C);
+    ascii threeGppChargingId               :   terminated_by(0x2C);
+    ascii imei                             :   terminated_by(0x2C);
+    ascii imsi                             :   terminated_by(0x2C);
+    ascii userSubcriberType                :   terminated_by(0x2C);
+    ascii callHolderCounter                :   terminated_by(0x2C);
+    ascii sip_Header                       :   terminated_by(0x2C);
+    ascii reservedField5                   :   terminated_by(0x2C);
+    ascii paniHeader                       :   terminated_by(0x2C);
+    ascii to_Header                        :   terminated_by(0x2C);
+    ascii pai                              :   terminated_by(0x2C);
+    ascii msrn                             :   terminated_by(0x2C);
+    ascii callFlag                         :   int(base10), terminated_by(0x2C);
+    
+    //Added as part of CDR doc v2.4
+    ascii callCdrCounter                   :   int(base10),terminated_by(0x2C);
+    ascii finalCdrIndicator                :   int(base10),terminated_by(0x2C); 
+    
+    ascii sessionPriority                  :   terminated_by(0x2C);
+    
+    //Added as part of CDR doc v2.5
+    ascii volteSubsHomeDomain              :   terminated_by(0x2C); 
+    
+    ascii impi                             :   terminated_by(0xA); 
+};
+
+in_map errorBlockCTASV20_InMap : external (errorBlockCTAS_V20), target_internal(errorBlockCTAS_V20){automatic;};
+
+in_map CTASV_InMap : external (CTAS_V), target_internal(CTAS_V){
+   automatic {
+        errorBlockCTAS_V20 : using in_map Error_Map;
+    };
+};
+
+
+internal CTAS_UDR
+ {   
+    string recordType;
+    string recSeqNum;
+    string chargingEndTime;
+    string chargingStartTime;
+    string locRoutingNumber;  
+    int duration; 
+    string Imsi;
+    string imei;
+    string basicServiceType;
+    string sICID;
+    string sBProduct;
+    string sAProduct;
+    string normalizedCallingNumber;
+    string normalizedCalledNumber;
+    string normalizedOrigCallingNumber;
+    string normalizedRequestedPartyNumber;
+    string callingNumberProductGroup;
+    string calledNumberProductGroup;
+    string custLRNInfoOperator;
+    string custHomeInfoOperator;
+    string MccMnc;
+    string custVisitingInfoOperator;
+    string callType;
+    string operatorInfo;
+    boolean islocal;
+    string callHomeRoamCircleInfo;
+    string callingLRN;
+    int sOnnetOffnet;
+    int intermediateChargingInd;
+    int intermediateRecordNumber;
+    string translatedNumber;
+    string accessNetworkInfo;
+    string iMSVisitedNetworkIdentifier;
+    string firstRoamingCircleID;
+    string otherPartyOperator;
+    string otherPartyCircle;
+    string sCallAnsweredStatus;
+    int longCallInd;
+    string sessionId;
+    string snormlizeCallAsspartyNum;
+    string spServedUser;
+    boolean isVoWifiIR;
+    boolean isVoLTEIR;
+    CTAS_V origRec;
+    
+};
+
+out_map CTASV200_OutMap : external (CTAS_V), internal(CTAS_V){automatic;};
+encoder CtasV20_Enc : out_map(CTASV200_OutMap);
+decoder  ctasv20 : in_map(CTASV_InMap);
+//CTAS cdr decoder ends
+
+
+external errorBlockCTAS_V20: identified_by(strStartsWith(errorCode, "MOC")|| strStartsWith(errorCode, "MTC") || strStartsWith(errorCode, "FORW")) {
+    ascii errorCode        : terminated_by(",");
+    ascii errorMessage     : terminated_by(",");
+};
+
+in_map Error_Map : external(errorBlockCTAS_V20),target_internal(ErrorBlock) {
+    automatic;
+};
+
+
+session Aggregation_Session
+{
+
+    boolean   lastPartialReceived;
+    long      NumberOfPartials;
+    long      currentCount;
+    long      duration;
+    CTAS_UDR  internalUDR;
+};
+
+
+external CSVExternal
+{
+    ascii Recordtype  : terminated_by(",");
+    ascii CallingNumber   : terminated_by(",");
+    ascii CalledNumber  : terminated_by(",");
+    ascii RequestedNumber  : terminated_by(",");
+    ascii CallAssociatedNum : terminated_by(",");
+    ascii pServedUser : terminated_by(",");
+    ascii SessionId     :terminated_by(",");
+    ascii MediaName  : terminated_by(",");
+    ascii CallStartTime  : terminated_by(",");
+    ascii CallEndTime  : terminated_by(",");
+    ascii LRN  : terminated_by(",");
+    ascii VisitedNetwork  : terminated_by(",");
+    ascii AccessNetworkInfo : terminated_by(",");
+    ascii CallDuration : terminated_by(",");
+    ascii Circle  : terminated_by(",");
+    ascii Imsi    : terminated_by(",");
+    ascii ICID    : terminated_by(",");
+    ascii IMEI    : terminated_by(","); 
+    ascii recSeqNum : terminated_by(0xA);
+    
+    
+};
+
+in_map csv_im : external (CSVExternal) , target_internal(CSV_TI){
+	automatic;
+};
+
+out_map csv_om : external (CSVExternal) , internal(CSV_TI){
+	automatic;
+};
+
+decoder CSV_Decoder : in_map (csv_im);
+
+encoder CSV_Encoder : out_map(csv_om);
+
+
+internal SearchNode {
+    int minLength;
+    string regEx;
+    map<string, SearchNode> NextNode;
+    map<string, map<string,any>> colValues;
+};
+
+
+
+internal Filename
+{
+    string sourceFileName;
+};

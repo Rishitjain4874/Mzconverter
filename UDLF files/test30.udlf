@@ -1,0 +1,95 @@
+external AuditFile  : terminated_by(0xA){
+    ascii periodStart       : terminated_by(",");
+    ascii periodEnd         : terminated_by(",");
+    ascii wf_name           : terminated_by(",");
+    ascii inputSource       : terminated_by(",");    
+    ascii inputFilename     : terminated_by(",");
+    ascii destination       : terminated_by(",");
+    ascii outputFilename    : terminated_by(",");
+    ascii scenario          : terminated_by(",");    
+    ascii inRecordType      : terminated_by(",");
+    ascii outRecordType     : terminated_by(",");
+    ascii count             : terminated_by(";"),double;
+};
+
+//Map the external to the internal
+in_map AuditFileInMap : external ( AuditFile ),  target_internal ( AuditFile_TI ){automatic;};
+decoder AuditFile_Decoder : in_map ( AuditFileInMap );
+
+
+out_map AuditFileOutmap : internal ( AuditFile_TI ), external ( AuditFile ) {automatic;};
+encoder AuditFile_Encoder : out_map ( AuditFileOutmap );
+
+
+internal AuditCounter {
+    string id : optional;
+    date eventTimeStamp   : optional;
+    string inputSource    : optional;
+    string destination    : optional;
+    string scenario       : optional;
+    string recordType     : optional;
+    long    counter        : optional;
+
+};
+
+session auditSession {
+    long sessionStartTime;
+    list <auditUDR_TI> auditUDRs;
+};
+
+external auditEntry : terminated_by(";") {
+    ascii key : long(base10), terminated_by(",");
+    ascii value : long(base10), terminated_by(";");
+};
+external auditRsponse {
+    ascii key : terminated_by("|");
+    ascii value : long(base10), terminated_by("|");
+};
+
+external auditUDR : terminated_by(0xA) {
+    ascii startTime : long(base10), terminated_by(",");
+    ascii endTime : long(base10), terminated_by(",");
+    ascii wfName : terminated_by(",");
+    set {
+        list<auditEntry> auditEntries;
+    };
+    
+    set {
+        list<auditRsponse> auditResp;
+    };
+};
+
+in_map auditInmap : external(auditUDR), target_internal(auditUDR_TI) { automatic : use_external_names; };
+
+decoder auditDec : in_map(auditInmap);
+
+out_map auditOutmap : internal(auditUDR_TI), external(auditUDR) { automatic; };
+
+encoder auditEnc : out_map(auditOutmap);
+
+internal auditTable  {
+    string auditCounters;
+    string wfName;
+};
+
+/*
+internal Audit_Interval {
+    long auditIntervalStart;
+    long auditIntervalEnd;
+};
+*/
+
+external Audit_Interval_Ext  : terminated_by(0xA){
+    ascii auditIntervalStart       : long(base10), terminated_by(",");
+    ascii auditIntervalEnd         : long(base10), terminated_by(",");
+    ascii auditWfName              : terminated_by(";");
+};
+
+out_map auditIntervalOutmap : internal(Audit_Interval), external(Audit_Interval_Ext) { automatic; };
+encoder auditInterval : out_map(auditIntervalOutmap);
+
+
+in_map auditIntervalInmap : external ( Audit_Interval_Ext ),  target_internal ( Audit_Interval ){automatic;};
+decoder auditIntervalDec : in_map ( auditIntervalInmap );
+
+

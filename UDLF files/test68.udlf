@@ -1,0 +1,101 @@
+external PGW_CSV_External {
+	ascii      servedPDPPDNAddress  : terminated_by(",");
+	ascii      servedIMSI       	: terminated_by(",");
+	ascii      servedMSISDN     	: terminated_by(",");
+	ascii      recordOpeningTime	: terminated_by(",");
+	ascii      p_GWAddress      	: terminated_by(",");
+	ascii      IMEI      			: terminated_by(",");
+	ascii      FirstCellID      	: terminated_by(",");
+	ascii      SessionEndDateTime   : terminated_by(",");
+	ascii      Duration      		: terminated_by(",");
+	ascii      DataVolumeUplink     : terminated_by(",");
+	ascii      DataVolumeDownlink   : terminated_by(",");
+	ascii      ChargingID      		: terminated_by(",");
+	ascii      AccessPointName      : terminated_by(",");
+	ascii      CGI_ID      			: terminated_by(",");
+	ascii      ratingGroup      	: terminated_by(",");
+	ascii      partial_rec_seq_no   : terminated_by(",");
+	ascii      time_stamp      	    : terminated_by(",");
+	ascii      timeofreport         : terminated_by(",");
+	ascii      total_volume_mb      : terminated_by(",");
+	ascii      pgw_address              : terminated_by(",");
+	ascii      address_type      	: terminated_by(",");
+	ascii      pdp_pdn_type      	: terminated_by(",");
+	ascii      node_id      		: terminated_by(",");
+	ascii      session_close_cause  : terminated_by(",");
+	ascii      apn_selection_mode   : terminated_by(",");
+	ascii      charging_char      	: terminated_by(",");
+	ascii      channel_selection    : terminated_by(",");
+	ascii      plmn_identifier      : terminated_by(",");
+	ascii      rat_type      		: terminated_by(",");
+	ascii      ms_time_zone      	: terminated_by(",");
+	ascii      user_loc_info      	: terminated_by(",");
+	ascii      pdn_conn_chrg_id     : terminated_by(",");
+	ascii      serving_node_addr    : terminated_by(",");
+	ascii      time_usage      		: terminated_by(",");
+	ascii      serv_chng_cond       : terminated_by(",");
+	ascii      qci      			: terminated_by(",");
+	ascii      max_req_bw_ul        : terminated_by(",");
+	ascii      max_req_bw_dl        : terminated_by(",");
+	ascii      guranteed_bit_ul     : terminated_by(",");
+	ascii      guranteed_bit_dl     : terminated_by(",");
+	ascii      arp      			: terminated_by(",");
+	ascii      local_seq_no      	: terminated_by(",");
+	ascii      serv_node_plmn_id    : terminated_by(",");
+	ascii      serving_node_type    : terminated_by(",");
+	ascii      starttime      		: terminated_by(",");
+	ascii      stoptime      	    : terminated_by(",");
+	ascii      serv_pdppdnaddr_ext  : terminated_by(",");
+	ascii      dyn_addr_flag_ext    : terminated_by(",");
+	ascii      node_name   		    : terminated_by(",");
+	ascii      losd_rat_type     	: terminated_by(",");
+	ascii      losd_charg_rule_basename      : terminated_by(",");
+	ascii      losd_result_code     : terminated_by(",");
+	ascii      losd_local_seq_no    : terminated_by(",");
+	ascii      losd_time_first_usg  : terminated_by(",");
+	ascii      losd_time_last_usg   : terminated_by(",");
+	ascii      losd_serv_cond_change: terminated_by(",");
+	ascii      losd_sgsn_plmn_identifier: terminated_by(",");
+	ascii      losd_fail_hand_cont      : terminated_by(",");
+	ascii      losd_service_spec_data   : terminated_by(",");
+	ascii      losd_service_spec_type   : terminated_by(",");
+	ascii      losd_event_charge        : terminated_by(",");
+	ascii      losd_event_time          : terminated_by(",");
+	ascii      losd_tom_basetime        : terminated_by(",");
+	ascii      losd_tom_timequota       : terminated_by(",");
+	ascii      losd_free_format_data    : terminated_by(",");
+	ascii      losd_psff_apnd_id      	: terminated_by(",");
+	ascii      losd_af_recinfo_chg_id   : terminated_by(",");
+	ascii      losd_af_recinfo_mc_no    : terminated_by(",");
+	ascii      losd_af_recinfo_flow_no  : terminated_by(",");
+	ascii      losd_user_location_info  : terminated_by(",");
+	ascii      Threegpp_user_loc_info       : terminated_by(",");
+	ascii      diag_gsm0408_cause       : terminated_by(",");
+	ascii      diag_gsm0902_maperr_val  : terminated_by(",");
+	ascii      diag_itu_tq767_cause     : terminated_by(",");
+	ascii      diag_ntw_sp_cause      	: terminated_by(",");
+	ascii      diag_mfr_sp_cause      	: terminated_by(",");
+	ascii      diag_significance      	: terminated_by(",");
+	ascii      diag_information      	: terminated_by(",");
+	ascii      pos_fail_cause      		: terminated_by(",");
+	ascii      unautho_lcs_clientcause  : terminated_by(",");
+	ascii      record_type_name      	: terminated_by(",");
+	ascii      sgsn_address      		: terminated_by(0xA);
+};
+
+
+
+// input file
+in_map pgw_csv_im : external(PGW_CSV_External), target_internal(PGWCSV_TI) {automatic;};
+out_map pgw_csv_om : external(PGW_CSV_External), internal (PGWCSV_TI) { automatic; };
+
+encoder PGWCSV_Encoder : out_map(pgw_csv_om);
+decoder PGWCSV_Decoder : in_map(pgw_csv_im);
+
+
+event eEmailEvent{
+    string messageTo;
+    string message;
+    string subjectLine;
+};
+

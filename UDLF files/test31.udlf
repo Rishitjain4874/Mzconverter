@@ -1,0 +1,24 @@
+external DBextIn : terminated_by( 0xA ) {//0xA
+   ascii trx_id :terminated_by(",");
+   ascii ne_type :terminated_by(",");
+   ascii tb_name  :terminated_by(0xA);
+};
+
+in_map DB_Record_IN_Map : external(DBextIn),target_internal(DBextRecord) {
+    automatic;
+  
+};
+
+out_map DB_Record_OUT_Map :  external(DBextIn),internal(DBextRecord) {
+    automatic;
+};
+
+decoder DBDecoder : in_map(DB_Record_IN_Map);
+encoder DBEncoder : out_map(DB_Record_OUT_Map);
+
+
+internal RefreshRequestUDR: extends_class ("com.digitalroute.wfc.http.HttpdUDR")
+{
+  // Additional fields (if required).
+    string table_name;
+};  

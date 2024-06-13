@@ -1,0 +1,20 @@
+
+external QNSMessage : identified_by(recordType=="QNS")
+{
+    ascii recordType         : encode_value("QNS"),terminated_by(",");
+    ascii networkId        : terminated_by(",");
+    ascii originalRecordType : long(base10), terminated_by(",");
+    ascii circleCode       : terminated_by(",");
+    ascii serviceType      : terminated_by(",");
+    ascii policyCode       : terminated_by (0xA);
+
+
+};
+
+in_map QNSMessageInMap : external ( QNSMessage ),  target_internal ( QNS_Message_Int ){automatic;};
+decoder QNSMessage_Decoder : in_map ( QNSMessageInMap );
+
+
+out_map QNSMessageOutmap : internal ( QNS_Message_Int ), external ( QNSMessage ) {automatic;};
+encoder QNSMessage_Encoder : out_map ( QNSMessageOutmap );
+

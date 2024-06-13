@@ -1,0 +1,108 @@
+external GTPOutCSV
+{
+    ascii ratingGroup                                                : terminated_by(","),int(base10);
+    ascii servedIMSI                                                 : terminated_by(",");
+    ascii servedMSISDN                                               : terminated_by(",");
+    ascii sessionID                                                  : terminated_by(",");
+    ascii IMEI                                                       : terminated_by(",");
+    ascii startTime                                                  : terminated_by(",");
+    ascii endTime                                                    : terminated_by(",");
+    ascii pdpAddress                                                 : terminated_by(",");
+    ascii ggsnAddress                                                : terminated_by(",");
+    ascii sgsnAddress                                                : terminated_by(",");
+    ascii dataVolUpLink                                              : terminated_by(","),long(base10);
+    ascii dataVolDownLink                                            : terminated_by(","),long(base10);
+    ascii recSeqNum                                                  : terminated_by(","),int(base10);
+    ascii localSeqNum                                                : terminated_by(","),int(base10);
+    ascii duration                                                   : terminated_by(","),long(base10);
+    ascii ratType                                                    : terminated_by(",");
+    ascii chargingId                                                 : terminated_by(",");
+    ascii calledStationId                                            : terminated_by(",");
+    ascii threeGPPUserLocationInfoTAIMCC                             : terminated_by(",");
+    ascii threeGPPUserLocationInfoTAIMNC                             : terminated_by(",");
+    ascii threeGPPUserLocationInfoTAITAC                             : terminated_by(",");
+    ascii threeGPPUserLocationInfoECGIMCC                            : terminated_by(",");
+    ascii threeGPPUserLocationInfoECGIMNC                            : terminated_by(",");
+    ascii threeGPPUserLocationInfoECGISPARE                          : terminated_by(",");
+    ascii threeGPPUserLocationInfoECGIECI                            : terminated_by(",");
+    ascii pgwStartTime                                               : terminated_by(",");
+    ascii pgwStopTime                                                : terminated_by(",");
+    ascii zone                                                       : terminated_by(",");
+    ascii circle                                                     : terminated_by(0xA);
+};
+
+in_map csvGTP_im : external (GTPOutCSV) , target_internal(GTPOutCSV_TI){
+	automatic;
+};
+
+out_map csvGTP_om : external (GTPOutCSV) , internal(GTPOutCSV_TI){
+	automatic;
+};
+
+decoder CSVOutGTP_Decoder : in_map (csvGTP_im);
+
+encoder CSVOutGTP_Encoder : out_map(csvGTP_om);
+
+external GTPOutCSVHeader
+{
+    ascii ratingGroup                         : encode_value("RatingGroup"), terminated_by(",");
+    ascii servedIMSI                          : encode_value("ServedIMSI"), terminated_by(",");
+    ascii servedMSISDN                        : encode_value("ServedMSISDN"), terminated_by(",");
+    ascii sessionID                           : encode_value("SessionID"), terminated_by(",");
+    ascii IMEI                                : encode_value("IMEI"), terminated_by(",");
+    ascii startTime                           : encode_value("StartTime"), terminated_by(",");
+    ascii endTime                             : encode_value("EndTime"), terminated_by(",");
+    ascii pdpAddress                          : encode_value("PdpAddress"), terminated_by(",");
+    ascii ggsnAddress                         : encode_value("GgsnAddress"), terminated_by(",");
+    ascii sgsnAddress                         : encode_value("SgsnAddress"), terminated_by(",");
+    ascii dataVolUpLink                       : encode_value("DataVolUpLink"), terminated_by(",");
+    ascii dataVolDownLink                     : encode_value("DataVolDownLink"), terminated_by(",");
+    ascii recSeqNum                           : encode_value("ReqSeqNum"), terminated_by(",");
+    ascii localSeqNum                         : encode_value("LocalSeqNum"), terminated_by(",");
+    ascii duration                            : encode_value("Duration"), terminated_by(",");
+    ascii ratType                             : encode_value("RatType"), terminated_by(",");
+    ascii chargingId                          : encode_value("ChargingID"), terminated_by(",");
+    ascii calledStationId                     : encode_value("CalledStationID"), terminated_by(",");
+    ascii threeGPPUserLocationInfoTAIMCC      : encode_value("3GPPUserLocationInfoTAIMCC"), terminated_by(",");
+    ascii threeGPPUserLocationInfoTAIMNC      : encode_value("3GPPUserLocationInfoTAIMNC"), terminated_by(",");
+    ascii threeGPPUserLocationInfoTAITAC      : encode_value("3GPPUserLocationInfoTAITAC"), terminated_by(",");
+    ascii threeGPPUserLocationInfoECGIMCC     : encode_value("3GPPUserLocationInfoECGIMCC"), terminated_by(",");
+    ascii threeGPPUserLocationInfoECGIMNC     : encode_value("3GPPUserLocationInfoECGIMNC"), terminated_by(",");
+    ascii threeGPPUserLocationInfoECGISPARE   : encode_value("3GPPUserLocationInfoECGISPARE"), terminated_by(",");
+    ascii threeGPPUserLocationInfoECGIECI     : encode_value("3GPPUserLocationInfoECGIECI"), terminated_by(",");
+    ascii pgwStartTime                        : encode_value("PgwStartTime"), terminated_by(",");
+    ascii pgwStopTime                         : encode_value("PgwStopTime"), terminated_by(",");
+    ascii zone                                : encode_value("Zone"), terminated_by(",");
+    ascii circle                              : encode_value("Circle"), terminated_by(0xA);
+};
+
+in_map csvGTPHeader_im : external (GTPOutCSVHeader) , target_internal(GTPOutCSVHeader_TI),discard_output{
+	automatic;
+};
+
+out_map csvGTPHeader_om : external (GTPOutCSVHeader) , internal(GTPOutCSVHeader_TI){
+	automatic;
+};
+
+decoder CSVOutGTPHeader_Decoder : in_map (csvGTPHeader_im);
+
+encoder CSVOutGTPHeader_Encoder : out_map(csvGTPHeader_om);
+
+decoder GTP_Rec
+{
+    decoder CSVOutGTPHeader_Decoder;
+    decoder CSVOutGTP_Decoder *;
+};
+
+internal GTP_UDR{
+    string Filename;
+    int TotRec;
+    boolean DupRec;
+    GTPOutCSV_TI origRec;
+};
+
+session UDRsession{
+    string sessionId;
+    string recSeq;
+    boolean isSessionInit;
+};

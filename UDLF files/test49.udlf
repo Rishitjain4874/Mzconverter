@@ -1,0 +1,348 @@
+
+
+// new format version: 524001
+external Data_Block_v_520500  : identified_by (recordType==0 && formatVersion=="520500") , static_size(8176) { // size supposed to be 8KB=8192
+    int recordLength                            : static_size(2),little_endian, encode_value(41);
+    long recordType                             : static_size(1);
+    bcd charging_block_size                     : static_size(1);
+    bcd(lsn_fd) tapeBlockType                   : static_size(2), little_endian ;
+    int dataLengthInBlock                       : static_size(2), little_endian ; // 8 bytes
+    bcd(lsn_fd) exchangeId                      : static_size(10), padded_with(0xF);
+    bcd firstRecordNumber                       : static_size(4), little_endian;
+    bcd batchSeqNumber                          : static_size(4), little_endian;
+    bcd blockSeqNumber                          : static_size(2), little_endian; // 28
+    bcd startTime                               : static_size(7), little_endian;
+    ascii formatCustomerName                    : static_size(2);
+    bcd formatVersion                           : static_size(3); // 40
+    bcd formatVersionFiller                     : static_size(1), encode_value("1F"); // 41
+                
+    set : dynamic_size(dataLengthInBlock-41) {
+        list<MocRec_V2> mocRec;
+        list<SupsRec_V2> supsRec;
+        list<LocaRec_V2> locaRec;
+        list<SmmtRec_V2> smmtRec;
+        list<PtcRec_V2> ptcRec;
+        list<In2Rec_V2> in2Rec;
+        list<OtherRec> otherRec;
+        TrailerRec trailer: optional;
+    };
+    bytearray padding                           : padded_with(0xFF), trailing_optional, dynamic_size(8176-dataLengthInBlock);
+};
+
+external OtherRec : identified_by(recordType!=1 && recordType!=7 && recordType!=9 && recordType!=16 && recordType!=12 && recordType!=5
+        && recordType!=24), dynamic_size(recordLength) {
+    int recordLength                : static_size(2),  little_endian;
+    long recordType                 : static_size(1);
+    bytearray content : trailing_optional, dynamic_size(remaining_size);
+};
+
+external MocRec_V2                          : identified_by (recordType==1), dynamic_size(recordLength) {
+    int recordLength                        : static_size(2), little_endian, encode_value(field_size(filter) + field_size(dynamicContainer) + 301);
+    int recordType                         : static_size(1);
+    bcd recSeqNum                           : static_size(4), little_endian;
+    int recordStatus                        : static_size(1);
+    int checkSum                            : static_size(2), little_endian;
+    long callReference                      : static_size(5);
+    bcd(lsn_fd) exchangeId                  : static_size(10),padded_with(0xF);
+    int addRoutingCategory                    : static_size(2), little_endian;
+    bcd answerTime                            : static_size(7), padded_with(0xF), little_endian;
+    int basicServiceCode                      : static_size(1);
+    bcd basicServiceType                      : static_size(1);
+    int callHoldCounter                       : static_size(1);
+    bcd callReferenceTime                    : static_size(7), little_endian;
+    CallType call_type;
+    bcd callWaitCounter                       : static_size(1);
+    int callingCategory                       : static_size(1);
+    int callingChargingArea                   : static_size(2), little_endian;
+    bcd(lsn_fd) callingImeisv                 : static_size(8), padded_with(0xF);
+    bcd callingSubsFirstCi                    : static_size(4), little_endian;
+    bcd callingSubsFirstLac                   : static_size(2), little_endian;
+    int callingSubsFirstLocationType          : static_size(1);
+    bcd(lsn_fd) callingSubsFirstMcc           : static_size(2), padded_with(0xF);
+    bcd(lsn_fd) callingSubsFirstMnc           : static_size(2), padded_with(0xF);
+    bcd callingSubsLastCi                     : static_size(4), little_endian;
+    bcd callingSubsLastLac                    : static_size(2), little_endian;
+    int callingSubsLastLocationType         : static_size(1);
+    bcd(lsn_fd) callingSubsLastMcc            : static_size(2), padded_with(0xF);
+    bcd(lsn_fd) callingSubsLastMnc            : static_size(2), padded_with(0xF);
+    bcd camelCallReference                  : static_size(8);
+    bcd(lsn_fd) camelExchangeId               : static_size(9), padded_with(0xF);
+    int camelExchangeIdTon                    : static_size(1);
+    bcd carrierSelection                      : static_size(1);
+    int causeForTermination                   : static_size(4), little_endian;
+    int chargeNature                        : static_size(1);
+    bcd(lsn_fd) chargeNumber                : static_size(12), padded_with(0xF);
+    int chargeNumberTon                     : static_size(1);
+    bcd chargingEndTimeTenMs                  : static_size(8), little_endian;
+    bcd chargingStartTimeTenMs                : static_size(8), little_endian;
+    bcd cipCarrierCode                        : static_size(2), padded_with(0xF);
+    bcd(lsn_fd) ctThirdPartyNumber            : static_size(12),padded_with(0xF);
+    bcd ctThirdPartyNumberTon                 : static_size(1), padded_with(0xFF);
+    bcd defaultCallHandling                   : static_size(1);
+    bcd(lsn_fd) destinationNumber             : static_size(12),padded_with(0xF);
+    bcd destinationNumberTon                  : static_size(1), padded_with(0xFF);
+    bcd disconnectingParty                    : static_size(1);
+    bcd facilityUsage                       : static_size(5), little_endian;
+    int inBncConnectionType                   : static_size(1);
+    bcd inCircuitGroup                        : static_size(2);
+    bcd inServ1FreeFormData                   : static_size(40),padded_with(0xF);
+    bcd inServ1ScfAddress                     : static_size(9), padded_with(0xF);
+    bcd inServ1ScfAddressTon                  : static_size(1), padded_with(0xFF);
+    bcd inServ1ServiceKey                     : static_size(4), padded_with(0xF);
+    int intermediateChargingInd             : static_size(1);
+    int intermediateChrgCause                 : static_size(4), little_endian;
+    int intermediateRecordNumber            : static_size(1);
+    bcd(lsn_fd) locRoutingNumber              : static_size(12), padded_with(0xF);
+    bcd locRoutingNumberOrig                  : static_size(1);
+    bcd locRoutingNumberTon                   : static_size(1), padded_with(0xFF);
+    bcd(lsn_fd) locationNumber                : static_size(12), padded_with(0xF);
+    bcd locationNumberTon                     : static_size(1), padded_with(0xFF);
+    bcd npdbQueryStatus                       : static_size(1);
+    int oli                                 : static_size(1);
+    int origDiallingClass                     : static_size(2), little_endian;
+    bcd origMczChrgType                       : static_size(1);
+    bcd(msn_fd) origMczDurationTenMs1         : static_size(4), long(base10), little_endian;
+    bcd origMczTariffClass                    : static_size(3);
+    bcd ossscodeList                          : static_size(2);
+    int outBncConnectionType                  : static_size(1);
+    bcd outCircuitGroup                     : static_size(2), padded_with(0xF), little_endian;
+    bcd pic                                   : static_size(2), padded_with(0xF);
+    bcd(lsn_fd) pni                           : static_size(3), padded_with(0xF);
+    int radioNetworkType                      : static_size(1);
+    int redirectedInd                       : static_size(1);
+    int routingCategory                       : static_size(1);
+    int scpConnection                         : static_size(1);
+    bcd setupDurationTenMs                    : static_size(4), little_endian;
+    bcd tnsCarrierCode                        : static_size(2), padded_with(0xF);
+    bcd tnsCircuitCode                        : static_size(1), padded_with(0xF);
+    bcd (lsn_fd)virtualMscId                  : static_size(10),padded_with(0xF);
+    bcd virtualMscIdTon                       : static_size(1), padded_with(0xFF);
+    DynamicContainer dynamicContainer;
+    FilterBlock filter : trailing_optional;
+};
+
+external SupsRec_V2 : identified_by(record_type == 5), dynamic_size(recordLength) {
+	int recordLength               : static_size(2),  little_endian, encode_value( field_size(filter) + 169);
+	int record_type                 : static_size(1);
+	bcd record_number               : static_size(4), little_endian;
+	bcd record_status               : static_size(1);
+	int check_sum                   : static_size(2), little_endian;
+	long CallReference              : static_size(5);
+	bcd(lsn_fd) exchange_id         : static_size(10), padded_with(0xF);
+    bcd action                 	    : static_size(1);
+    int add_routing_category        : static_size(2), little_endian;
+    bcd basic_call_state_model      : static_size(1);
+    bcd basic_service_code          : static_size(1);
+    bcd basic_service_type          : static_size(1);
+    bcd CallReferenceTime           : static_size(7), little_endian;
+    bcd camelCallReference         : static_size(8), padded_with(0xF);
+    bcd camelExchangeId             : static_size(9), little_endian;
+    bcd camelExchangeIdTon          : static_size(1);
+    bcd causeForTermination         : static_size(4);
+    bcd charge_nature               : static_size(1); --new field
+    bcd charge_number               : static_size(12); --new field
+    bcd charge_number_ton           : static_size(1); --new field
+    bcd charging_time_ten_ms        : static_size(8), little_endian;
+    long legCallReference           : static_size(5),  padded_with(0xF);
+    bcd(lsn_fd) location_number     : static_size(12), padded_with(0xF);
+    bcd location_number_ton         : static_size(1), padded_with(0xFF);
+    bcd oli                         : static_size(1); --new field
+    bcd(lsn_fd) parameters          : static_size(30), padded_with(0xF);
+    int parameters_length           : static_size(1);
+    bcd(lsn_fd) pni                 : static_size(3), padded_with(0xF);
+    bcd protocol_identification     : static_size(1); --new field
+    bcd radio_network_type          : static_size(1);
+    bcd result_indicator            : static_size(2);
+    int routing_category            : static_size(1);
+    bcd(lsn_fd) served_imeisv       : static_size(8), padded_with(0xF);
+    bcd(lsn_fd) served_imsi         : static_size(8), padded_with(0xF);
+    bcd served_subs_ci              : static_size(4), little_endian;
+    int served_subs_lac             : static_size(2), little_endian;
+    bcd served_subs_location_type   :static_size(1); --new field
+    bcd(lsn_fd) served_subs_mcc     : static_size(2), padded_with(0xF);
+	bcd(lsn_fd) served_subs_mnc     : static_size(2), padded_with(0xF);
+    bcd ss_record_number            : static_size(1);
+	bcd supplementary_service_code  : static_size(1);
+    FilterBlock filter : trailing_optional;
+};
+
+external LocaRec_V2 : identified_by(record_type == 7), dynamic_size(recordLength) {
+ 	int recordLength         	   : static_size(2), little_endian, encode_value(field_size(filter) + 54);
+    int record_type          	   : static_size(1); 
+    bcd record_number        	   : static_size(4), little_endian; 
+    bcd record_status        	   : static_size(1); 
+    int check_sum            	   : static_size(2), little_endian; 
+    long CallReference       	   : static_size(5); 
+    bcd(lsn_fd) exchange_id  	   : static_size(10), padded_with(0xF);
+	bcd CallReferenceTime    	   : static_size(7), little_endian;
+    bcd charging_time_ten_ms 	   : static_size(8), little_endian; 
+	bcd loc_up_indicator           : static_size(1);
+	bcd number_of_in_records       : static_size(1);
+	bcd served_imsi                : static_size(8);
+	bcd subs_new_ci                : static_size(2);
+	bcd subs_new_lac               : static_size(2);
+    FilterBlock filter : trailing_optional;
+};
+
+external SmmtRec_V2 : identified_by(record_type ==9), dynamic_size(recordLength) {
+	int recordLength              : static_size(2), little_endian, encode_value(field_size(dynamicContainer) + field_size(filter) + 199);
+	int record_type                : static_size(1);
+	bcd record_number              : static_size(4), little_endian;
+	bcd record_status              : static_size(1);
+	int check_sum                  : static_size(2), little_endian;
+	long CallReference             : static_size(5);
+	bcd(lsn_fd) exchange_id        : static_size(10),padded_with(0xF);
+    bcd add_routing_category       : static_size(2);
+    bcd application_info           : static_size(1);
+    bcd basic_service_code         : static_size(1);
+    bcd basic_service_type         : static_size(1);
+    bcd CallReferenceTime          : static_size(7), little_endian;
+    bcd calling_category           : static_size(1);
+    bcd(lsn_fd) calling_imeisv     : static_size(8), padded_with(0xF);
+    bcd(lsn_fd) calling_vmsc_number: static_size(10), padded_with(0xF);
+    long camelCallReference        : static_size(8), padded_with(0xF);
+    bcd camel_exchange_id          : static_size(9), padded_with(0xF);
+    bcd camel_exchange_id_ton      : static_size(1), padded_with(0xFF);
+    bcd camel_service_key          : static_size(4), padded_with(0xF), little_endian;
+    bcd camel_sms_modification     : static_size(2);
+    int cause_for_termination      : static_size(4), little_endian;
+    int concatenated_record_number : static_size(1);
+    bcd concatenated_sms_reference : static_size(2);
+    bcd data_coding_scheme         : static_size(1);
+    bcd default_sms_handling       : static_size(1);
+    bcd delivery_time_ten_ms       : static_size(8), little_endian;
+    bcd incoming_message_type      : static_size(1);
+    bcd incoming_time_ten_ms       : static_size(8), little_endian;
+    bcd(lsn_fd) location_number    : static_size(12), padded_with(0xF);
+    bcd location_number_ton        : static_size(1), padded_with(0xFF);
+    bcd msim_group_imsi            : static_size(8), padded_with(0xF);
+    bcd msim_group_number          : static_size(9), padded_with(0xF);
+    int msim_group_number_ton      : static_size(1);
+    int msim_hunting_method         : static_size(1);
+    bcd network_element_type       :static_size(1);
+    bcd num_of_concatenated_sms    : static_size(1);
+    bcd number_of_in_records       : static_size(1);
+    bcd ossscode_list              : static_size(2);
+    bcd outgoing_message_type      : static_size(1);
+    bcd radio_network_type         : static_size(1);
+    bcd routing_category           : static_size(1);
+    bcd(lsn_fd) scf_address        : static_size(9), padded_with(0xF);
+    bcd scf_address_ton            : static_size(1), padded_with(0xFF);
+    bcd served_subs_ci             : static_size(4), little_endian;
+    int served_subs_lac            : static_size(2), little_endian;
+    bcd served_subs_location_type  :static_size(1);
+    bcd(lsn_fd) served_subs_mcc    : static_size(2), padded_with(0xF);
+	bcd(lsn_fd) served_subs_mnc    : static_size(2), padded_with(0xF);
+    bcd(lsn_fd) sm_router_correlation_id   : static_size(9);
+    bcd sm_text_length             : static_size(1);
+    bcd sms_length                 : static_size(1);
+    bcd sms_protocol_ID            : static_size(1);
+    bcd sms_type                   : static_size(1);
+    bcd(lsn_fd) smsc_address       :static_size(10), padded_with(0xF);
+    bcd smsc_time               : static_size(7), little_endian;
+    bcd smsc_time_zone              : static_size(1);
+    bcd msim_nbr_of_delivered_sms  : static_size(1);
+    DynamicContainer dynamicContainer;
+    FilterBlock filter : trailing_optional;
+};		
+
+external PtcRec_V2 : identified_by(record_type == 12), dynamic_size(recordLength) {
+    int recordLength                      : static_size(2),little_endian, encode_value( field_size(filter) + 250); 
+	int record_type                       : static_size(1);
+	bcd record_number                     : static_size(4), little_endian;
+	int record_status                     : static_size(1);
+	int check_sum                         : static_size(2), little_endian;
+	long CallReference                    : static_size(5);
+	bcd(lsn_fd)  exchange_id              : static_size(10), padded_with(0xF);
+	bcd(lsn_fd) additionalCallingNumber   : static_size(12), padded_with(0xF), little_endian;
+	bcd additional_calling_number_ton     : static_size(1), padded_with(0xFF);
+	bcd answer_time                       : static_size(7), little_endian;
+	bcd basic_service_code                : static_size(1);
+	bcd basic_service_type                : static_size(1);
+	bcd CallReferenceTime                 : static_size(7),little_endian;
+	CallType call_type 					  : static_size(1);
+	bcd carrier_selection                 : static_size(1);
+	bcd cause_for_termination             : static_size(4), little_endian;
+	bcd cf_information                    : static_size(1);
+	bcd charge_nature                     : static_size(1);
+	bcd charge_number                     : static_size(12);
+	bcd charge_number_ton                 : static_size(1);
+	bcd charging_end_time_ten_ms          : static_size(8), little_endian;
+	bcd charging_start_time_ten_ms        : static_size(8), little_endian;
+	bcd cip_carrier_code                  : static_size(2), padded_with(0xF);
+	bcd(lsn_fd) dialled_digits            : static_size(12), padded_with(0xF);
+	bcd dialled_digits_ton                : static_size(1), padded_with(0xFF);
+	bcd disconnecting_party               : static_size(1);
+	bcd idle_duration_ten_ms              : static_size(4), little_endian;
+	bcd in_bnc_connection_type            : static_size(1);
+	bcd in_circuit_group                  : static_size(2);
+	bcd intermediate_charging_ind         : static_size(1);
+	int intermediate_chrg_cause           : static_size(4), little_endian;
+	long intermediate_record_number       : static_size(1);
+	long legCallReference                 : static_size(5), padded_with(0xF);
+	bcd loc_routing_number                : static_size(12), padded_with(0xF);
+	bcd loc_routing_number_orig           : static_size(1);
+	bcd loc_routing_number_ton            : static_size(1), padded_with(0xFF);
+	bcd(lsn_fd) location_number           : static_size(12), padded_with(0xF);
+	bcd location_number_ton               : static_size(1), padded_with(0xFF);
+	bcd npdb_query_status                 : static_size(1);
+	int oaz_chrg_type                     : static_size(1);
+	bcd oaz_duration_ten_ms               : static_size(4), little_endian;
+	bcd oaz_tariff_class                  : static_size(3);
+	bcd oli                               : static_size(1);
+	bcd(lsn_fd) orig_add_calling_number   : static_size(12), padded_with(0xF);
+	bcd orig_add_calling_number_ton       : static_size(1), padded_with(0xFF);
+	bcd out_bnc_connection_type           : static_size(1);
+	bcd[] out_circuit_group               : static_size(2), padded_with(0xF), little_endian;
+	bcd(lsn_fd) outpulsed_calling_number  : static_size(12), padded_with(0xF);
+	bcd outpulsed_calling_number_ton      : static_size(1), padded_with(0xFF);
+	bcd(lsn_fd) outpulsed_number          : static_size(12), padded_with(0xF);
+	bcd outpulsed_number_ton              : static_size(1), padded_with(0xFF);
+	int radio_network_type                : static_size(1);
+	int rate_adaption                     : static_size(1);
+	bcd redir_number_indicator            : static_size(1);
+	int redirected_indicator              : static_size(1);
+	bcd(lsn_fd) redirecting_number        : static_size(12), padded_with(0xF);
+	bcd redirecting_number_ton            : static_size(1), padded_with(0xFF);
+	bcd redirection_counter               : static_size(1);
+	bcd selected_codec                    : static_size(1);
+	bcd setup_duration_ten_ms             : static_size(4), little_endian;
+	int term_mcz_chrg_type                : static_size(1);
+	bcd term_mcz_duration_ten_ms          : static_size(4), little_endian;
+	bcd term_mcz_tariff_class             : static_size(3);
+	bcd tns_carrier_code                  : static_size(2), padded_with(0xF);
+	bcd tns_circuit_code                  : static_size(1), padded_with(0xF);
+    FilterBlock filter : trailing_optional;
+};                                                 
+
+external TrailerRec : static_size(13), identified_by(recordType==16) {
+    int recordLength                : static_size(2),  little_endian;
+    int recordType                 : static_size(1);
+    bcd(lsn_fd) exchangeId          : static_size(10), padded_with(0xF);
+};
+
+external In2Rec_V2 : identified_by(record_type==24), dynamic_size(recordLength) {
+    int recordLength               : static_size(2), little_endian, encode_value( field_size(filter) + 388); 
+	int record_type                :  static_size(1);
+	bcd record_number              :  static_size(4), little_endian;
+	bcd record_status              :  static_size(1);
+	bcd check_sum                  :  static_size(2), little_endian;
+	bcd call_reference             :  static_size(5), little_endian;
+	bcd exchange_id                :  static_size(10);
+	bcd call_reference_time        :  static_size(7), little_endian;
+	bcd camel_call_reference       :  static_size(8);
+	bcd(lsn_fd) camel_exchange_id  :  static_size(9), padded_with(0xF);
+	bcd camel_exchange_id_ton      :  static_size(1);
+	bcd in_data                    :  static_size(325), padded_with(0xF);
+	bcd in_data_length             :  static_size(2);
+	bcd in_record_number           :  static_size(1);
+	bcd in_service_key             :  static_size(4), little_endian;
+	bcd leg_call_reference         :  static_size(5), little_endian;
+	bcd protocol_identification    :  static_size(1);
+    FilterBlock filter : trailing_optional;
+};
+
+in_map Data_Block_v_520500_inmap : external(Data_Block_v_520500), target_internal(Data_Block_v15_8) {automatic: use_external_names;};
+
+//NOKIA TAS DECODER
+decoder TAS_Decoder : in_map(Data_Block_v_520500_inmap);

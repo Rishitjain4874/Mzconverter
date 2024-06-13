@@ -1,0 +1,162 @@
+external CTAS_ONL : terminated_by(0xA)
+{
+    ascii Recordtype  : terminated_by(",");
+    ascii CallingNumber   : terminated_by(",");
+    ascii CalledNumber  : terminated_by(",");
+    ascii RequestedNumber  : terminated_by(",");
+    ascii SessionId :   terminated_by(",");
+    ascii MediaName  : terminated_by(",");
+    ascii CallStartTime  : terminated_by(",");
+    ascii CallEndTime  : terminated_by(",");
+    ascii LRN  : terminated_by(",");
+    ascii VisitedNetwork  : terminated_by(",");
+    ascii AccessNetworkInfo : terminated_by(",");
+    ascii CallDuration : terminated_by(",");
+    ascii Circle  : terminated_by(",");
+    ascii Imsi    : terminated_by(",");
+    ascii ICID    : terminated_by(",");
+    ascii IMEI    : terminated_by(","); 
+    ascii recSeqNum : terminated_by(0xA);
+    
+    
+};
+
+in_map ctas_im : external (CTAS_ONL) , target_internal(CTAS_ONL_TI){
+	automatic;
+};
+
+out_map ctas_om : external (CTAS_ONL) , internal(CTAS_ONL_TI){
+	automatic;
+};
+
+decoder ctas_Decoder : in_map (ctas_im);
+
+encoder ctas_Encoder : out_map(ctas_om);
+
+external CSVHeader{
+    ascii Recordtype        :encode_value("Recordtype"),terminated_by(",");
+    ascii CallingNumber     :encode_value("CallingNumber"),terminated_by(",");
+    ascii CalledNumber      :encode_value("CalledNumber"),terminated_by(",");
+    ascii RequestedNumber   :encode_value("RequestedNumber"),terminated_by(",");
+    ascii SessionId         :encode_value("SessionId"),terminated_by(",");
+    ascii MediaName         :encode_value("MediaName"),terminated_by(",");
+    ascii CallStartTime     :encode_value("CallStartTime"),terminated_by(",");
+    ascii CallEndTime       :encode_value("CallEndTime"),terminated_by(",");
+    ascii LRN               :encode_value("LRN"),terminated_by(",");
+    ascii VisitedNetwork    :encode_value("VisitedNetwork"),terminated_by(",");
+    ascii AccessNetworkInfo :encode_value("AccessNetworkInfo"),terminated_by(",");
+    ascii CallDuration      :encode_value("CallDuration"),terminated_by(",");
+    ascii Circle            :encode_value("Circle"),terminated_by(",");
+    ascii Imsi              :encode_value("Imsi"),terminated_by(",");
+    ascii IMEI              :encode_value("IMEI"),terminated_by(",");
+    ascii recSeqNum         :encode_value("recSeqNum"),terminated_by(0XA);
+};
+in_map header_in : external (CSVHeader) , target_internal(CsvHeader_TI),discard_output{
+	automatic;
+};
+
+decoder header_Dec : in_map (header_in);
+
+
+out_map header_out : external(CSVHeader),internal(CsvHeader_TI){
+	automatic;
+};
+
+encoder header_enc : out_map(header_out);
+
+
+internal CTAS_internal{
+    string Recordtype;
+    string CallingNumber;
+    string CalledNumber;
+    string RequestedNumber;
+    string SessionId;
+    string MediaName;
+    date CallStartTime;   
+    string CallEndTime;
+    string LRN;
+    string VisitedNetwork;
+    string AccessNetworkInfo;
+    string CallDuration;
+    string Circle;
+    string Imsi;
+    string ICID;
+    string IMEI;
+    string recSeqNum;
+    CTAS_ONL_TI ctasExt;
+};
+
+decoder CTAS_Rec
+{
+    decoder header_Dec;
+    decoder ctas_Decoder *;
+};
+
+
+
+external ErrDrop :identified_by(strStartsWith(outputCode, "ERR") || strStartsWith(outputCode, "DRP")){
+    ascii outputCode : terminated_by(",");  
+    ascii outputType : terminated_by(",");
+};
+in_map ErrDrop_im : external(ErrDrop), target_internal(ErrDrop_TI) {
+    automatic;
+};
+decoder ErrDrop_dec  : in_map(ErrDrop_im);
+out_map ErrDrop_out : external(ErrDrop), internal (ErrDrop_TI)
+{
+    automatic;
+};
+encoder ErrDrop_enc      :out_map(ErrDrop_out);
+
+external Audit
+{
+    ascii StartTime : terminated_by(",");
+    ascii ProcessTime : terminated_by(",");
+    ascii filename : terminated_by(",");
+    ascii TotalRecords : terminated_by(","),bigint(base10);
+    ascii successRecords : terminated_by(","),bigint(base10);
+    ascii TechnicalError : terminated_by(","),bigint(base10);
+    ascii FunctionalError :terminated_by(","),bigint(base10);
+    ascii InvalidCustomer :terminated_by(","),bigint(base10);
+    ascii InvalidParameter : terminated_by(0xA),bigint(base10);
+};
+
+in_map inmap_AuditDetails : external (Audit),target_internal(Audit_TI) {automatic;};   
+decoder AuditDetailsDec : in_map (inmap_AuditDetails); 
+out_map outmap_AuditDetails : external (Audit) , internal (Audit_TI){automatic;}; 
+encoder AuditDetailsEnc : out_map(outmap_AuditDetails);
+
+
+external FailureDetails{
+    //ascii Filename : terminated_by(","); 
+    ascii exceptionType :terminated_by(",");
+    ascii exception:terminated_by(",");
+    ascii excepCode : terminated_by(",");
+    ascii FailureReason : terminated_by(",");
+   
+};
+in_map inmap_FailureDetails : external (FailureDetails),target_internal(FailureDetails_TI) {automatic;};   
+decoder FailureDetailsDec : in_map (inmap_FailureDetails);  
+out_map outmap_FailureDetails : external (FailureDetails) , internal (FailureDetails_TI){automatic;}; 
+encoder FailureDetailsEnc : out_map(outmap_FailureDetails);
+
+/*external SuccessDetails{
+    //ascii Filename : terminated_by(","); 
+    
+   
+};
+in_map inmap_SuccessDetails : external (SuccessDetails),target_internal(SuccessDetails_TI) {automatic;};   
+decoder SuccessDetailsDec : in_map (inmap_SuccessDetails); 
+out_map outmap_SuccessDetails : external (SuccessDetails) , internal (SuccessDetails_TI){automatic;}; 
+encoder SuccessDetailsEnc : out_map(outmap_SuccessDetails);*/
+
+external DropDetails{
+    //ascii Filename : terminated_by(","); 
+    ascii Dropmsg  : terminated_by(",");
+    
+   
+};
+in_map inmap_DropDetails : external (DropDetails),target_internal(DropDetails_TI) {automatic;};   
+decoder DropDetailsDec : in_map (inmap_DropDetails); 
+out_map outmap_DropDetails : external (DropDetails) , internal (DropDetails_TI){automatic;}; 
+encoder DropDetailsEnc : out_map(outmap_DropDetails);

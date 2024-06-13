@@ -1,0 +1,29 @@
+external biIPSMFormat_Ext {
+	ascii callingNumber        : terminated_by(",");
+	ascii calledNumber         : terminated_by(",");
+	ascii submitDate           : terminated_by(",");
+	ascii submitTime           : terminated_by(",");
+	ascii originatorCellId     : terminated_by(",");
+	ascii callType             : terminated_by(",");
+	ascii IMEI                 : terminated_by(",");
+	ascii IMSI                 : terminated_by(",");
+	ascii smscAddress          : terminated_by(",");
+	ascii visitedNetwrkIdentier: terminated_by(",");
+    ascii visitedCircle        : terminated_by(",");
+	ascii terminatingLRN       : terminated_by(",");
+    ascii paniHeader           : terminated_by(",");
+    ascii iCID                 : terminated_by(0xA);
+};
+
+in_map BIIPSM_Inmap : external(biIPSMFormat_Ext), internal(mavIPSM_TI){
+    automatic;
+};
+
+decoder BIIPSM_Dec : in_map(BIIPSM_Inmap);
+
+out_map BIIPSM_OutMap : internal(mavIPSM_TI),external(biIPSMFormat_Ext) { 
+    automatic;
+};
+
+encoder BIIPSM_Enc : out_map(BIIPSM_OutMap);
+
