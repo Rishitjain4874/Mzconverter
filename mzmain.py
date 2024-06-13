@@ -75,15 +75,14 @@ class Terminator(ASTNode):
         return f"Terminator(value={self.value})"
 
 class SetDeclaration(ASTNode):
-    def __init__(self, name, varname, field, query, query_nxt):
+    def __init__(self, name, varname, fields, queries):
         self.name = name
         self.varname = varname
-        self.field = field
-        self.query = query
-        self.query_nxt = query_nxt
+        self.fields = fields
+        self.queries = queries
 
     def __repr__(self):
-        return f"SetDeclaration(name={self.name}, varname={self.varname}, field={self.field}, query={self.query}, query_nxt={self.query_nxt})" 
+        return f"SetDeclaration(name={self.name}, varname={self.varname}, query_B1={self.fields}, query_B2={self.queries})"
 
 class Asn_LengthDeclaration(ASTNode):
     def __init__(self, name, terminator, options=None):
@@ -150,7 +149,7 @@ class Parser:
         token = self.tokens[self.pos]
         self.pos += 1
         if expected_value and token != expected_value:
-            raise SyntaxError(f"Expected {expected_value}, got {token}")
+            raise SyntaxError(f"Expected {expected_value}")
         return token    
     
     def parse_external_declaration(self):
@@ -162,6 +161,7 @@ class Parser:
             self.consume(';')
         elif self.tokens[self.pos] == ':':
             self.consume(':')
+            print('test123')
             declarations = self.parse_declaration_list()
             self.consume('}')
             self.consume(';')
@@ -175,6 +175,9 @@ class Parser:
             if self.tokens[self.pos] in ['\n', '']:
                 self.pos += 1
                 continue
+            if self.tokens[self.pos] == 'terminated_by':
+                declarations.append(self.parse_terminator())
+                self.consume('{')
             elif self.tokens[self.pos] == 'ascii':
                 declarations.append(self.parse_ascii_declaration())
             elif self.tokens[self.pos] == 'identified_by':
@@ -267,38 +270,38 @@ class Parser:
     
     def parse_set(self):
         self.consume('\n')
-        if self.tokens[self.pos] == 'set':
-            self.consume('set')
-            self.consume('{')
-            while self.pos + 3 < len(self.tokens) and self.tokens[self.pos] != '}' and self.tokens[self.pos + 1] != ';' and self.tokens[self.pos + 2] != '\n':
-                self.consume('\n')
-                while self.tokens[self.pos] != '}':
-                    name = self.consume()
-                    varname = self.consume()
-                    if self.tokens[self.pos] == ':':
-                        self.consume(':')
-                    else:
-                        pass
-                    field = self.consume()   
-                    self.consume(';')
-                    self.consume('\n')
-
-                self.consume('}')
-                self.consume(';')
-                self.consume('\n')
-                self.consume(';')
-                self.consume('\n')
-                while self.tokens[self.pos] != '}':
-                    query = self.consume()
-                    if self.tokens[self.pos] == ':':
-                        self.consume(':')
-                    else:
-                        pass
-                    query_nxt = self.consume()
-                    self.consume(';')
-                    self.consume('\n')
-
-        return SetDeclaration(name, varname, field, query, query_nxt)
+        self.consume('set')
+        self.consume('{')
+        self.consume('\n')
+        fields = []
+        while self.tokens[self.pos] != '}':
+            name = self.consume()
+            varname = self.consume()
+            if self.tokens[self.pos]== ':':
+                self.consume(':')
+            else:
+                pass
+            field = self.consume()
+            fields.append((name, varname, field))
+            self.consume(';')
+            self.consume('\n')
+        self.consume('}')
+        self.consume(';')
+        self.consume('\n')
+        self.consume(';')
+        self.consume('\n')
+        queries = []
+        while self.pos < len(self.tokens) and self.tokens[self.pos] != '}' and self.tokens[self.pos + 1] != ';' and self.tokens[self.pos + 2] != '\n':
+            query = self.consume()
+            if self.tokens[self.pos]== ':':
+                self.consume(':')
+            else:
+                pass
+            query_nxt = self.consume()
+            queries.append((query, query_nxt))
+            self.consume(';')
+            self.consume('\n')
+        return SetDeclaration(name, varname, fields, queries)
 
     def parse_identified_by(self):
         self.consume('identified_by')
@@ -442,7 +445,7 @@ def parse_multiple_lists(token_lists):
             ast = parser.parse()
             asts.append(ast)
         except Exception as e:
-            print(f"Error parsing AST: {e}, for token {tokens}")
+            print(f"Error parsing AST: {e} in {tokens}")
             continue
     print(asts)
     return asts
@@ -624,7 +627,7 @@ def parse_ast(ast_str):
         external_declarations.append(ExternalDeclaration(name=name, declarations=declarations))
     return external_declarations
 
-file = 'sampleUltraFormat.txt'
+file = 'UDLF files/Test3.udlf'
 with open(file, 'r') as f:
     content = f.read()
 block_value_ext = check_Ext_int(getcontentfile(content), 'external')
@@ -655,4 +658,4 @@ def receive_tokens_ext():
     return go_code
 
 if __name__ == '__main__':
-    app.run(port=5011)'''               
+    app.run(port=5011)  '''

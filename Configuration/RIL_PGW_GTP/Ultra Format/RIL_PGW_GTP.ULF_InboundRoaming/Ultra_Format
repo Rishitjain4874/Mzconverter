@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE exportmultiplex SYSTEM "jar:/mz/dtd/export_multiplex.dtd">
+<exportmultiplex category="Ultra_Format" ref_path="ultra_format[Internal]/storable[ultra_format]/storable[Data]">
+   <string name="Definition"><![CDATA[external ExtHeader
+{
+    ascii begin : terminated_by(0xA);
+};
+external ExternalBSNL 
+{
+	ascii  chargingId			  : terminated_by(",");
+	ascii  msisdn                  : terminated_by(",");
+	ascii  time                    : terminated_by(",");
+	ascii  duration                : terminated_by(",");
+	ascii  imsi                    : terminated_by(",");
+	ascii  imei                    : terminated_by(",");
+	ascii  apn_name                : terminated_by(",");
+	ascii  technicalInfoType       : terminated_by(",");
+	ascii  causeForRecClosing      : terminated_by(",");
+	ascii  cdrComplete             : terminated_by(",");
+	ascii  uplinkVolume            : terminated_by(",");
+	ascii  downlinkVolume          : terminated_by(",");
+	ascii  nodeId                  : terminated_by(",");
+	ascii  sgsnAddress             : terminated_by(",");
+	ascii  ggsnAddress             : terminated_by(",");
+	ascii  plmnId                  : terminated_by(",");
+	ascii  locationAreaCode        : terminated_by(",");
+	ascii  pdpType                 : terminated_by(",");
+	ascii  cellIdentifier          : terminated_by(",");
+	ascii  chargingCharacteristic  : terminated_by(",");
+	ascii  ratType                 : terminated_by(0xA);
+};
+
+external ExtTrailer
+{    
+  ascii end : terminated_by(",");
+  ascii recordCount : terminated_by(0xA);
+};
+
+//Header
+in_map BSNLHeader_imap  : external (ExtHeader), target_internal (Header){automatic;};
+
+decoder BSNLHeaderDec : in_map(BSNLHeader_imap);
+
+out_map BSNLHeader_OutMap : internal(Header),external(ExtHeader) {
+    automatic;
+};
+
+encoder BSNLHeaderEnc : out_map(BSNL_OutMap);
+
+//Record
+in_map BSNL_imap : external(ExternalBSNL), target_internal(BsnlUDR){automatic;};
+
+decoder BSNLDec : in_map(BSNL_imap);
+
+out_map BSNL_OutMap : internal(BsnlUDR),external(ExternalBSNL) {
+    automatic;
+};
+
+encoder BSNLEnc : out_map(BSNL_OutMap);
+
+//Trailer
+in_map BSNLTrailer_imap : external (ExtTrailer), target_internal (Trailer){automatic;};
+
+decoder BSNLTrailerEnc : in_map(BSNLTrailer_imap);
+
+out_map BSNLTriler_OutMap : internal(Trailer),external(ExtTrailer) {
+    automatic;
+};
+
+encoder BSNLTrailerEnc : out_map(BSNLTriler_OutMap);
+
+encoder BSNLFinalEnc : out_map(BSNLHeader_OutMap), out_map(BSNL_OutMap),out_map(BSNLTriler_OutMap);
+
+decoder BSNLFinalDec {
+    decoder BSNLHeaderDec;
+    decoder BSNLDec *;
+    decoder BSNLTrailerEnc;
+};]]></string>
+   <boolean name="IsValid" value="true"/>
+</exportmultiplex>

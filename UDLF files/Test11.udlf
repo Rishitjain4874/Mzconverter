@@ -1,0 +1,31 @@
+external CommonExternal
+{
+    ascii callingNumber : terminated_by(",");
+    ascii calledNumber  : terminated_by(",");
+    ascii reqPartyNumber: terminated_by(",");
+    ascii sdpMediaName  : terminated_by(",");
+    ascii imsChargingInd: terminated_by(",");
+    ascii accessNetworkInfo : terminated_by(",");
+    ascii service_Specific_Data : terminated_by(",");
+    ascii endUserImsi : terminated_by(",");
+    ascii callStartTime : terminated_by(",");
+    ascii callDuration : terminated_by(","),int(base10);
+    ascii imei : terminated_by(",");
+    ascii circle : terminated_by(",");
+    ascii zone : terminated_by(",");
+    ascii numberPortabilityInfo : terminated_by(",");
+    //ascii errorMessage : terminated_by(",");
+    //ascii errorCode : terminated_by(0xA);
+};
+
+in_map comExt_im : external (CommonExternal) , target_internal(CE_TI){
+	automatic;
+};
+
+out_map comExt_om : external (CommonExternal) , internal(CE_TI){
+	automatic;
+};
+
+decoder CE_Decoder : in_map (comExt_im);
+
+encoder CE_Encoder : out_map(comExt_om);

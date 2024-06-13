@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE exportmultiplex SYSTEM "jar:/mz/dtd/export_multiplex.dtd">
+<exportmultiplex category="Ultra_Format" ref_path="ultra_format[Internal]/storable[ultra_format]/storable[Data]">
+   <string name="Definition"><![CDATA[external inContentFormat_Sgw{
+    ascii event_type 						: align(left), padded_with(0x20), static_size(2);
+    ascii calling_number                    : align(left), padded_with(0x20), static_size(20);
+    ascii called_number                     : align(left), padded_with(0x20), static_size(20);
+    ascii start_date                        : align(left), padded_with(0x20), static_size(8);
+    ascii start_time                        : align(left), padded_with(0x20), static_size(6);
+    ascii call_duration                     : align(left), padded_with(0x20), static_size(6);
+    ascii volume_uplink                     : align(left), padded_with(0x20), static_size(12);
+    ascii volume_downlink                   : align(left), padded_with(0x20), static_size(12);
+    ascii imsi                              : align(left), padded_with(0x20), static_size(15);
+    ascii esn_imei                          : align(left), padded_with(0x20), static_size(15);
+    ascii time_zone                         : align(left), padded_with(0x20), static_size(5);
+    ascii sSwitch                           : align(left), padded_with(0x20), static_size(16);
+    ascii cell_id                           : align(left), padded_with(0x20), static_size(5);
+    ascii location_area                     : align(left), padded_with(0x20), static_size(5);
+    ascii tele_service_code                 : align(left), padded_with(0x20), static_size(2);
+    ascii bearer_service_code               : align(left), padded_with(0x20), static_size(2);
+    ascii suppl_service                     : align(left), padded_with(0x20), static_size(2);
+    ascii pdpadress                         : align(left), padded_with(0x20), static_size(64);
+    ascii apn_ni                            : align(left), padded_with(0x20), static_size(63);
+    ascii apn_oi                            : align(left), padded_with(0x20), static_size(37);
+    ascii chargingid                        : align(left), padded_with(0x20), static_size(10);
+    ascii reserved_for_future_use_1         : align(left), padded_with(0x20), static_size(64);
+    ascii sgsn                              : align(left), padded_with(0x20), static_size(64);
+    /*ascii sgsn                              : align(left), padded_with(0x20), static_size(54);
+    ascii cell_identity                     : align(left), padded_with(0x20), static_size(9);
+    ascii partial_type_indicator            : align(left), padded_with(0x20), static_size(1);*/
+    ascii rec_entity_type                   : align(left), padded_with(0x20), static_size(1);
+    ascii dialled_digits                    : align(left), padded_with(0x20), static_size(20);
+    ascii third_party_number                : align(left), padded_with(0x20), static_size(20);
+    ascii cause_for_termination             : align(left), padded_with(0x20), static_size(2);
+    ascii camel_serv_key                    : align(left), padded_with(0x20), static_size(10);
+    ascii camel_serv_level                  : align(left), padded_with(0x20), static_size(1);
+    ascii camel_dest_number                 : align(left), padded_with(0x20), static_size(20);
+    ascii camel_call_reference              : align(left), padded_with(0x20), static_size(3);
+    ascii default_call_hand_ind             : align(left), padded_with(0x20), static_size(1);
+    ascii eps_error_code                    : align(left), padded_with(0x20), static_size(50);
+    ascii previous_dur_vol                  : align(left), padded_with(0x20), static_size(12);
+    ascii previous_value                    : align(left), padded_with(0x20), static_size(10);
+    ascii previous_date                     : align(left), padded_with(0x20), static_size(8);
+    ascii orig_file_name_from_eps           : align(left), padded_with(0x20), static_size(54);
+    ascii serving_bid                       : align(left), padded_with(0x20), static_size(5);
+    ascii reserved_for_future_use_2         : align(left), padded_with(0x20), static_size(1);
+    ascii reserved_for_future_use_3         : align(left), padded_with(0x20), static_size(64);
+    ascii event_reference                   : align(left), padded_with(0x20), static_size(50);
+    ascii reserved_for_future_use_4         : align(left), padded_with(0x20), static_size(64);
+    ascii reserved_for_future_use_5         : align(left), padded_with(0x20), static_size(64);
+    ascii reserved_for_future_use_6         : align(left), padded_with(0x20), static_size(64);
+    ascii non_charged_party_public_usr_id   : align(left), padded_with(0x20), static_size(50);
+    ascii charged_party_home_bid            : align(left), padded_with(0x20), static_size(5);
+    ascii charged_party_public_usr_id       : align(left), padded_with(0x20), static_size(50);
+    ascii requested_public_usr_id           : align(left), padded_with(0x20), static_size(50);
+    ascii recording_entity_type_01          : align(left), padded_with(0x20), static_size(2);
+    ascii recording_entity_01               : align(left), padded_with(0x20), static_size(64);
+    ascii recording_entity_type_02          : align(left), padded_with(0x20), static_size(2);
+    ascii recording_entity_02               : align(left), padded_with(0x20), static_size(64);
+    ascii recording_entity_type_03          : align(left), padded_with(0x20), static_size(2);
+    ascii recording_entity_03               : align(left), padded_with(0x20), static_size(64);
+    ascii recording_entity_type_04          : align(left), padded_with(0x20), static_size(2);
+    ascii recording_entity_04               : align(left), padded_with(0x20), static_size(64);
+    ascii network_element_type_01           : align(left), padded_with(0x20), static_size(2);
+    ascii network_element_01                : align(left), padded_with(0x20), static_size(64);
+    ascii network_element_type_02           : align(left), padded_with(0x20), static_size(2);
+    ascii network_element_02                : align(left), padded_with(0x20), static_size(64);
+    ascii network_element_type_03           : align(left), padded_with(0x20), static_size(2);
+    ascii network_element_03                : align(left), padded_with(0x20), static_size(64);
+    ascii network_element_type_04           : align(left), padded_with(0x20), static_size(2);
+    ascii network_element_04                : align(left), padded_with(0x20), static_size(64);
+    ascii filler                            : align(left), padded_with(0x20), static_size(95);
+    ascii lineFeed                          : terminated_by(0xA), external_only;
+};
+
+in_map contentSgw_imap : external(inContentFormat_Sgw), target_internal(inContentFormatSgw_TI){automatic;};
+
+decoder inContentFormatSgw_Dec : in_map(contentSgw_imap);
+
+out_map contentSgw_OutMap : internal(inContentFormatSgw_TI),external(inContentFormat_Sgw) { 
+    automatic;
+};
+
+encoder contentSgw_Enc : out_map(contentSgw_OutMap);]]></string>
+   <boolean name="IsValid" value="true"/>
+</exportmultiplex>

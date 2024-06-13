@@ -1,0 +1,46 @@
+external CSVExternal
+{
+    ascii field1  : terminated_by(",");
+    ascii field2  : terminated_by(",");
+    ascii field3  : terminated_by(",");
+    ascii field4  : terminated_by(",");
+    ascii field5  : terminated_by(",");
+    ascii field6  : terminated_by(",");
+    ascii field7  : terminated_by(",");
+    ascii field8  : terminated_by(",");
+    ascii field9  : terminated_by(",");
+    ascii field10 : terminated_by(",");
+    ascii field11 : terminated_by(",");
+    ascii field12 : terminated_by(",");
+    ascii field13 : terminated_by(",");
+    ascii field14 : terminated_by(",");
+    ascii field15 : terminated_by(",");
+    ascii field16 : terminated_by(",");
+    ascii field17 : terminated_by(",");
+    ascii field18 : terminated_by(",");
+    ascii field19 : terminated_by(",");
+    ascii field20  : terminated_by(",");
+    ascii field21 : terminated_by(",");
+    ascii field22 : terminated_by(",");
+    ascii field23 : terminated_by(",");
+    ascii field24 : terminated_by(",");
+    ascii field25 : terminated_by(",");
+    ascii field26 : terminated_by(",");
+    ascii field27 : terminated_by(",");
+    ascii field28 : terminated_by(",");
+    ascii field29 : terminated_by(",");
+    ascii field30 : terminated_by(0xA);
+    
+};
+
+in_map csv_im : external (CSVExternal) , target_internal(CSV_TI){
+	automatic;
+};
+
+out_map csv_om : external (CSVExternal) , internal(CSV_TI){
+	automatic;
+};
+
+decoder CSBV_Decoder : in_map (csv_im);
+
+encoder CSV_Encoder : out_map(csv_om);

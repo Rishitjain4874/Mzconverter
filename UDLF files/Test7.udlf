@@ -1,0 +1,9 @@
+external JplBit {
+    ascii value : terminated_by(0xA);
+};
+
+in_map JplBit_inMap : external(JplBit), target_internal(JplBit) {automatic;};
+decoder JplBit_dec: in_map(JplBit_inMap);
+
+out_map JplBit_OutMap : internal (JplBit), external(JplBit){automatic;};
+encoder JplBit_Enc: out_map(JplBit_OutMap);

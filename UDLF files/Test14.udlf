@@ -1,0 +1,95 @@
+external ExtHeader
+{
+    ascii begin : terminated_by(0xA);
+};
+external ExternalBI 
+{
+	ascii servedMSISDN            : terminated_by(",");
+    ascii servedIMSI              : terminated_by(",");
+    ascii firstCell_ID            : terminated_by(",");
+    ascii CGI_ID                  : terminated_by(",");
+    ascii servedPDPPDNAddressIPv4 : terminated_by(",");
+    ascii servedPDPPDNAddressIPv6 : terminated_by(",");
+    ascii startDate               : terminated_by(",");
+    ascii startTime               : terminated_by(",");
+    ascii IMEI                    : terminated_by(",");
+    ascii p_GWAddress             : terminated_by(",");
+    ascii duration                : terminated_by(",");
+    ascii chargingId              : terminated_by(",");
+    ascii ratType                 : terminated_by(",");
+    ascii apGroupName             : terminated_by(",");
+    ascii aPMACID                 : terminated_by(",");
+    ascii aPN                     : terminated_by(",");
+    ascii uEIP                    : terminated_by(",");
+    ascii uEPort                  : terminated_by(",");
+    ascii dataVolumeUplink        : terminated_by(",");
+    ascii dataVolumeDownlink      : terminated_by(",");
+    ascii lastCell_ID             : terminated_by(",");
+    ascii visitedMCCMNC           : terminated_by(",");
+    ascii IPAddressSGW            : terminated_by(",");
+    ascii nodeId                  : terminated_by(","); //new field added on 20190408
+    ascii aFchargingIdentifier    : terminated_by(0xA); //new field added on 20200319	
+};
+
+external ExtTrailer
+{    
+  ascii end : terminated_by(",");
+  ascii recordCount : terminated_by(0xA);
+};
+
+/*Header
+in_map BIHeader_imap  : external (ExtHeader), target_internal (Header){automatic;};
+
+decoder BIHeaderDec : in_map(BIHeader_imap);
+
+out_map BIHeader_OutMap : internal(Header),external(ExtHeader) {
+    automatic;
+};
+*/
+external FileHeader {
+   ascii header : terminated_by(0xA);
+};
+
+in_map Header_in : external( FileHeader ), 
+   target_internal( Header ), discard_output { 
+        automatic; 
+};
+
+decoder Header : in_map( Header_in ); 
+decoder Records : in_map( BI_imap );
+decoder dlt_dec {
+   decoder Header;
+   decoder Records *;  
+};
+
+encoder BIHeaderEnc : out_map(BI_OutMap);
+
+//Record
+in_map BI_imap : external(ExternalBI), target_internal(BiUDR){automatic;};
+
+decoder BIDec : in_map(BI_imap);
+
+out_map BI_OutMap : internal(BiUDR),external(ExternalBI) {
+    automatic;
+};
+
+encoder BIEnc : out_map(BI_OutMap);
+
+/* Trailer
+in_map BITrailer_imap : external (ExtTrailer), target_internal (Trailer){automatic;};
+
+decoder BITrailerEnc : in_map(BITrailer_imap);
+
+out_map BITriler_OutMap : internal(Trailer),external(ExtTrailer) {
+    automatic;
+};
+
+encoder BITrailerEnc : out_map(BITriler_OutMap);
+
+encoder BIFinalEnc : out_map(BIHeader_OutMap), out_map(BI_OutMap),out_map(BITriler_OutMap);
+
+decoder BIFinalDec {
+    decoder BIHeaderDec;
+    decoder BIDec *;
+   // decoder BITrailerEnc;
+};

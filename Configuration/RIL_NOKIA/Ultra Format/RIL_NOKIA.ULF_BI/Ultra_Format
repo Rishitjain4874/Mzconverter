@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE exportmultiplex SYSTEM "jar:/mz/dtd/export_multiplex.dtd">
+<exportmultiplex category="Ultra_Format" ref_path="ultra_format[Internal]/storable[ultra_format]/storable[Data]">
+   <string name="Definition"><![CDATA[--Author : Manoj Garud
+--Email  : Manoj.garud@ril.com
+--Purpose: To send data to Regulatary system(BI)
+--Date   : 04-09-2015
+ 
+external BIExternal{
+	ascii  callingNumber     		: terminated_by(",");
+	ascii  calledNumber				: terminated_by(",");
+	ascii  callStartDate			: terminated_by(",");
+	ascii  callStartTime			: terminated_by(",");
+	ascii  callEndDate				: terminated_by(",");
+	ascii  callEndTime				: terminated_by(",");
+	ascii  callDuration				: terminated_by(",");
+	ascii  firstCellID				: terminated_by(",");
+	ascii  lastCellID				: terminated_by(",");
+	ascii  callType					: terminated_by(",");-- (IN/OUT/SMS IN/SMS OUT)
+	ascii  imei						: terminated_by(",");
+	ascii  imsi						: terminated_by(",");
+    ascii  imsVisitedNetworkID      : terminated_by(",");
+	ascii  firstRoamingCircleID		: terminated_by(",");
+	ascii  lrn				    	: terminated_by(",");
+    ascii  cNumber                  : terminated_by(",");
+	ascii  paniHeader				: terminated_by(",");
+    ascii  iCID                     : terminated_by(",");//added iCID --04-08-2016
+    ascii  recordType               : terminated_by(",");
+    ascii  callnet                  : terminated_by(",");
+    ascii  callTypeInfo             : terminated_by(",");
+    ascii  roamingInfo              : terminated_by(",");
+    ascii  otherPartyRecordType     : terminated_by(",");
+    ascii  sdcaInfo                 : terminated_by(",");
+    ascii  requestedPartyNumber     : terminated_by(",");
+    ascii  homeCircleCode           : terminated_by(",");
+	ascii  causeForForward          : terminated_by(",");
+    ascii  causeForRecordClosing    : terminated_by(","); 
+	ascii  onlineChargingFailure    : terminated_by(",");
+	ascii  sourceName               : terminated_by(",");
+	ascii  otherpartyOperator       : terminated_by(",");
+	ascii  otherpartyCircle         : terminated_by(",");
+    ascii  endUserNAI               : terminated_by(0xA);
+};
+
+in_map bi_im : external (BIExternal) , target_internal(BI_TI){
+	automatic;
+};
+
+out_map bi_om : external (BIExternal) , internal(BI_TI){
+	automatic;
+};
+
+decoder BI_Decoder : in_map (bi_im);
+
+encoder BI_Encoder : out_map(bi_om);
+
+
+external BI2External{
+	ascii  callingNumber     		: terminated_by(",");
+	ascii  calledNumber				: terminated_by(",");
+	ascii  callStartDate			: terminated_by(",");
+	ascii  callStartTime			: terminated_by(",");
+	ascii  callEndDate				: terminated_by(",");
+	ascii  callEndTime				: terminated_by(",");
+	ascii  callDuration				: terminated_by(",");
+	ascii  firstCellID				: terminated_by(",");
+	ascii  lastCellID				: terminated_by(",");
+	ascii  callType					: terminated_by(",");-- (IN/OUT/SMS IN/SMS OUT)
+	ascii  imei						: terminated_by(",");
+	ascii  imsi						: terminated_by(",");
+    ascii  imsVisitedNetworkID      : terminated_by(",");
+	ascii  firstRoamingCircleID		: terminated_by(",");
+	ascii  lrn				    	: terminated_by(",");
+    ascii  cNumber                  : terminated_by(",");
+	ascii  	paniHeader				: terminated_by(",");
+    ascii  iCID                     : terminated_by(",");//added iCID --04-08-2016
+    ascii  recordType               : terminated_by(",");
+    ascii callnet                   : terminated_by(",");
+    ascii callTypeInfo              : terminated_by(",");
+    ascii roamingInfo               : terminated_by(",");
+    ascii otherPartyRecordType      : terminated_by(",");
+    ascii sdcaInfo                  : terminated_by(",");
+    ascii requestedPartyNumber      : terminated_by(",");
+    ascii callReferenceTime         : terminated_by(",");
+    ascii error                  /*: terminated_by(",");
+    ascii errorMsg         */         : terminated_by(0xA);
+
+};
+
+in_map bi2_im : external (BI2External) , target_internal(BI2_TI){
+	automatic;
+};
+
+out_map bi2_om : external (BI2External) , internal(BI2_TI){
+	automatic;
+};
+
+decoder BI2_Decoder : in_map (bi2_im);
+
+encoder BI2_Encoder : out_map(bi2_om);]]></string>
+   <boolean name="IsValid" value="true"/>
+</exportmultiplex>

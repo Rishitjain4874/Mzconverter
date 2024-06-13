@@ -1,0 +1,228 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE exportmultiplex SYSTEM "jar:/mz/dtd/export_multiplex.dtd">
+<exportmultiplex category="Ultra_Format" ref_path="ultra_format[Internal]/storable[ultra_format]/storable[Data]">
+   <string name="Definition"><![CDATA[external ZRF6Ext
+    {
+
+                ascii CC_ITEM_INDEX        : terminated_by(",");
+        ascii SRCTATYPE        : terminated_by(",");
+        ascii SRCTAID        : terminated_by(",");
+        ascii SUBPROCESS        : terminated_by(",");
+        ascii BITTYPE        : terminated_by(",");
+        ascii PREPAID        : terminated_by(",");
+        ascii PPREFILL        : terminated_by(",");
+        ascii VKONT        : terminated_by(",");
+        ascii GPART        : terminated_by(",");
+        ascii VTREF        : terminated_by(",");
+        ascii VTPOS        : terminated_by(",");
+        ascii SUBAP        : terminated_by(",");
+        ascii PPACC        : terminated_by(",");
+        ascii BILL_BASEDATE        : terminated_by(",");
+        ascii BILL_FIRST        : terminated_by(",");
+        ascii BITDATE        : terminated_by(",");
+        ascii BITTIME        : terminated_by(",");
+        ascii BITDATE_FROM        : terminated_by(",");
+        ascii BITDATE_TO        : terminated_by(",");
+        ascii BIT_AMOUNT        : terminated_by(",");
+        ascii BIT_CURR        : terminated_by(",");
+        ascii TAX_INCLUDED        : terminated_by(",");
+        ascii TAX_DET_TYPE        : terminated_by(",");
+        ascii EXT_TAX_DATE        : terminated_by(",");
+        ascii EXT_TAX_ID        : terminated_by(",");
+        ascii BITREF32        : terminated_by(",");
+        ascii PY_GROUP        : terminated_by(",");
+        ascii BKVID        : terminated_by(",");
+        ascii CNTU1        : terminated_by(",");
+        ascii CNTU1_REQ        : terminated_by(",");
+        ascii CNTU2        : terminated_by(",");
+        ascii CNTU2_REQ        : terminated_by(",");
+        ascii CNTU3        : terminated_by(",");
+        ascii CNTU3_REQ        : terminated_by(",");
+        ascii CRDID        : terminated_by(",");
+        ascii CRDRS        : terminated_by(",");
+        ascii PA8120_POS_ID1        : terminated_by(",");
+        ascii PA8120_POS_ID2        : terminated_by(",");
+        ascii PA8120_POS_ID3        : terminated_by(",");
+        ascii PA8120_POS_ID4        : terminated_by(",");
+        ascii PA8121_POS_ID1        : terminated_by(",");
+        ascii PA8121_POS_ID2        : terminated_by(",");
+        ascii PA8121_POS_ID3        : terminated_by(",");
+        ascii PA8121_POS_ID4        : terminated_by(",");
+        ascii PCARD_GUID32        : terminated_by(",");
+        ascii PPAMOUNT_REQ        : terminated_by(",");
+        ascii PPDOC        : terminated_by(",");
+        ascii PPRSN        : terminated_by(",");
+        ascii PREPR        : terminated_by(",");
+        ascii REFPK        : terminated_by(",");
+        ascii RFPCN        : terminated_by(",");
+        ascii TULOC        : terminated_by(",");
+        ascii TUMTH        : terminated_by(",");
+        ascii TUSE1        : terminated_by(",");
+        ascii TUSE2        : terminated_by(",");
+        ascii TUSE3        : terminated_by(",");
+        ascii XRVRF        : terminated_by(",");
+        ascii ZZAGENT_ID        : terminated_by(",");
+        ascii ZZAUTH_ID        : terminated_by(",");
+        ascii ZZBALANCE_AFTER        : terminated_by(",");
+        ascii ZZBALANCE_BEFORE        : terminated_by(",");
+        ascii ZZBIT_AMOUNT        : terminated_by(",");
+        ascii ZZCHANNEL_ID        : terminated_by(",");
+        ascii ZZCIRCLE_ID        : terminated_by(",");
+        ascii ZZDISTRIBUTOR_ID        : terminated_by(",");
+        ascii ZZFILE_NAME        : terminated_by(",");
+        ascii ZZFREE_B_AMOUNT        : terminated_by(",");
+        ascii ZZFREE_B_QTY        : terminated_by(",");
+        ascii ZZGROSS_AMOUNT        : terminated_by(",");
+        ascii ZZMERCHANT_ID        : terminated_by(",");
+        ascii ZZMODE_OF_PMNT        : terminated_by(",");
+        ascii ZZMODE_OF_SALE        : terminated_by(",");
+        ascii ZZMON_REFILL        : terminated_by(",");
+        ascii ZZPLAN_ID        : terminated_by(",");
+        ascii ZZPOS_ID        : terminated_by(",");
+        ascii ZZPROCESS_FEES        : terminated_by(",");
+        ascii ZZPRODUCTID        : terminated_by(",");
+        ascii ZZPYMT_TRANS_ID        : terminated_by(",");
+        ascii ZZREFILL_REF1        : terminated_by(",");
+        ascii ZZREFILL_REF2        : terminated_by(",");
+        ascii ZZREFILL_REF3        : terminated_by(",");
+        ascii ZZREFILL_REF4        : terminated_by(",");
+        ascii ZZROAMING_IND        : terminated_by(",");
+        ascii ZZROAMING_TEXT        : terminated_by(",");
+        ascii ZZROLEOFNODE        : terminated_by(",");
+        ascii ZZSERVICE_ID        : terminated_by(",");
+        ascii ZZTAX1        : terminated_by(",");
+        ascii ZZTAX2        : terminated_by(",");
+        ascii ZZTAX3        : terminated_by(",");
+        ascii ZZTAX4        : terminated_by(",");
+        ascii ZZTECHNICAL_ID        : terminated_by(",");
+        ascii ZZTRANS_ID        : terminated_by(",");
+        ascii ZZTRANS_QTY        : terminated_by(",");
+        ascii ZZTRANS_SUB_TYPE        : terminated_by(",");
+        ascii ZZTRANS_TYPE        : terminated_by(",");
+        ascii ZZUSER_LOCATION        : terminated_by(",");
+        ascii ZZVALID_FROM        : terminated_by(",");
+        ascii ZZVALID_TO        : terminated_by(",");
+        ascii SIMULATED        : terminated_by(",");
+        ascii TAX_COUNTRY        : terminated_by(",");
+        ascii BIT_QUANTITY        : terminated_by(",");
+        ascii BIT_QTY_UNIT        : terminated_by(",");
+        ascii DEFREV_CAT        : terminated_by(",");
+        ascii DEFREV_PDATE        : terminated_by(",");
+        ascii ALLOWANCE        : terminated_by(",");
+        ascii DEFREV_ACTION        : terminated_by(",");
+        ascii DEFREV_ASSKY        : terminated_by(",");
+        ascii DEFREV_CTYPE        : terminated_by(",");
+        ascii ZZBONUS_AMT        : terminated_by(",");
+        ascii ZZCPTANS_ID        : terminated_by(",");
+        ascii ZZORDERREF_ID        : terminated_by(",");
+        ascii ZZSERVICE_TYPE        : terminated_by(",");
+        ascii ZZPLAN_TYPE        : terminated_by(",");
+        ascii ZZRECOGNISE_TYPE        : terminated_by(",");
+        ascii ZZREVENUE_TYPE        : terminated_by(",");
+        ascii ZZRPDATE_FROM        : terminated_by(",");
+        ascii ZZRPDATE_TO        : terminated_by(",");
+        ascii ZZRRPERIOD_TYPE        : terminated_by(",");
+        ascii APPLK        : terminated_by(",");
+        ascii MAKEY        : terminated_by(",");
+        ascii POSTREL        : terminated_by(",");
+        ascii PRINTREL        : terminated_by(",");
+        ascii PRINT_SUBSTITUTE        : terminated_by(",");
+        ascii SPART        : terminated_by(",");
+        ascii BUKRS        : terminated_by(",");
+        ascii GSBER        : terminated_by(",");
+        ascii SEGMT        : terminated_by(",");
+        ascii PRCTR        : terminated_by(",");
+        ascii HVORG        : terminated_by(",");
+        ascii TVORG        : terminated_by(",");
+        ascii KOFIZ        : terminated_by(",");
+        ascii TAX_DATE_TYPE        : terminated_by(",");
+        ascii ERMWSKZ        : terminated_by(",");
+        ascii MWSKZ        : terminated_by(",");
+        ascii XANZA        : terminated_by(",");
+        ascii STAKZ        : terminated_by(",");
+        ascii AGRMT        : terminated_by(",");
+        ascii AGRTY        : terminated_by(",");
+        ascii CONTRACTITEMID        : terminated_by(",");
+        ascii DISCKEY        : terminated_by(",");
+        ascii DISCKEY_VERSNO        : terminated_by(",");
+        ascii DISC_BASE_AMT        : terminated_by(",");
+        ascii DISC_BASGR        : terminated_by(",");
+        ascii DISC_BIT_NUMBER        : terminated_by(",");
+        ascii DISC_CALC_REL        : terminated_by(",");
+        ascii DISC_COND_REL        : terminated_by(",");
+        ascii DISC_GRNUM        : terminated_by(",");
+        ascii DISC_LEVEL        : terminated_by(",");
+        ascii DISC_NUM        : terminated_by(",");
+        ascii ERMWSKZ_B2B        : terminated_by(",");
+        ascii GPART_VT        : terminated_by(",");
+        ascii MWSKZ_B2B        : terminated_by(",");
+        ascii VKONT_VT        : terminated_by(",");
+        ascii ZZCUG_ID        : terminated_by(",");
+        ascii ZZDP_AMOUNT        : terminated_by(",");
+        ascii ZZFF_ID        : terminated_by(",");
+        ascii ZZNET_AMOUNT        : terminated_by(",");
+        ascii ZZTD_AMOUNT        : terminated_by(",");
+        ascii ZZTRANSFERFEEQTY        : terminated_by(",");
+        ascii ZZTAX5        : terminated_by(",");
+        ascii ZZTAX6        : terminated_by(",");
+        ascii ZZTAX7        : terminated_by(",");
+        ascii ZZBITCRDATEHR        : terminated_by(",");
+        ascii ZZSUB_TYPE_CODE        : terminated_by(",");
+        ascii ZZQSTYPE        : terminated_by(",");
+        ascii ZZRPVALUE        : terminated_by(",");
+        ascii ZZRPVALUE_UOM        : terminated_by(",");
+        ascii ZZREASON_ID        : terminated_by(",");
+        ascii ZZIS_ADVANCE        : terminated_by(",");
+        ascii ZZIS_TAXINCL        : terminated_by(",");
+        ascii ZZPRICE_SUB_TYPE        : terminated_by(",");
+        ascii ZZPRICE_TYPE        : terminated_by(",");
+        ascii ZZCCR_AMT        : terminated_by(",");
+        ascii ZZREV_REC_RATE        : terminated_by(",");
+        ascii ZZISPLAN_CHANGE        : terminated_by(",");
+        ascii NOT_BPREL        : terminated_by(",");
+        ascii PY_CHANNEL        : terminated_by(",");
+        ascii SEC_REASON        : terminated_by(",");
+        ascii ZZFEATURE_CODE        : terminated_by(",");
+        ascii ZZPAYMENT_AMOUNT        : terminated_by(",");
+        ascii remainingFields : terminated_by(0xA);
+    };
+
+in_map inmap_zrf6 : external (ZRF6Ext) , target_internal(Zrf6)    
+    {
+        automatic;
+    };
+
+decoder ZRF6Dec : in_map (inmap_zrf6);
+
+out_map outmap_zrf6 : external (ZRF6Ext) , internal (Zrf6) 
+{ 
+    automatic;
+};
+encoder ZRF6Enc : out_map(outmap_zrf6);
+///////SE changes /////
+external seExternal{
+
+	ascii sequenceNo 				       :  terminated_by(",");
+	ascii callingParty                     :  terminated_by(",");
+	ascii planId					       :  terminated_by(",");
+    ascii bpId					           :  terminated_by(",");
+    ascii planRefKey                       :  terminated_by(",");
+	ascii newPlanRefKey                    :  terminated_by(",");
+	ascii productOrderId 				   :  terminated_by(",");
+	ascii planEffectiveDate				   :  terminated_by(0xA); 
+};
+
+in_map in_map_se : external(seExternal), target_internal(se_TI){
+	automatic;
+};
+
+decoder seDecoder : in_map (in_map_se);
+
+out_map out_map_se : external(seExternal), internal(se_TI){
+	automatic;
+};
+
+encoder seEncoder : out_map (out_map_se);
+]]></string>
+   <boolean name="IsValid" value="true"/>
+</exportmultiplex>

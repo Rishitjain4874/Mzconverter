@@ -1,0 +1,58 @@
+external extHeader: identified_by (CircuitId == "Circuitid")
+{
+    ascii CircuitId           : terminated_by(",");
+	ascii ServiceId           : terminated_by(",");
+	ascii Circle              : terminated_by(",");
+    ascii Timestamp           : terminated_by(",");
+	ascii Bandwidth_in        : terminated_by(",");
+	ascii Bandwidth_out       : terminated_by(0xA);
+};
+
+in_map extHeader_in_map : external(extHeader), target_internal(extHeader_TI),discard_output{
+    automatic;
+};
+
+decoder Header_Dec : in_map(extHeader_in_map);
+
+out_map Header_out_map : external(extHeader), internal(extHeader_TI){
+    automatic;
+};
+
+encoder Header_Enc : out_map(Header_out_map);
+
+external extBurstableBandwidth_Records : terminated_by(0xA)
+{
+    set {
+        errorBB errBB : optional;  
+    };
+    ascii CircuitId           : terminated_by(",");
+	ascii ServiceId           : terminated_by(",");
+	ascii Circle              : terminated_by(",");
+    ascii Timestamp           : terminated_by(",");
+	ascii Bandwidth_in        : terminated_by(",");
+	ascii Bandwidth_out       : terminated_by(0xA);
+};
+
+in_map extBurstableBand_Records_in_map : external(extBurstableBandwidth_Records), target_internal(extBB_TI)
+{
+    automatic {
+        errorBB : using in_map errorBlockBB_InMap;
+    };
+};
+
+decoder BurstableBandwidth_Dec : in_map(extBurstableBand_Records_in_map);
+
+out_map extBurstableBand_Records_out_map : external(extBurstableBandwidth_Records), internal(extBB_TI){
+    automatic;
+};
+
+encoder BurstableBandwidth_Enc : out_map(extBurstableBand_Records_out_map);
+
+external errorBB : identified_by(strStartsWith(errorCode, "DRP") || strStartsWith(errorCode, "ERR")) {
+    ascii errorCode        : terminated_by(",");
+    ascii errorMessage     : terminated_by(",");
+};
+in_map errorBlockBB_InMap : external (errorBB), target_internal(errorBB){automatic;};
+
+decoder FinalDec : in_map(extHeader_in_map),in_map(extBurstableBand_Records_in_map);
+encoder FinalEnc : out_map(Header_out_map),out_map(extBurstableBand_Records_out_map);

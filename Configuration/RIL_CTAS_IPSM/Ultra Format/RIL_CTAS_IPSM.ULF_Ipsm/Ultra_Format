@@ -1,0 +1,344 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE exportmultiplex SYSTEM "jar:/mz/dtd/export_multiplex.dtd">
+<exportmultiplex category="Ultra_Format" ref_path="ultra_format[Internal]/storable[ultra_format]/storable[Data]">
+   <string name="Definition"><![CDATA[external CtasIpsm : terminated_by(0xA){
+    set {
+        errorBlockCtasIpsm errIpsm : optional;  
+    };
+    
+    ascii seqNum                           : terminated_by(0x2C);
+    ascii timeStampSubmit                  : terminated_by(0x2C);
+    ascii timeStampDelivery                : terminated_by(0x2C);
+    ascii cdrType                          : terminated_by(0x2C);
+    ascii reqType                          : terminated_by(0x2C);
+    ascii msgSegType                       : terminated_by(0x2C);
+    ascii msgIdentifier                    : terminated_by(0x2C);
+    ascii ANumber                          : terminated_by(0x2C);
+    ascii BNumber                          : terminated_by(0x2C);
+    ascii pVisitedNetworkId                : terminated_by(0x2C);
+    ascii correlationId                    : terminated_by(0x2C);
+    ascii protocolId                       : terminated_by(0x2C);
+    ascii imsChargingId                    : terminated_by(0x2C);
+    ascii sessionId                        : terminated_by(0x2C);
+    ascii msgForwardInd                    : terminated_by(0x2C);
+    ascii numOfAttempts                    : terminated_by(0x2C);
+    ascii respFromMnpDip                   : terminated_by(0x2C);
+    ascii diaResultCode                    : terminated_by(0x2C);
+    ascii pAccessNetworkInfo               : terminated_by(0x2C);
+    ascii roamGT                           : terminated_by(0x2C);
+    ascii valPeriodOfSms                   : terminated_by(0x2C);
+    ascii lrn                              : terminated_by(0x2C);
+    ascii imei                             : terminated_by(0x2C);
+    ascii callId                           : terminated_by(0x2C);
+    ascii sriResponse                      : terminated_by(0x2C);
+    ascii deliveryResponse                 : terminated_by(0x2C);
+    ascii mtResponse                       : terminated_by(0x2C);
+    ascii submitSmResponse                 : terminated_by(0x2C);
+    ascii spamFound                        : terminated_by(0x2C);
+    ascii spamType                         : terminated_by(0x2C);
+    ascii currentPartial                   : terminated_by(0x2C);
+    ascii totalPartial                     : terminated_by(0x2C);
+    ascii homeGT                           : terminated_by(0x2C);
+    ascii smscAddress                      : terminated_by(0x2C);
+    ascii OriginatingImsi                  : terminated_by(0x2C);
+    ascii deliveryStatus                   : terminated_by(0x2C);
+    ascii sourceAccountId                  : terminated_by(0x2C);
+    ascii errorCode                        : terminated_by(0x2C);
+    ascii LengthSms                        : terminated_by(0x2C);
+    ascii DestiAccId                       : terminated_by(0x2C);
+    ascii VVMSC                            : terminated_by(0x2C);
+    ascii CommandId                        : terminated_by(0x2C);
+    ascii Reserved3                        : terminated_by(0x2C);
+    ascii Reserved4                        : terminated_by(0x2C);
+    ascii Reserved5                        : terminated_by(0x2C);
+    ascii Reserved6                        : terminated_by(0x2C);
+    ascii Reserved7                        : terminated_by(0x2C);
+    ascii Reserved8                        : terminated_by(0x2C);
+    ascii Reserved9                        : terminated_by(0x2C);
+    ascii Reserved10                       : terminated_by(0x2C);
+    ascii Reserved11                       : terminated_by(0xA);
+};
+
+//dlt fields
+external DLTIpsm {
+    
+    ascii Id                               : terminated_by(0x2C);
+    ascii OA                               : terminated_by(0x2C);
+    ascii DA                               : terminated_by(0x2C);
+    ascii sourceAccId                      : terminated_by(0x2C);
+    ascii ErrorCode                        : terminated_by(0x2C);
+    ascii DeliveryStatus                   : terminated_by(0x2C);
+    ascii TS                               : terminated_by(0x2C);
+    ascii TD                               : terminated_by(0x2C);
+    ascii HomeGt                           : terminated_by(0xA);
+};
+
+in_map errorBlockCtasIpsm_InMap : external (errorBlockCtasIpsm), target_internal(errorBlockCtasIpsm){automatic;};
+
+in_map CtasIpsm_InMap : external (CtasIpsm), target_internal(CtasIpsm_TI){
+   automatic {
+        errorBlockCtasIpsm : using in_map Error_Map;
+        
+    };
+};
+
+out_map CtasIpsm_OutMap : external (CtasIpsm), internal(CtasIpsm_TI){automatic;};
+encoder CtasIpsm_Enc : out_map(CtasIpsm_OutMap);
+decoder  Ctasv20 : in_map(CtasIpsm_InMap);
+//CTAS cdr decoder ends
+
+
+in_map DLTIpsm_InMap : external (DLTIpsm), target_internal(DLTIpsm_TI){automatic;};
+
+//DLT cdr decoder
+out_map DLTIpsm_OutMap : external (DLTIpsm), internal(DLTIpsm_TI){automatic;};
+encoder DLTIpsm_Enc : out_map(DLTIpsm_OutMap);
+decoder DLT_Dec : in_map(DLTIpsm_InMap);
+
+external errorBlockCtasIpsm : identified_by(strStartsWith(errorCode, "DRP")|| strStartsWith(errorCode, "ERR")) {
+    ascii errorCode          : terminated_by(",");
+    ascii errorMessage       : terminated_by(",");
+};
+
+in_map Error_Map : external(errorBlockCtasIpsm),target_internal(ErrorBlock) {
+    automatic;
+};
+
+internal dltInternal{
+    string Reserved8;
+    string ANumber;
+    string BNumber;
+    string sourceAccountId;
+    string errorCode;
+    string deliveryStatus;
+    string timeStampSubmit;
+    string timeStampDelivery;
+    string homeGT;
+    long chargingStartTimeForDup;
+    long chargStartTimeForDup;
+    string iCID;
+    string currentPartial;
+    string sCdrLegType;
+    string sSmscAddress;
+    drudr origRec;
+};
+
+internal ctasInternal{
+    string  sANum;
+    string  sBNum;
+    string  sSmscAddress;
+    string  sSMSType;
+    string  sCdrLegType;
+    string  sEvntStartTm;
+    string  sEvntstartDt;
+    long    chargingStartTimeForDup;
+    long    chargStartTimeForDup;
+    string  sIMSI;
+    string  sLRN;
+    string  sMsgStatus;
+    string  sRecordSeqNum;
+    string  sHomeGT;
+    string  sSid;
+    string  sEvntEndTm;
+    string  sEvntEndDt;
+    string  sDeliveryStatus;
+    string  sErrorCode;
+    string  sPani;
+    string  sAnumberRoamingGT;
+    boolean skipForIpsmBI;
+    boolean isValidRec;
+    string sDgtiHubPartner;
+    string sDgtiOpType;
+    string sDgtiTrunkName;
+    string sHomeGTOperator;
+    string sHomeGTCircle;
+    string sHomeCircle;
+    string sHomeOperator;
+    string sHomeZone;
+    string outgoingSwitch;
+    string incomingSwitch;
+    string outgoingTrunk;
+    string incomingTrunk;
+    string outgoingProduct;
+    string incomingProduct;
+    boolean booICR;
+    drudr origRec;
+    string sMsgSegType;
+    string sRsnCode;
+    string sANumLRN;
+    string iCID;
+
+    
+    //for mt records - to check if internal values are repeating
+    boolean booANumIsInternational;
+    string sGTOperator;
+    string sGTCircle;
+    string sTrunkId;
+    string sDestinationType;
+    boolean booNationalOptrIntGT;
+    string sAHomeOperator;
+    string sAHomeCircleCd;
+    boolean booOptrCircleFound;
+    string sBOperator;
+    string sBHomeCircleCd;
+    string sBHomeZoneCd;
+    string sNormalizedCallingNumber;
+    string sProductGroup;
+    boolean booNormalizationSucceded;
+    boolean booPerformLRNLookup;
+    string sNormalizedCalledNumber;
+    string origGT;
+    boolean booBsOptrCircleFound;
+    string sTrunk;
+    string sFinalProduct;
+    string sAVisitorZoneCd;
+    string aAVisitorOperator;
+    string subsFirstMcc;
+    string subsFirstMnc;
+    string subsFirstCi;
+
+    boolean isLrnLookupFail;
+    boolean isTrunkNotConfigured;
+    boolean isRjioTrunkNonRjioDgti;
+    boolean isProductDerivationFail;
+
+    boolean aNumOptrShortCDLookupFail;
+    boolean aNumCircleShortCDLookupFail;
+    boolean isOnnetIntraCircle;
+    boolean isMtIcrScenario;
+    boolean SendForICR;
+
+    string currentPartial;
+    string totalPartial;
+    
+    long    chargingEndTimeForDup;
+    string  DuplicateKeyCheck;
+    string  sMtRoamingGT;
+    string  sMtRGTOperator;
+    string  sMtRGTCircle;
+    string SudoMoIcrOutgoingSwitch;
+    string SudoMoIcrOutgoingProduct;
+    string SudoMoIcrOutgoingTrunk;
+    
+    string sLengthSms;
+    string sDestiAccId;
+    string sVVMSC;
+    string A2PoutgoingSwitch;
+    string A2PoutgoingTrunk;
+    string A2PoutgoingProduct;
+    string sA2PDgtiHubPartner;
+    string sA2PDgtiOpType;
+    string sA2PDgtiTrunkName;
+    string vmscSubsFirstMcc;
+    string vmscSubsFirstMnc;
+    boolean isRedirectSms;
+    boolean isa2pScLookUpFail;
+    boolean isOnnetA2PSms;
+    boolean isA2PTrunkNotConfigured;
+    boolean isA2PProductDerivationFail;
+    boolean isA2PRjioTrunkNonRjioDgti;
+    string sBILRNDesc;
+    string sBiCallNet;
+//errorBlockCtasIpsm CtasE;
+};
+
+external IntecFormat_Ctas{
+    ascii incomingSwitch         : align(left), padded_with(0x20), static_size(20);
+    ascii outgoingSwitch         : align(left), padded_with(0x20), static_size(20);
+    ascii eventStartDate         : align(left), padded_with(0x20), static_size(8);
+    ascii eventStartTime         : align(left), padded_with(0x20), static_size(8);
+    ascii eventDuration          : align(right), padded_with("0"), static_size(10);
+    ascii aNum                   : align(left), padded_with(0x20), static_size(28); 
+    ascii bNum                   : align(left), padded_with(0x20), static_size(28);
+    ascii incomingTrunk          : align(left), padded_with(0x20), static_size(20);
+    ascii outgoingTrunk          : align(left), padded_with(0x20), static_size(20);
+    ascii incomingProduct        : align(left), padded_with(0x20), static_size(14); 
+    ascii outgoingProduct        : align(left), padded_with(0x20), static_size(14);
+    ascii eventDirection         : align(left), padded_with(0x20), static_size(1);
+    ascii discreteRatingParam_1  : align(left), padded_with(0x20), static_size(15); 
+    ascii dataUnit               : align(left), padded_with(0x20), static_size(8);
+    ascii recSeqNum              : int(base10), align(left), padded_with(0x20),static_size(40);
+    ascii recType                : align(left), padded_with(0x20), static_size(2); 
+    ascii userSummarization      : align(left), padded_with(0x20), static_size(20);
+    ascii userData               : align(left), padded_with(0x20), static_size(30);
+    ascii userData_2             : align(left), padded_with(0x20), static_size(30);
+    ascii linkField              : align(left), padded_with(0x20), static_size(2);
+    ascii userData_3             : align(left), padded_with(0x20), static_size(80); 
+    ascii lineFeed               : terminated_by(0xA), external_only;
+};
+
+in_map IntecRec_im : external(IntecFormat_Ctas) , target_internal(IntecRec_TI){
+    automatic;
+};
+decoder IntecRec_Dec : in_map(IntecRec_im);
+
+out_map IntecRec_ot : external(IntecFormat_Ctas), internal(IntecRec_TI){
+    automatic;
+};
+encoder IntecRec_Enc : out_map(IntecRec_ot);
+
+
+
+
+//CTAS IPSM BI 
+
+
+
+//Start : IPSM for BI
+external biIPSMFormat_Ext {
+	ascii callingNumber        : terminated_by(",");
+	ascii calledNumber         : terminated_by(",");
+	ascii submitDate           : terminated_by(",");
+	ascii submitTime           : terminated_by(",");
+	ascii originatorCellId     : terminated_by(",");
+	ascii callType             : terminated_by(",");
+	ascii IMEI                 : terminated_by(",");
+	ascii IMSI                 : terminated_by(",");
+	ascii smscAddress          : terminated_by(",");
+	ascii visitedNetwrkIdentier: terminated_by(",");
+    ascii visitedCircle        : terminated_by(",");
+	ascii terminatingLRN       : terminated_by(",");
+    ascii paniHeader           : terminated_by(",");//added for the paniHeader in IPSM BI--29/7/2016
+    ascii iCID                 : terminated_by(",");//added IMS_Charging_Identifier--02-08-2016
+    ascii callNet              : terminated_by(",");
+    ascii callDirection        : terminated_by(",");
+    ascii serviceType          : terminated_by(",");
+    ascii LRNDesc              : terminated_by(",");
+    ascii switchID             : terminated_by(",");
+    ascii roamingCircleName    : terminated_by(0xA);
+};
+
+in_map BIIPSM_Inmap : external(biIPSMFormat_Ext), target_internal(biIPSM_ti){
+    automatic;
+};
+
+decoder BIIPSM_Dec : in_map(BIIPSM_Inmap);
+
+out_map BIIPSM_OutMap : internal(biIPSM_ti),external(biIPSMFormat_Ext) { 
+    automatic;
+};
+
+encoder BIIPSM_Enc : out_map(BIIPSM_OutMap);
+
+external filterBlock : static_size(12), identified_by(strStartsWith(outputType, "ERROR") || strStartsWith(outputType, "DROP")) {
+    ascii outputType : static_size(6), padded_with("_");
+    ascii outputCode : static_size(6);  
+};    
+
+in_map filter_im : external(filterBlock), target_internal(filter) {
+    automatic;
+};
+
+internal SourceFileNm {
+    string sourceFileName;    
+};
+
+internal SearchNode {
+    int minLength;
+    string regEx;
+    map<string, SearchNode> NextNode;
+    map<string, map<string,any>> colValues;
+};
+]]></string>
+   <boolean name="IsValid" value="true"/>
+</exportmultiplex>

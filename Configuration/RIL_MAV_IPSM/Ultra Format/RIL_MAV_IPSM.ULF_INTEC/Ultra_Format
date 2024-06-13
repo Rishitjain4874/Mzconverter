@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE exportmultiplex SYSTEM "jar:/mz/dtd/export_multiplex.dtd">
+<exportmultiplex category="Ultra_Format" ref_path="ultra_format[Internal]/storable[ultra_format]/storable[Data]">
+   <string name="Definition"><![CDATA[import RIL_MAV_IPSM.ULF_MAVENIR_SMS;
+//Intec record starts
+external inContentFormat_IPSM {
+
+    ascii incomingSwitch         : align(left), padded_with(0x20), static_size(20);
+    ascii outgoingSwitch         : align(left), padded_with(0x20), static_size(20);
+    ascii submitDate             : align(left), padded_with(0x20), static_size(8);//eventStartDate
+    ascii submitTime             : align(left), padded_with(0x20), static_size(6);//eventStartTime
+    //submitTimeSec added for appending "00" to submit Time 
+    ascii submitTimeSec          : align(left), padded_with(0x20), static_size(2), encode_value("00"), external_only;
+    ascii eventDuration          : align(right), padded_with("0"), static_size(10);
+    ascii callingNumber          : align(left), padded_with(0x20), static_size(28); //aNum-as per Intec format;
+    ascii calledNumber           : align(left), padded_with(0x20), static_size(28); //bNum-as per Intec;
+    ascii incomingTrunk          : align(left), padded_with(0x20), static_size(20);
+    ascii outgoingTrunk          : align(left), padded_with(0x20), static_size(20);
+    ascii incomingProduct        : align(left), padded_with(0x20), static_size(14); 
+    ascii outgoingProduct        : align(left), padded_with(0x20), static_size(14);
+    ascii eventDirection         : align(left), padded_with(0x20), static_size(1);
+    ascii discreteRatingParam_1  : align(left), padded_with(0x20), static_size(15); 
+    //ascii discreteRatingParam_2  : static_size(15);
+    //ascii discreteRatingParam_3  : static_size(15);
+    ascii dataUnit               : align(left), padded_with(0x20), static_size(8);
+    ascii recSeqNum              : int(base10), align(left), padded_with(0x20), static_size(40);
+    ascii recType                : align(left), padded_with(0x20), static_size(2); 
+    ascii userSummarization      : align(left), padded_with(0x20), static_size(20);
+    ascii LRN                    : align(left), padded_with(0x20), static_size(30);//userData
+    ascii smscAddress            : align(left), padded_with(0x20), static_size(30);//userData_2
+    ascii linkField              : align(left), padded_with(0x20), static_size(2);// Added new field for Idenfication of splited record @Build 5
+    ascii userData_3             : align(left), padded_with(0x20), static_size(80); //Added for mapping ICID on 20170807
+    ascii lineFeed               : terminated_by(0xA), external_only;
+};
+internal mavIPSM_TI{
+    string callingNumber;
+    string calledNumber;
+    string submitDate;
+    string submitTime;
+    string originatorCellId;
+    string callType;
+    string IMEI;
+    string IMSI;
+    string smscAddress;
+    string visitedNetwrkIdentier;
+    string visitedCircle;
+    string terminatingLRN;
+    string paniHeader;
+    string iCID;
+    string incomingSwitch;
+    string outgoingSwitch;
+    string eventDuration;
+    string incomingTrunk;
+    string outgoingTrunk;
+    string incomingProduct;
+    string outgoingProduct;
+    string eventDirection;
+    string discreteRatingParam_1;
+    string dataUnit;
+    int  recSeqNum;//for Interconnect change data Type to Integer
+    string recType;//for Intec
+    string userSummarization;
+    string LRN;
+    string linkField;
+    string lineFeed;
+    string RecordType;//Identifies whether SMMO/SMMT Record is there
+    date dupIndexField;//added for Duplicate UDR Indexing
+    string sendToBI;//decides whether to send to BI or not
+    string smsType;//identifies A2P or P2P
+//  string chargingStartTime;//
+    long chargeStartTime;//chargeStartTime for Port on date
+    //added for Intec Field derivation
+    string sCalledCircle;
+    string sCalledOperator;
+    string sCallingCircle;
+    string sCallingOperator;
+    string sBHomeZoneCd;
+    string sScenario; //added to identify scenario
+    boolean bDeliveryReport;//added for delivery Report identification
+    boolean bIsSuccTerminated;
+    string productGroup;
+    boolean normalizationSucceded;
+    string CallingTag;
+    string CalledTag;
+    string TrunkId;
+    string sDestType;
+    CdrRecord origRec;//added to Pass raw record to Error & Drop
+};
+in_map contentIPSMimap : external(inContentFormat_IPSM), internal(mavIPSM_TI){automatic;};
+
+decoder inContentFormatIPSMDec : in_map(contentIPSMimap);
+
+out_map contentIPSMOutMap : internal(mavIPSM_TI),external(inContentFormat_IPSM) { 
+    automatic;
+};
+
+encoder contentIPSMEnc : out_map(contentIPSMOutMap);
+
+//added for International GT
+internal International_GT
+{
+    string LOOKUP_KEY;
+    string sOperator;
+    string sTrunkId;
+    boolean NAT_OPTR_INT_GT;//check whether National Operator having rights to terminate International SMS
+};
+
+//added for MccMnc Circle Operator
+internal MccMncCircleOptr_TI
+{
+    string sCircle;
+    string sOperator;
+    string sTrunkId;
+};
+
+//added for Intec Flag For SMS Type
+
+internal IntecFlagSMSType_TI
+{
+    boolean isSendToIntec;
+    string sOutputType;//decides error or drop
+    string sOutputCode;//Error or drop code
+};
+
+//added for LRN based Circle and Operator
+internal LRNCircleOptr_TI
+{
+    string sCircle;
+    string sOperator;
+    string sTrunkId;
+};
+
+//Circle Operator Based on SMSC Number Series
+
+internal SMSCNumberSeriesCircleOptr_TI
+{
+    string sCircle;
+    string sOperator;
+    string sTrunkId;
+};
+
+//Circle Operator based on Fixed Line 
+internal FixedLineCircleOptr_TI
+{
+    string sCircle;
+    string sOperator;
+    string sTrunkId;
+};
+
+//Circle Operator based on National GT 
+
+internal NationalGTCircleOptr_TI
+{
+    string sCircle;
+    string sOperator;
+    string sTrunkId;
+};
+
+//getting Scenario from TB_SMS_SCENARIO_STATUS_DATA
+
+internal SMSScenarioStatus_TI
+{
+    boolean isSendToIntec;
+    string sScenario;
+    string sOutputType;
+    string sOutputCode;   
+};
+
+//Getting Circle Operator based on Short Code
+
+internal ShortCodeCircleOptr_TI
+{
+    string sCircle;
+    string sOperator;
+};
+
+
+//IPSM Number Normalization Rule 
+internal IPSMNumberNormalization 
+{
+    int numberOfDigitsToRemove;
+    string prefixString;
+    string tag;
+    string productGroup;
+    string normalizedNumber;
+    string performLRNLookup;
+    boolean normalizationSucceded;
+};]]></string>
+   <boolean name="IsValid" value="true"/>
+</exportmultiplex>

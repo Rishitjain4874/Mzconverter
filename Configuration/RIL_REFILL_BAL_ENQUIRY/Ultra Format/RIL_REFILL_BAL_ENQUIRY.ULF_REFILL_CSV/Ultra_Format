@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE exportmultiplex SYSTEM "jar:/mz/dtd/export_multiplex.dtd">
+<exportmultiplex category="Ultra_Format" ref_path="ultra_format[Internal]/storable[ultra_format]/storable[Data]">
+   <string name="Definition" quoted="true"><![CDATA[external ChargeableItem {\u000d
+    ascii uidType   : terminated_by(",");\u000d
+    ascii uidValue  : terminated_by(",");\u000d
+    ascii offerID  : terminated_by(",");\u000d
+    ascii serviceID1  : terminated_by(",");\u000d
+    ascii modeOfSale  : terminated_by(",");\u000d
+    ascii refillTransID  : terminated_by(",");\u000d
+    ascii serviceID2  : terminated_by(",");\u000d
+    ascii technicalID1  : terminated_by(",");\u000d
+    ascii technicalID2  : terminated_by(",");\u000d
+    ascii serviceType1  : terminated_by(",");\u000d
+    ascii serviceType2  : terminated_by(",");\u000d
+    ascii technicalID3  : terminated_by(",");\u000d
+    ascii technicalID4  : terminated_by(",");\u000d
+    ascii technicalID5  : terminated_by(",");\u000d
+    ascii autoRenew  : terminated_by(",");\u000d
+    ascii serviceID3  : terminated_by(",");\u000d
+    ascii serviceType3  : terminated_by(",");\u000d
+    ascii serviceID4  : terminated_by(",");\u000d
+    ascii serviceType4  : terminated_by(",");\u000d
+    ascii serviceType5  : terminated_by(",");\u000d
+    ascii activateNow  : terminated_by(",");\u000d
+    ascii freeBAmount  : terminated_by(",");\u000d
+    ascii netAmount  : terminated_by(",");\u000d
+    ascii transactionID  : terminated_by(",");\u000d
+    ascii grossAmount  : terminated_by(",");\u000d
+    ascii refillChannelID  : terminated_by(",");\u000d
+    ascii orderReferenceNumber  : terminated_by(",");\u000d
+    ascii merchantCode  : terminated_by(",");\u000d
+    ascii pOSUserCode  : terminated_by(",");\u000d
+    ascii modeOfPayment  : terminated_by(",");\u000d
+    ascii zTax1  : terminated_by(",");\u000d
+    ascii zTax2  : terminated_by(",");\u000d
+    ascii zTax3  : terminated_by(",");\u000d
+    ascii zTax4  : terminated_by(",");\u000d
+    ascii processingFee  : terminated_by(",");\u000d
+    ascii nextBillCycleDate  : terminated_by(",");\u000d
+    ascii salesChannelID  : terminated_by(",");\u000d
+    ascii rEPLAY  : terminated_by(",");\u000d
+    ascii serviceID  : terminated_by(",");\u000d
+    ascii serviceChannelID  : terminated_by(",");\u000d
+    ascii technicalID  : terminated_by(",");\u000d
+    ascii refillType  : terminated_by(",");\u000d
+    ascii payFromAccount  : terminated_by(",");\u000d
+    ascii pGTransactionID  : terminated_by(",");\u000d
+    ascii recurrenceValidityDate  : terminated_by(",");\u000d
+    ascii quantity  : terminated_by(",");\u000d
+    ascii transactionType  : terminated_by(",");\u000d
+    ascii transactionSubType  : terminated_by(",");\u000d
+    ascii units  : terminated_by(",");\u000d
+    ascii currencyCode  : terminated_by(",");\u000d
+    ascii cPTransactionID  : terminated_by(",");\u000d
+    ascii bucketID  : terminated_by(",");\u000d
+    ascii authID  : terminated_by(",");\u000d
+    ascii sHARE  : terminated_by(",");\u000d
+    ascii recurrValidityDate  : terminated_by(",");\u000d
+    ascii serviceId  : terminated_by(",");\u000d
+    ascii name  : terminated_by(",");\u000d
+    ascii consumptionDate  : terminated_by(",");\u000d
+    ascii userTechnicalId  : terminated_by(",");\u000d
+    ascii cause  : terminated_by(",");\u000d
+    ascii message  : terminated_by(",");\u000d
+    ascii reason  : terminated_by(",");\u000d
+    ascii reasonCode  : terminated_by(",");\u000d
+    ascii type  : terminated_by(",");\u000d
+    ascii retryFlag  : terminated_by(",");\u000d
+    ascii retryCount  : terminated_by(0xA);\u000d
+};\u000d
+\u000d
+in_map inMapChargeableItem : external (ChargeableItem) , target_internal(ChargeableItem_TI) {\u000d
+    \u000d
+    automatic;\u000d
+};\u000d
+out_map outMapChargeableItem : external (ChargeableItem) , internal(ChargeableItem_TI) {\u000d
+    \u000d
+    automatic;\u000d
+};\u000d
+\u000d
+encoder ChargeableItem_Enc  : out_map(outMapChargeableItem);\u000d
+\u000d
+decoder ChargeableItem_Dec  : in_map(inMapChargeableItem);\u000d
+\u000d
+]]></string>
+   <boolean name="IsValid" value="true"/>
+</exportmultiplex>

@@ -1,0 +1,13 @@
+external AuditRZ
+{
+ascii wfName        : terminated_by(",");
+ascii fileName      : terminated_by(",");
+ascii serviceId     : terminated_by(",");
+ascii routingZone   : terminated_by(",");
+ascii status    : terminated_by(",");
+ascii recDate       : terminated_by(0XA);
+};
+in_map in_AuditRZ : external (AuditRZ),target_internal(AuditRZInt){automatic;};
+decoder AuditRZdec : in_map(in_AuditRZ);
+out_map out_AuditRZ : external(AuditRZ),internal(AuditRZInt){automatic;};
+encoder AuditRZenc : out_map(out_AuditRZ);

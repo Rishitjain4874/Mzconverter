@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE exportmultiplex SYSTEM "jar:/mz/dtd/export_multiplex.dtd">
+<exportmultiplex category="Ultra_Format" ref_path="ultra_format[Internal]/storable[ultra_format]/storable[Data]">
+   <string name="Definition"><![CDATA[
+external QNSMessage : identified_by(recordType=="QNS")
+{
+    ascii recordType         : encode_value("QNS"),terminated_by(",");
+    ascii networkId        : terminated_by(",");
+    ascii originalRecordType : long(base10), terminated_by(",");
+    ascii circleCode       : terminated_by(",");
+    ascii serviceType      : terminated_by(",");
+    ascii policyCode       : terminated_by (0xA);
+
+
+};
+
+in_map QNSMessageInMap : external ( QNSMessage ),  target_internal ( QNS_Message_Int ){automatic;};
+decoder QNSMessage_Decoder : in_map ( QNSMessageInMap );
+
+
+out_map QNSMessageOutmap : internal ( QNS_Message_Int ), external ( QNSMessage ) {automatic;};
+encoder QNSMessage_Encoder : out_map ( QNSMessageOutmap );
+
+]]></string>
+   <boolean name="IsValid" value="true"/>
+</exportmultiplex>

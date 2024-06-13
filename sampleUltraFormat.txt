@@ -58,8 +58,9 @@ external VCDR {
     set {
         errorBlock error : optional;
     };    
-    VCDR_Ext vcdr;
+      b vcdr;
 };
+
 external VCDR_Ext{
     ascii CDRSequenceNumber : terminated_by(","),short(base2);
     ascii CDRMajorVersion : terminated_by(","),int(base10);

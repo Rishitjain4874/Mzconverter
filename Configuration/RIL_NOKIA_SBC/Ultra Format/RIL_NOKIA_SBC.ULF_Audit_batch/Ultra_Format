@@ -1,0 +1,216 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE exportmultiplex SYSTEM "jar:/mz/dtd/export_multiplex.dtd">
+<exportmultiplex category="Ultra_Format" ref_path="ultra_format[Internal]/storable[ultra_format]/storable[Data]">
+   <string name="Definition"><![CDATA[external AuditFile  : terminated_by(0xA){
+    ascii periodStart : terminated_by(",");
+    ascii periodEnd : terminated_by(",");
+    ascii wf_name : terminated_by(",");
+    ascii inputSource : terminated_by(",");    
+    ascii inputFilename : terminated_by(",");
+    ascii destination : terminated_by(",");
+    ascii outputFilename : terminated_by(",");
+    ascii scenario : terminated_by(",");    
+    ascii inRecordType : terminated_by(",");
+    ascii outRecordType : terminated_by(",");
+    ascii count :  terminated_by(";");
+};
+
+//Map the external to the internal
+in_map AuditFileInMap : external ( AuditFile ),  target_internal ( AuditFile_TI ){automatic;};
+decoder AuditFile_Decoder : in_map ( AuditFileInMap );
+
+
+out_map AuditFileOutmap : internal ( AuditFile_TI ), external ( AuditFile ) {automatic;};
+encoder AuditFile_Encoder : out_map ( AuditFileOutmap );
+
+
+external AuditFileBatch : terminated_by(0xA) {
+    ascii periodStart : terminated_by(",");
+    ascii periodEnd : terminated_by(",");
+    ascii wf_name : terminated_by(",");
+    ascii source : terminated_by(",");
+    ascii sourceFilename : terminated_by(",");
+    ascii destination : terminated_by(",");
+    ascii outputFilename : terminated_by(",");
+    ascii scenario : terminated_by(",");
+    ascii sourceIPAddress : terminated_by(",");
+    ascii destinationIPAddress : terminated_by(",");
+    ascii count : terminated_by(";");
+};
+
+in_map AuditFileBatchInMap : external(AuditFileBatch), target_internal(AuditFileBatch_TI) {
+    automatic;
+};
+decoder AuditFileBatch_Decoder : in_map(AuditFileBatchInMap);
+
+out_map AuditFileBatchOutmap : internal(AuditFileBatch_TI), external(AuditFileBatch) {
+    automatic;
+};
+encoder AuditFileBatch_Encoder : out_map(AuditFileBatchOutmap);
+
+//Introduced the format for Spectrum Performance Testing Auditing
+external AuditFileSpectrum {
+    ascii BatchStartTime : terminated_by(",");
+    ascii BatchEndTime : terminated_by(",");
+    ascii Duration : terminated_by(",");
+    ascii Stream : terminated_by(",");
+    ascii InputFileName : terminated_by(",");
+    ascii FileType : terminated_by(",");
+    ascii InputRecordCount : terminated_by(",");
+    ascii OutputFileName_OR_DataBase : terminated_by(",");
+    ascii OutputRecordCount : terminated_by(",");
+    ascii ReprocessedRecordCount : terminated_by(",");
+    ascii ValidRecordCount : terminated_by(",");
+    ascii InvalidRecordCount : terminated_by(",");
+    ascii SplittedRecordCount : terminated_by(",");
+    ascii SpectrumDefaultCount : terminated_by(",");
+    ascii Spectrum1800Count : terminated_by(",");
+    ascii Spectrum2300Count : terminated_by(",");
+    ascii DBInsertFailCount : terminated_by(0xA);
+};
+
+in_map AuditFileSpectrumInMap : external(AuditFileSpectrum), target_internal(AuditFileSpectrum) {
+    automatic;
+};
+decoder AuditFileSpectrum_Decoder : in_map(AuditFileSpectrumInMap);
+
+out_map AuditFileSpectrumOutmap : internal(AuditFileSpectrum), external(AuditFileSpectrum) {
+    automatic;
+};
+encoder AuditFileSpectrum_Encoder : out_map(AuditFileSpectrumOutmap);
+
+/*
+internal distAudit {
+    string startTime;
+    string endTime;
+    string wfName;
+    string inputFileName;
+    string outputFileName;
+    string destination;
+ };*/
+ 
+ // For SQL Error Handling
+external collAudit  : terminated_by(0xA){
+    ascii startTime : terminated_by(",");
+    ascii endTime : terminated_by(",");
+    ascii wfName : terminated_by(",");
+    ascii inputSource : terminated_by(",");    
+    ascii switchId : terminated_by(",");
+    ascii inputFileName : terminated_by(",");
+    ascii outputFileName : terminated_by(",");
+    ascii errorMessage : terminated_by(0xA);
+};
+
+internal collAuditInt {
+    date dAuditFileStartTime;
+    long lFileSize;
+};
+
+in_map Coll_Audit_InMAP :
+    external(collAudit), internal(collAuditInt),target_internal(collAudit) {
+    automatic;
+};
+
+out_map Coll_Audit_OutMAP :
+    external(collAudit), internal(collAudit){
+    automatic;
+};
+
+
+decoder Coll_Audit_Decode : in_map(Coll_Audit_InMAP);
+encoder Coll_Audit_Encode : out_map(Coll_Audit_OutMAP);
+
+// for distribution --18-01-2017
+external distAudit : terminated_by(0xA){
+    ascii startTime : terminated_by(",");
+    ascii endTime : terminated_by(",");
+    ascii wfName : terminated_by(",");
+    ascii inputFileName : terminated_by(",");
+    ascii outputFileName : terminated_by(",");
+    ascii destination : terminated_by(",");
+    ascii errorMessage : terminated_by(0xA);
+};
+
+internal distAuditInt {
+    date dAuditFileStartTime;
+};
+
+in_map Dist_Audit_InMap : 
+    external(distAudit),internal(distAuditInt), target_internal(distAudit){
+    automatic;
+};
+
+out_map Dist_Audit_OutMAP : 
+external(distAudit),internal(distAudit){
+    automatic;
+};
+
+decoder Dist_Audit_Decode : in_map(Dist_Audit_InMap);
+encoder Dist_Audit_Encode : out_map(Dist_Audit_OutMAP);
+
+
+// For SQL Error Handling Processing Audit
+external processAudit  : terminated_by(0xA){
+    ascii startTime : terminated_by(",");
+    ascii endTime : terminated_by(",");
+    ascii wfName : terminated_by(",");
+    ascii inputFileName : terminated_by(",");    
+    ascii outputFileName : terminated_by(",");
+    ascii scenario : terminated_by(",");
+    ascii inputRecType : terminated_by(",");
+    ascii outputRecType : terminated_by(",");
+    ascii recCount : terminated_by(",");
+    ascii errorMessage : terminated_by(0xA);
+};
+
+internal Audit_Proc {
+   date dAuditFileStartTime;
+};
+
+in_map Process_Audit_InMAP :
+    external(processAudit), internal(Audit_Proc),target_internal(processAudit) {
+    automatic;
+};
+
+out_map Process_Audit_OutMAP :
+    external(processAudit), internal(processAudit){
+    automatic;
+};
+
+
+decoder Process_Audit_Decode : in_map(Process_Audit_InMAP);
+encoder Process_Audit_Encode : out_map(Process_Audit_OutMAP);
+
+
+// For SQL Error Handling GTP Processing Audit
+external processGTPAudit  : terminated_by(0xA){
+    ascii periodStart : terminated_by(",");
+    ascii periodEnd : terminated_by(",");
+    ascii wf_name : terminated_by(",");
+    ascii source : terminated_by(",");
+    ascii sourceFilename : terminated_by(",");
+    ascii destination : terminated_by(",");
+    ascii outputFilename : terminated_by(",");
+    ascii scenario : terminated_by(",");
+    ascii sourceIPAddress : terminated_by(",");
+    ascii destinationIPAddress : terminated_by(",");
+    ascii count : terminated_by(";");
+    ascii errorMessage : terminated_by(0xA);
+};
+
+in_map Process_GTPAudit_InMAP :
+    external(processGTPAudit), target_internal(processGTPAudit) {
+    automatic;
+};
+
+out_map Process_GTPAudit_OutMAP :
+    external(processGTPAudit), internal(processGTPAudit){
+    automatic;
+};
+
+
+decoder Process_GTPAudit_Decode : in_map(Process_GTPAudit_InMAP);
+encoder Process_GTPAudit_Encode : out_map(Process_GTPAudit_OutMAP);
+]]></string>
+   <boolean name="IsValid" value="true"/>
+</exportmultiplex>

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!DOCTYPE exportmultiplex SYSTEM "jar:/mz/dtd/export_multiplex.dtd">
+<exportmultiplex category="Ultra_Format" ref_path="ultra_format[Internal]/storable[ultra_format]/storable[Data]">
+   <string name="Definition" quoted="true"><![CDATA[\u000d
+import RIL_TAP_IN.ULF_TD57;\u000d
+\u000d
+\u000d
+\u000d
+external negativeBalance_Ext{\u000d
+    ascii imsi : terminated_by(",");   \u000d
+    ascii msisdn : terminated_by(",");\u000d
+    ascii qouta : terminated_by(",");\u000d
+    ascii status : terminated_by(0xA);\u000d
+};\u000d
+\u000d
+in_map nagativeBala_im : external (negativeBalance_Ext) , target_internal(negativeBalance_TI) {\u000d
+    automatic;\u000d
+};\u000d
+\u000d
+decoder nagativeBalance_Dec : in_map(nagativeBala_im );\u000d
+\u000d
+out_map nagativeBala_om : external(negativeBalance_Ext) , internal(negativeBalance_TI){\u000d
+    automatic;    \u000d
+};  \u000d
+\u000d
+encoder nagativeBalance_Enc : out_map (nagativeBala_om );]]></string>
+   <boolean name="IsValid" value="true"/>
+</exportmultiplex>

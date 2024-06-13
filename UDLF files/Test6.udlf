@@ -1,0 +1,6 @@
+external SapccBit {
+    ascii value : terminated_by(0xA);
+};
+
+in_map SapccBit_inMap : external(SapccBit), target_internal(SapccBit) {automatic;};
+decoder SapccBit_dec: in_map(SapccBit_inMap);

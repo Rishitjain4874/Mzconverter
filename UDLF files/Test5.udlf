@@ -1,0 +1,11 @@
+external AuditCRMU
+{
+ascii wfName        : terminated_by(",");
+ascii fileName      : terminated_by(",");
+ascii serviceId     : terminated_by(",");
+ascii errorField    : terminated_by(0XA);
+};
+in_map in_AuditCRMU : external (AuditCRMU),target_internal(AuditCRMUInt){automatic;};
+decoder AuditCRMUdec : in_map(in_AuditCRMU);
+out_map out_AuditCRMU : external(AuditCRMU),internal(AuditCRMUInt){automatic;};
+encoder AuditCRMUenc : out_map(out_AuditCRMU);
