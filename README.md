@@ -23,6 +23,22 @@ This project was developed by Rishit Jain under the guidance of Mr. Manish Gandh
 
 Alternatively, you can use the Flask app provided in the script by running the `flask_app()` function. This will start a Flask server on `http://localhost:5011`. You can then send POST requests to the `/` endpoint with the UDLF file content in the request body, and the server will respond with the generated Go code.
 
+## Dependencies
+
+This project utilizes the following Python libraries:
+
+- re (Regular Expressions)
+- nltk (Natural Language Toolkit)
+- flask (Web Framework)
+- request (Flask Request Handling)
+- string (String Operations)
+
+Make sure to install these libraries before running the script.
+
+## Note
+
+Please note that this script was created for a specific use case and may require modifications to work with different UDLF file structures or to generate code in other programming languages.
+
 ## Testing
 
 The script includes a `main_check_test` function that runs a series of tests against the UDLF files in the `UDLF files` directory. It reports the number of passed and failed cases, along with a list of failed case numbers.
@@ -31,16 +47,3 @@ To run the tests, call the `main_check_test` function with the starting file num
 
 ```python
 main_check_test(starting_file_number, max_file_number)
-
-Dependencies
-This project utilizes the following Python libraries:
-
-re (Regular Expressions)
-nltk (Natural Language Toolkit)
-flask (Web Framework)
-request (Flask Request Handling)
-string (String Operations)
-
-Make sure to install these libraries before running the script.
-Note
-Please note that this script was created for a specific use case and may require modifications to work with different UDLF file structures or to generate code in other programming languages.
