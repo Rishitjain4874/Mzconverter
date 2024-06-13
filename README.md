@@ -47,3 +47,11 @@ To run the tests, call the `main_check_test` function with the starting file num
 
 ```python
 main_check_test(starting_file_number, max_file_number)
+```
+
+To check the Go code in the terminal itself a function `main_check_code` is included in script.
+
+You would need to simple run the following to check this function
+
+```python
+main_check_code(starting_file_number, max_file_number)
