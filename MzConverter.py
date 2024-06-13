@@ -659,12 +659,14 @@ def main_check_code(q, maxfile):
             print(go_code)
             print("\n\n^^^^^^^^^^^^^^^^^")
             passed_Cases += 1
-        except:
+        except Exception as e:
             failed_Cases += 1
             failed_Cases_list.append(q)
+            print(f"\n\nError: {e}\n\n")
+            
             pass
         q += 1
-        print(f"Total Passed Cases: {passed_Cases}, Total Failed Cases: {failed_Cases}", f"Failed Cases: {failed_Cases_list}")
+    print(f"Total Passed Cases: {passed_Cases}, Total Failed Cases: {failed_Cases}", f"Failed Cases: {failed_Cases_list}")
 
 def flask_app():
     app = Flask(__name__)
