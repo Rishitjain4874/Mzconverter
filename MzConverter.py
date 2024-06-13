@@ -686,7 +686,7 @@ def flask_app():
         go_code = generate_go_code(ast2)
         return go_code
     if __name__ == '__main__':
-        app.run(port=5011) 
+        app.run(host="0.0.0.0", port=5011, debug=True) 
 
 def main_check_test(q, maxfile):
     passed_Cases = 0
@@ -715,4 +715,4 @@ def main_check_test(q, maxfile):
     print(f"Total Passed Cases: {passed_Cases}, Total Failed Cases: {failed_Cases}")
     print(f"Failed Cases: {failed_Cases_list}")
 
-main_check_code(1,83)
+flask_app()
