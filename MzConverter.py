@@ -61,11 +61,14 @@ class GenericDeclaration(ASTNode):
         return f"GenericDeclaration(type_name={self.type_name}, name={self.name})"
 
 class Identifier(ASTNode):
-    def __init__(self, tag):
+    def __init__(self, tag, tag2= None):
         self.tag = tag
-
+        self.tag2 = tag2
     def __repr__(self):
-        return f"Identified_by(tag={self.tag})"
+        if self.tag2 != None:
+            return f"Identified_by(tag={self.tag}, tag2 = {self.tag2})"
+        else:
+            return f"Identified_by(tag={self.tag})"
 
 class Terminator(ASTNode):
     def __init__(self, value):
@@ -175,12 +178,14 @@ class Parser:
     def parse_declaration_list(self):
         declarations = []
         if 'set' in self.tokens:
+            if self.tokens[self.pos] == 'identified_by':
+                declarations.append(self.parse_identified_by())
             declarations.append(self.parse_set())
         while self.pos < len(self.tokens) and self.tokens[self.pos] != '}':
             if self.tokens[self.pos] in ['\n', '']:
                 self.pos += 1
                 continue
-            if self.tokens[self.pos] == 'terminated_by':
+            elif self.tokens[self.pos] == 'terminated_by':
                 declarations.append(self.parse_terminator())
                 self.consume('{')
             elif self.tokens[self.pos] == 'ascii':
@@ -297,20 +302,51 @@ class Parser:
         self.consume('\n')
         queries = []
         while self.pos < len(self.tokens) and self.tokens[self.pos] != '}' and self.tokens[self.pos + 1] != ';' and self.tokens[self.pos + 2] != '\n':
-            query = self.consume()
-            if self.tokens[self.pos]== ':':
-                self.consume(':')
+            if self.tokens[self.pos] == 'ascii':
+                queries.append(self.parse_ascii_declaration())
+            else:
+                query = self.consume()
+                if self.tokens[self.pos]== ':':
+                    self.consume(':')
+                else:
+                    pass
+                query_nxt = self.consume()
+                queries.append((query, query_nxt))
+                self.consume(';')
+            if self.tokens[self.pos]== '\n':
+                self.consume('\n')
             else:
                 pass
-            query_nxt = self.consume()
-            queries.append((query, query_nxt))
-            self.consume(';')
-            self.consume('\n')
         return SetDeclaration(name, varname, fields, queries)
 
     def parse_identified_by(self):
+        identifier1 = None
         self.consume('identified_by')
-        self.consume('(')
+        if self.tokens[self.pos] == '(' and self.tokens[self.pos +1] == '(':
+            self.consume('(')
+            self.consume('(')
+            identifier = self.parse_items_identified_by()
+            self.consume(')')
+            if self.tokens[self.pos] == "|":
+                self.consume('|')
+                self.consume('|')
+                self.consume('(')
+                identifier1 = self.parse_items_identified_by()
+                self.consume(')')
+            self.consume(')')
+        else:
+            self.consume('(')
+            identifier = self.parse_items_identified_by()
+            self.consume(')')
+        self.consume('{')
+        ascii_declaration1 = []
+        if self.pos < len(self.tokens) and self.tokens[self.pos] == 'ascii':
+            ascii_declaration1.append(self.parse_ascii_declaration())
+            if self.pos < len(self.tokens) and self.tokens[self.pos] == 'ascii':
+                ascii_declaration1.append(self.parse_ascii_declaration())
+        return Identifier(identifier, identifier1)
+
+    def parse_items_identified_by(self):
         if self.tokens[self.pos] == 'tag':
             self.consume('tag')
             self.consume('=')
@@ -318,7 +354,6 @@ class Parser:
             self.consume('"')
             identifier = self.consume()
             self.consume('"')
-            self.consume(')')
         elif self.tokens[self.pos] == 'strStartsWith':
             self.consume('strStartsWith')
             self.consume('(')
@@ -327,7 +362,6 @@ class Parser:
             self.consume('"')
             identifier = self.consume()
             self.consume('"')
-            self.consume(')')
             self.consume(')')
         elif self.tokens[self.pos] == 'strContains':
             self.consume('strContains')
@@ -338,15 +372,18 @@ class Parser:
             identifier = self.consume()
             self.consume('"')
             self.consume(')')
-            self.consume(')')
-        self.consume('{')
-        ascii_declaration1 = []
-        if self.pos < len(self.tokens) and self.tokens[self.pos] == 'ascii':
-            ascii_declaration1.append(self.parse_ascii_declaration())
-            if self.pos < len(self.tokens) and self.tokens[self.pos] == 'ascii':
-                ascii_declaration1.append(self.parse_ascii_declaration())
-        return Identifier(identifier)
-
+        else: 
+            self.consume()
+            self.consume('=')
+            self.consume('=')
+            self.consume('"')
+            idn = []
+            while self.tokens[self.pos] != '"':
+                idn.append(self.consume())
+            identifier = Identifier("".join(idn))
+            self.consume('"')
+        return identifier
+    
     def parse_ascii_declaration(self):
         self.consume('ascii')
         name = self.consume()
@@ -450,7 +487,7 @@ def parse_multiple_lists(token_lists):
             ast = parser.parse()
             asts.append(ast)
         except Exception as e:
-            print(f"Error parsing AST: {e} in {tokens}")
+            print(f"Error parsing AST: {ascii(e).replace("'", " ")}, \t at {parser.tokens[parser.pos]}, positing {parser.pos} in \n {tokens}")
             continue
     return asts
 # Text parsing functions
@@ -645,7 +682,7 @@ def main_check_code(q, maxfile):
     passed_Cases = 0
     while q != maxfile:
         try:
-            print(f"\n\n FOR FILE {q}\n\n")
+            print(f"\n FOR FILE {q}\n")
             file = f'UDLF files/Test{q}.udlf'
             with open(file, 'r') as f:
                 content = f.read()
@@ -657,7 +694,6 @@ def main_check_code(q, maxfile):
             ast2 = parse_ast(ast1)
             go_code = generate_go_code(ast2)
             print(go_code)
-            print("\n\n^^^^^^^^^^^^^^^^^")
             passed_Cases += 1
         except Exception as e:
             failed_Cases += 1
@@ -666,7 +702,10 @@ def main_check_code(q, maxfile):
             
             pass
         q += 1
-    print(f"Total Passed Cases: {passed_Cases}, Total Failed Cases: {failed_Cases}", f"Failed Cases: {failed_Cases_list}")
+    if failed_Cases == 0:
+        print(f"Total Passed Cases: {passed_Cases}")
+    else:
+        print(f"Total Passed Cases: {passed_Cases}, Total Failed Cases: {failed_Cases}", f"Failed Cases: {failed_Cases_list}")
 
 def flask_app():
     app = Flask(__name__)
@@ -715,4 +754,4 @@ def main_check_test(q, maxfile):
     print(f"Total Passed Cases: {passed_Cases}, Total Failed Cases: {failed_Cases}")
     print(f"Failed Cases: {failed_Cases_list}")
 
-flask_app()
+main_check_code(1, 85)
