@@ -373,14 +373,16 @@ class Parser:
             self.consume('"')
             self.consume(')')
         else: 
-            self.consume()
+            name = self.consume()
             self.consume('=')
             self.consume('=')
             self.consume('"')
             idn = []
+            idn.append(name)
+            idn.append(" ")
             while self.tokens[self.pos] != '"':
                 idn.append(self.consume())
-            identifier = Identifier("".join(idn))
+            identifier = "".join(idn)
             self.consume('"')
         return identifier
     
@@ -489,6 +491,7 @@ def parse_multiple_lists(token_lists):
         except Exception as e:
             print(f"Error parsing AST: {ascii(e).replace("'", " ")}, \t at {parser.tokens[parser.pos]}, positing {parser.pos} in \n {tokens}")
             continue
+    print(asts)
     return asts
 # Text parsing functions
 def check_Ext_int(tokens, key):
@@ -623,7 +626,23 @@ def parse_ast(ast_str):
     ascii_declaration_pattern = r"AsciiDeclaration\(name=([^,]+), terminator=Terminator\(value=([^)]+)\), \s*attri_type=(str|\('int', 'base(\d+)'\)|\('long', 'base(\d+)'\)|\('short', 'base(\d+)'\)|\('bigint', 'base(\d+)'\))"
     ascii_declaration_pattern1 = r"AsciiDeclaration\(name=([^,]+), \s*attri_type=(str|\('int', 'base\d+'\)|\('long', 'base\d+'\)), \s*align_value=([^,]+), \s*padded_value=([^,]+), \s*static_size_value=(\d+)\)"
     generic_declaration_pattern = r"GenericDeclaration\(type_name=(\w+), name=(\w+)\)"
-    identified_by_pattern = r"Identified_by\(tag=([^,]+), AsciiDeclaration\(name=([^,]+), terminator=Terminator\(value=([^)]+)\), \s*attri_type=(str|\('int', 'base(\d+)'\)|\('long', 'base(\d+)'\))(?:, align_value=([^,]+))?(?:, padded_value=([^,]+))?(?:, static_size_value=(\d+))?(?:, encoded_value=([^,]+))?(?:, externalonly=([^,]+))?(?:, additional_attributes=\[(.*?)\])?\)"
+    #identified_by_pattern =  r"Identified_by\(tag=([^,]+), (.*?)"
+    identified_by_pattern =  r"""Identified_by\(tag=([^,]+)\s*,\s*
+    (?:AsciiDeclaration\(name=([^,]+),
+    terminator=Terminator\(value=([^)]+)\),
+    \s*attri_type=(str|\('int', 'base(\d+)'\)|\('long', 'base(\d+)'\))(?:,
+    align_value=([^,]+))?(?:,
+    padded_value=([^,]+))?(?:,
+    static_size_value=(\d+))?(?:,
+    encoded_value=([^,]+))?(?:,
+    externalonly=([^,]+))?(?:,
+    additional_attributes=\[(.*?)\])?\))?
+    (?:,\s*)?
+    (?:SetDeclaration\(name=([^,]+), varname=([^,]+), query_B1=\[(.*?)\], query_B2=\[(.*?)\]\))?"""
+    set_declaration_pattern = r"""SetDeclaration\(name=([^,]+),\s*
+    varname=([^,]+),\s*
+    query_B1=\[(.*?)\],\s*
+    query_B2=\[(.*?)\]\)"""
     ast_matches = re.findall(external_declaration_pattern, ast_str, re.DOTALL)
     if not ast_matches:
         raise ValueError("Invalid AST format")
@@ -636,7 +655,10 @@ def parse_ast(ast_str):
         else:
             external_terminator = None 
         declarations = []
+        for declaration_match in re.finditer(set_declaration_pattern, declarations_str):
+            print("test1234")
         for declaration_match in re.finditer(identified_by_pattern, declarations_str):
+            print("test")
             tag = declaration_match.group(1)
             ascii_declaration_name = declaration_match.group(2)
             terminator_value = declaration_match.group(3)
@@ -646,6 +668,7 @@ def parse_ast(ast_str):
             ascii_declaration = AsciiDeclaration(name=ascii_declaration_name, terminator=Terminator(value=terminator_value), attri_type=attri_type, encoded_value=encoded_value, externalonly=externalonly)
             identifier = Identifier(tag=tag.rstrip(")"))
             declarations.append(identifier)
+            print(identifier)
             declarations.append(ascii_declaration)
 
         for declaration_match in re.finditer(ascii_declaration_pattern, declarations_str):
@@ -674,6 +697,7 @@ def parse_ast(ast_str):
             declaration = GenericDeclaration(type_name=type_name, name=declaration_name)
             declarations.append(declaration)
         external_declarations.append(ExternalDeclaration(name=name, declarations=declarations, external_terminator=external_terminator))
+  
     return external_declarations
 
 def main_check_code(q, maxfile):
@@ -754,4 +778,4 @@ def main_check_test(q, maxfile):
     print(f"Total Passed Cases: {passed_Cases}, Total Failed Cases: {failed_Cases}")
     print(f"Failed Cases: {failed_Cases_list}")
 
-main_check_code(1, 85)
+main_check_code(1,85)
