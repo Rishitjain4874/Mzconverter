@@ -182,8 +182,16 @@ class Parser:
         if 'set' in self.tokens:
             if self.tokens[self.pos] == 'identified_by':
                 declarations.append(self.parse_identified_by())
+                if self.tokens[self.pos] == '\n':
+                    self.consume('\n')
+                else:
+                    pass
             elif self.tokens[self.pos] == 'terminated_by':
                 declarations.append(self.parse_terminator())
+                if self.tokens[self.pos] == '\n':
+                    self.consume('\n')
+                else:
+                    pass
                 if self.tokens[self.pos] == '{':
                     self.consume('{')
                 else:
@@ -291,7 +299,10 @@ class Parser:
         return f"{attribute_name}({attribute_value})"
     
     def parse_set(self):
-        self.consume('\n')
+        if self.tokens[self.pos] == '\n':
+            self.consume('\n')
+        else:
+            pass
         self.consume('set')
         self.consume('{')
         self.consume('\n')
@@ -363,6 +374,8 @@ class Parser:
             ascii_declaration1.append(self.parse_ascii_declaration())
             if self.pos < len(self.tokens) and self.tokens[self.pos] == 'ascii':
                 ascii_declaration1.append(self.parse_ascii_declaration())
+        elif self.tokens[self.pos] == ',' :
+            pass
         return Identifier(identifier, identifier1)
 
     def parse_items_identified_by(self):
@@ -395,14 +408,20 @@ class Parser:
             name = self.consume()
             self.consume('=')
             self.consume('=')
-            self.consume('"')
+            if self.tokens[self.pos] == '"':
+                self.consume('"')
+            else:
+                pass
             idn = []
             idn.append(name)
             idn.append(" ")
             while self.tokens[self.pos] != '"':
                 idn.append(self.consume())
             identifier = "".join(idn)
-            self.consume('"')
+            if self.tokens[self.pos] == '"':
+                self.consume('"')
+            else:
+                pass
         return identifier
     
     def parse_ascii_declaration(self):
@@ -657,7 +676,6 @@ def parse_ast(ast_str):
         elif 'Terminator' and 'Identified_by' in match[1].split("AsciiDeclaration")[0]:
             if 'Terminator' in match[1].split("AsciiDeclaration")[0].split("Identified_by")[0]:
                 external_terminator = match[1].split("AsciiDeclaration")[0].split("Identified_by")[0].replace(",","").replace("Terminator(value=","").replace(")","").replace(" ","")
-                print(external_terminator)
             else:
                 external_terminator = None 
         elif 'Terminator' in match[1].split("AsciiDeclaration")[0]:
@@ -790,4 +808,4 @@ def main_check_test(q, maxfile):
     print(f"Total Passed Cases: {passed_Cases}, Total Failed Cases: {failed_Cases}")
     print(f"Failed Cases: {failed_Cases_list}")
 
-flask_app()
+main_check_code(10, 16)
