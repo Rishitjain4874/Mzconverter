@@ -195,6 +195,10 @@ class Parser:
                 continue
             elif self.tokens[self.pos] == 'terminated_by':
                 declarations.append(self.parse_terminator())
+                if self.tokens[self.pos] == '\n':
+                    self.consume('\n')
+                else:
+                    pass
                 self.consume('{')
             elif self.tokens[self.pos] == 'ascii':
                 declarations.append(self.parse_ascii_declaration())
@@ -786,4 +790,4 @@ def main_check_test(q, maxfile):
     print(f"Total Passed Cases: {passed_Cases}, Total Failed Cases: {failed_Cases}")
     print(f"Failed Cases: {failed_Cases_list}")
 
-main_check_code(1, 85)
+flask_app()
