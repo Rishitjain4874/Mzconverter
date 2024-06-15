@@ -61,9 +61,11 @@ class GenericDeclaration(ASTNode):
         return f"GenericDeclaration(type_name={self.type_name}, name={self.name})"
 
 class Identifier(ASTNode):
-    def __init__(self, tag, tag2= None):
+    def __init__(self, tag, tag2= None, AsciiDeclaration=None, SetDeclaration=None):
         self.tag = tag
         self.tag2 = tag2
+        self.AsciiDeclaration = AsciiDeclaration
+        self.SetDeclaration = SetDeclaration
     def __repr__(self):
         if self.tag2 != None:
             return f"Identified_by(tag={self.tag}, tag2 = {self.tag2})"
@@ -491,7 +493,6 @@ def parse_multiple_lists(token_lists):
         except Exception as e:
             print(f"Error parsing AST: {ascii(e).replace("'", " ")}, \t at {parser.tokens[parser.pos]}, positing {parser.pos} in \n {tokens}")
             continue
-    print(asts)
     return asts
 # Text parsing functions
 def check_Ext_int(tokens, key):
@@ -575,40 +576,34 @@ def generate_go_code(external_declarations):
                 align_value = declaration.align_value
                 padded_value = declaration.padded_value
                 static_size_value = declaration.static_size_value
+                if declaration.name == None:
+                    continue
                 if encoded_value and externalonly:
                     go_code += f"\t{declaration.name} string `mzConverter: terminated_by({terminator_value}), encoded_by({encoded_value}), {externalonly}\"`\n"
-                elif static_size_value:
+                elif static_size_value and align_value and padded_value:
                     go_code += f"\t{declaration.name} string `mzConverter: static_size({static_size_value}), align({align_value}), padded_with({padded_value})\"`\n"
-                elif attri_value == 'str':
+                elif attri_value == 'str' or attri_value == None and terminator_value:
                     go_code += f"\t{declaration.name} string `mzConverter: terminated_by({terminator_value})\"`\n"
-                elif 'int' in attri_value:
+                elif 'int' in attri_value and terminator_value:
                     go_code += f"\t{declaration.name} Int64 `mzConverter: terminated_by({terminator_value}), base({(eval(attri_value))[1]})\"`\n"
-                elif 'long' in attri_value:
+                elif 'long' in attri_value and terminator_value:
                     go_code += f"\t{declaration.name} Decimal.decimal `mzConverter: terminated_by({terminator_value}), base({eval((attri_value))[1]})\"`\n"
-                elif 'byte' in attri_value:
+                elif 'byte' in attri_value and terminator_value:
                     go_code += f"\t{declaration.name} byte `mzConverter: terminated_by({terminator_value})\"`\n"
-                elif 'short' in attri_value:
+                elif 'short' in attri_value and terminator_value:
                     go_code += f"\t{declaration.name} int16 `mzConverter: terminated_by({terminator_value}), base({eval((attri_value))[1]})\"`\n"
-                elif 'bigint' in attri_value:
+                elif 'bigint' in attri_value and terminator_value:
                     go_code += f"\t{declaration.name} big.Int `mzConverter: terminated_by({terminator_value}), base({eval((attri_value))[1]})\"`\n"
-              
+            elif isinstance(declaration, SetDeclaration):
+                set_Dec = declaration.name
+                set_field = declaration.fields
+                go_code += f"\t{set_Dec} struct " + "{\n"
+                go_code += f"\t{set_field[0]} {set_field[1]} {set_field[2]}\n"
+                go_code += "}{\n"
             elif isinstance(declaration, GenericDeclaration):
                 go_code += f"\t{declaration.name} {declaration.type_name}\n"
             elif isinstance(declaration, Identifier):
-                for attr in declaration.tag:
-                    if isinstance(attr, AsciiDeclaration):
-                        terminator_value = attr.terminator.value
-                        attri_value = attr.attri_type
-                        if terminator_value:
-                            terminator_value_str = terminator_value if terminator_value.startswith('0x') else f"'{terminator_value}'"
-                        else:
-                            terminator_value_str = "''"
-                        if attri_value == 'str':
-                            go_code += f"\t{declaration.tag} string `mzConverter: terminated_by({terminator_value_str}, encoded_by({encoded_value}), {externalonly})\"`\n"
-                        elif 'int' in attri_value:
-                            go_code += f"\t{declaration.tag} Int64 `mzConverter: terminated_by({terminator_value_str}), base({(eval(attri_value))[1]})\"`\n"
-                        elif 'long' in attri_value:
-                            go_code += f"\t{declaration.tag} Decimal.decimal `mzConverter: terminated_by({terminator_value_str}), base({eval((attri_value))[1]})\"`\n"
+                go_code += f"\t_metadata string `mzConverter: Identified_by({declaration.tag})\"`\n"
         if external_declaration.external_terminator:
             go_code += f"\t_endRecord string `mzConverter: terminated_by({external_declaration.external_terminator})\"`\n"
         else:
@@ -622,27 +617,12 @@ def symbol_to_hex(symbol):
     return hex_map.get(symbol, None)
 
 def parse_ast(ast_str):
-    external_declaration_pattern =  r"ExternalDeclaration\(name=(\w+), declarations=\[(.*?)\]\)"
+    external_declaration_pattern = r"ExternalDeclaration\(name=(\w+), declarations=\[(.*?)\]\)"
     ascii_declaration_pattern = r"AsciiDeclaration\(name=([^,]+), terminator=Terminator\(value=([^)]+)\), \s*attri_type=(str|\('int', 'base(\d+)'\)|\('long', 'base(\d+)'\)|\('short', 'base(\d+)'\)|\('bigint', 'base(\d+)'\))"
     ascii_declaration_pattern1 = r"AsciiDeclaration\(name=([^,]+), \s*attri_type=(str|\('int', 'base\d+'\)|\('long', 'base\d+'\)), \s*align_value=([^,]+), \s*padded_value=([^,]+), \s*static_size_value=(\d+)\)"
     generic_declaration_pattern = r"GenericDeclaration\(type_name=(\w+), name=(\w+)\)"
-    #identified_by_pattern =  r"Identified_by\(tag=([^,]+), (.*?)"
-    identified_by_pattern =  r"""Identified_by\(tag=([^,]+)\s*,\s*
-    (?:AsciiDeclaration\(name=([^,]+),
-    terminator=Terminator\(value=([^)]+)\),
-    \s*attri_type=(str|\('int', 'base(\d+)'\)|\('long', 'base(\d+)'\))(?:,
-    align_value=([^,]+))?(?:,
-    padded_value=([^,]+))?(?:,
-    static_size_value=(\d+))?(?:,
-    encoded_value=([^,]+))?(?:,
-    externalonly=([^,]+))?(?:,
-    additional_attributes=\[(.*?)\])?\))?
-    (?:,\s*)?
-    (?:SetDeclaration\(name=([^,]+), varname=([^,]+), query_B1=\[(.*?)\], query_B2=\[(.*?)\]\))?"""
-    set_declaration_pattern = r"""SetDeclaration\(name=([^,]+),\s*
-    varname=([^,]+),\s*
-    query_B1=\[(.*?)\],\s*
-    query_B2=\[(.*?)\]\)"""
+    identified_by_pattern = r"Identified_by\(tag=([^,]+)(?:,\s*AsciiDeclaration\(name=([^,]+),\s*terminator=Terminator\(value=([^)]+)\),\s*attri_type=(str|\('int', 'base(\d+)'\)|\('long', 'base(\d+)'\))(?:,\s*align_value=([^,]+))?(?:,\s*padded_value=([^,]+))?(?:,\s*static_size_value=(\d+))?(?:,\s*encoded_value=([^,]+))?(?:,\s*externalonly=([^,]+))?(?:,\s*additional_attributes=\[(.*?)\])?)?(?:,\s*SetDeclaration\(name=([^,]+), varname=([^,]+), query_B1=\[(.*?)\], query_B2=\[(.*?)\]\))?\)"
+    set_declaration_pattern = r"SetDeclaration\(\s*name=([^,]*),?\s*varname=([^,]*),?\s*query_B1\s*=\s*\[\s*\(\s*'(\w+)'\s*,\s*'(\w+)'\s*,\s*'(\w+)'\s*\)\s*\],\s*query_B2\s*=\s*\["
     ast_matches = re.findall(external_declaration_pattern, ast_str, re.DOTALL)
     if not ast_matches:
         raise ValueError("Invalid AST format")
@@ -655,10 +635,15 @@ def parse_ast(ast_str):
         else:
             external_terminator = None 
         declarations = []
-        for declaration_match in re.finditer(set_declaration_pattern, declarations_str):
-            print("test1234")
+        for declaration_match in re.finditer(set_declaration_pattern, match[1]):
+            set_declaration_name = declaration_match.group(1)
+            varname = declaration_match.group(2)
+            fields = (declaration_match.group(3), declaration_match.group(4), declaration_match.group(5))
+            queries = None
+            declaration = SetDeclaration(name=set_declaration_name, varname=varname, fields=fields, queries=queries)
+            declarations.append(declaration)
+
         for declaration_match in re.finditer(identified_by_pattern, declarations_str):
-            print("test")
             tag = declaration_match.group(1)
             ascii_declaration_name = declaration_match.group(2)
             terminator_value = declaration_match.group(3)
@@ -668,9 +653,7 @@ def parse_ast(ast_str):
             ascii_declaration = AsciiDeclaration(name=ascii_declaration_name, terminator=Terminator(value=terminator_value), attri_type=attri_type, encoded_value=encoded_value, externalonly=externalonly)
             identifier = Identifier(tag=tag.rstrip(")"))
             declarations.append(identifier)
-            print(identifier)
             declarations.append(ascii_declaration)
-
         for declaration_match in re.finditer(ascii_declaration_pattern, declarations_str):
             declaration_name = declaration_match.group(1)
             terminator_value = declaration_match.group(2).strip()
@@ -697,7 +680,6 @@ def parse_ast(ast_str):
             declaration = GenericDeclaration(type_name=type_name, name=declaration_name)
             declarations.append(declaration)
         external_declarations.append(ExternalDeclaration(name=name, declarations=declarations, external_terminator=external_terminator))
-  
     return external_declarations
 
 def main_check_code(q, maxfile):
@@ -778,4 +760,4 @@ def main_check_test(q, maxfile):
     print(f"Total Passed Cases: {passed_Cases}, Total Failed Cases: {failed_Cases}")
     print(f"Failed Cases: {failed_Cases_list}")
 
-flask_app()
+main_check_code(84, 85)
