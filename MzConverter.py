@@ -182,6 +182,12 @@ class Parser:
         if 'set' in self.tokens:
             if self.tokens[self.pos] == 'identified_by':
                 declarations.append(self.parse_identified_by())
+            elif self.tokens[self.pos] == 'terminated_by':
+                declarations.append(self.parse_terminator())
+                if self.tokens[self.pos] == '{':
+                    self.consume('{')
+                else:
+                    pass
             declarations.append(self.parse_set())
         while self.pos < len(self.tokens) and self.tokens[self.pos] != '}':
             if self.tokens[self.pos] in ['\n', '']:
@@ -307,18 +313,21 @@ class Parser:
             if self.tokens[self.pos] == 'ascii':
                 queries.append(self.parse_ascii_declaration())
             else:
-                query = self.consume()
-                if self.tokens[self.pos]== ':':
-                    self.consume(':')
+                if self.pos < len(self.tokens) and self.tokens[self.pos] == '\n':
+                    self.pos += 1
                 else:
-                    pass
-                query_nxt = self.consume()
-                queries.append((query, query_nxt))
-                self.consume(';')
-            if self.tokens[self.pos]== '\n':
-                self.consume('\n')
-            else:
-                pass
+                    query = self.consume()
+                    if self.tokens[self.pos]== ':':
+                        self.consume(':')
+                    else:
+                        pass
+                    query_nxt = self.consume()
+                    queries.append((query, query_nxt))
+                    self.consume(';')
+                    if self.pos < len (self.tokens) and self.tokens[self.pos] == '\n':
+                        self.consume('\n')
+                    else:
+                        pass
         return SetDeclaration(name, varname, fields, queries)
 
     def parse_identified_by(self):
@@ -340,6 +349,10 @@ class Parser:
             self.consume('(')
             identifier = self.parse_items_identified_by()
             self.consume(')')
+        if self.tokens[self.pos] == '\n':
+            self.consume('\n')
+        else:
+            pass
         self.consume('{')
         ascii_declaration1 = []
         if self.pos < len(self.tokens) and self.tokens[self.pos] == 'ascii':
@@ -493,6 +506,7 @@ def parse_multiple_lists(token_lists):
         except Exception as e:
             print(f"Error parsing AST: {ascii(e).replace("'", " ")}, \t at {parser.tokens[parser.pos]}, positing {parser.pos} in \n {tokens}")
             continue
+    
     return asts
 # Text parsing functions
 def check_Ext_int(tokens, key):
@@ -582,6 +596,8 @@ def generate_go_code(external_declarations):
                     go_code += f"\t{declaration.name} string `mzConverter: terminated_by({terminator_value}), encoded_by({encoded_value}), {externalonly}\"`\n"
                 elif static_size_value and align_value and padded_value:
                     go_code += f"\t{declaration.name} string `mzConverter: static_size({static_size_value}), align({align_value}), padded_with({padded_value})\"`\n"
+                elif static_size_value and align_value == None and padded_value == None:
+                    go_code += f"\t{declaration.name} string `mzConverter: static_size({static_size_value})\"`\n"
                 elif attri_value == 'str' or attri_value == None and terminator_value:
                     go_code += f"\t{declaration.name} string `mzConverter: terminated_by({terminator_value})\"`\n"
                 elif 'int' in attri_value and terminator_value:
@@ -597,8 +613,7 @@ def generate_go_code(external_declarations):
             elif isinstance(declaration, SetDeclaration):
                 set_Dec = declaration.name
                 set_field = declaration.fields
-                go_code += f"\t{set_Dec} struct " + "{\n"
-                go_code += f"\t{set_field[0]} {set_field[1]} {set_field[2]}\n"
+                go_code += f"\t{set_Dec} string `mzConverter: set {set_field[0]} {set_field[1]} {set_field[2]}`\n"
                 go_code += "}{\n"
             elif isinstance(declaration, GenericDeclaration):
                 go_code += f"\t{declaration.name} {declaration.type_name}\n"
@@ -630,7 +645,18 @@ def parse_ast(ast_str):
     for match in ast_matches:
         name = match[0]
         declarations_str = match[1]
-        if 'Terminator' in match[1].split("AsciiDeclaration")[0]:
+        if 'Terminator' and 'Declaration' in match[1].split("AsciiDeclaration")[0]:
+            if 'Terminator' in match[1].split("AsciiDeclaration")[0].split("SetDeclaration")[0]:
+                external_terminator = match[1].split("AsciiDeclaration")[0].split("SetDeclaration")[0].replace(",","").replace("Terminator(value=","").replace(")","").replace(" ","")
+            else:
+                external_terminator = None 
+        elif 'Terminator' and 'Identified_by' in match[1].split("AsciiDeclaration")[0]:
+            if 'Terminator' in match[1].split("AsciiDeclaration")[0].split("Identified_by")[0]:
+                external_terminator = match[1].split("AsciiDeclaration")[0].split("Identified_by")[0].replace(",","").replace("Terminator(value=","").replace(")","").replace(" ","")
+                print(external_terminator)
+            else:
+                external_terminator = None 
+        elif 'Terminator' in match[1].split("AsciiDeclaration")[0]:
             external_terminator = match[1].split("AsciiDeclaration")[0].replace(",","").replace("Terminator(value=","").replace(")","").replace(" ","")
         else:
             external_terminator = None 
@@ -704,7 +730,7 @@ def main_check_code(q, maxfile):
         except Exception as e:
             failed_Cases += 1
             failed_Cases_list.append(q)
-            print(f"\n\nError: {e}\n\n")
+            print(f"\n\nError: {ascii(e)}\n\n")
             
             pass
         q += 1
@@ -760,4 +786,4 @@ def main_check_test(q, maxfile):
     print(f"Total Passed Cases: {passed_Cases}, Total Failed Cases: {failed_Cases}")
     print(f"Failed Cases: {failed_Cases_list}")
 
-main_check_code(84, 85)
+main_check_code(1, 85)
