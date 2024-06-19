@@ -808,4 +808,4 @@ def main_check_test(q, maxfile):
     print(f"Total Passed Cases: {passed_Cases}, Total Failed Cases: {failed_Cases}")
     print(f"Failed Cases: {failed_Cases_list}")
 
-main_check_code(10, 16)
+main_check_code(1, 85)
