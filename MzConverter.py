@@ -577,6 +577,7 @@ def getcontentfile(content):
     tokenizer = RegexpTokenizer(pattern, gaps=True)
     content = re.sub(r'/\*.*?\*/', '', content, flags=re.DOTALL)
     content = re.sub(r'//.*|--.*', '', content)
+    content = re.sub(r'\\u000d', '', content)
     sent_tokens = tokenizer.tokenize(content)
     word_tokenizer_pattern = r'''(?x)    
         (?:[A-Z]\.)+                   
@@ -808,4 +809,4 @@ def main_check_test(q, maxfile):
     print(f"Total Passed Cases: {passed_Cases}, Total Failed Cases: {failed_Cases}")
     print(f"Failed Cases: {failed_Cases_list}")
 
-main_check_code(1, 85)
+main_check_code(36, 37)
