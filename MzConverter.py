@@ -212,6 +212,8 @@ class Parser:
                 declarations.append(self.parse_terminator())
                 if self.tokens[self.pos] == '\n':
                     self.consume('\n')
+                elif self.tokens[self.pos] == ',':
+                    self.consume(',')
                 else:
                     pass
                 self.consume('{')
@@ -219,6 +221,10 @@ class Parser:
                 declarations.append(self.parse_ascii_declaration())
             elif self.tokens[self.pos] == 'identified_by':
                 declarations.append(self.parse_identified_by())
+                if self.tokens[self.pos] == ',':
+                    self.consume(',')
+                else:
+                    pass
             elif self.tokens[self.pos] == 'asn_length':
                 declarations.append(self.parse_asn_length_declaration())
             elif self.tokens[self.pos] == 'bcd':
@@ -397,9 +403,10 @@ class Parser:
                 else:
                     pass
             elif self.tokens[self.pos] == '&':
-                self.consume('&')
-                self.consume('&')
-                identifier1 = self.parse_items_identified_by()
+                while self.tokens[self.pos] == "&":
+                    self.consume('&')
+                    self.consume('&')
+                    identifier1 = self.parse_items_identified_by()
             if self.tokens[self.pos] == ')':
                 self.consume(')')   
             else:
@@ -480,6 +487,10 @@ class Parser:
         return identifier
     
     def parse_ascii_declaration(self):
+        if self.tokens[self.pos] == "\n":
+            self.consume("\n")
+        else:
+            pass
         self.consume('ascii')
         name = self.consume()
         self.consume(':')
