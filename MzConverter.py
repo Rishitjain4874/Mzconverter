@@ -140,6 +140,13 @@ class ListDeclaration(ASTNode):
     def __repr__(self):
         return f"ListDeclaration(name={self.name}, terminator={self.terminator}, element_type={self.element_type}, element_count={self.element_count})"
 
+class BytearrayDeclaration(ASTNode):
+    def __init__(self, name, terminator):
+        self.name = name
+        self.terminator = terminator
+
+    def __repr__(self):
+        return f"BytearrayDeclaration(name={self.name}, terminator={self.terminator})"
 class Parser:
     def __init__(self, tokens):
         self.tokens = tokens
@@ -220,12 +227,25 @@ class Parser:
                 declarations.append(self.parse_ebcdic_declaration())
             elif self.tokens[self.pos] == 'msp_length':
                 declarations.append(self.parse_msp_length_declaration())
+            elif self.tokens[self.pos] == 'bytearray':
+                declarations.append(self.parse_bytearray_declaration())
             elif self.tokens[self.pos] == 'list':
                 declarations.append(self.parse_list_declaration())
             else:
                 declarations.append(self.parse_generic_declaration())
         return declarations
 
+    def parse_bytearray_declaration(self):
+        self.consume('bytearray')
+        name = self.consume()
+        self.consume(':')
+        terminator = self.parse_terminator()
+        if self.pos < len(self.tokens) and self.tokens[self.pos] == ';':
+            self.consume(';')  
+        elif self.pos < len(self.tokens) and self.tokens[self.pos] == '}':
+            self.consume('}')
+        return BytearrayDeclaration(name, terminator)
+    
     def parse_asn_length_declaration(self):
         self.consume('asn_length')
         name = self.consume()
@@ -348,18 +368,42 @@ class Parser:
     def parse_identified_by(self):
         identifier1 = None
         self.consume('identified_by')
-        if self.tokens[self.pos] == '(' and self.tokens[self.pos +1] == '(':
+        if self.tokens[self.pos] == '(':
             self.consume('(')
-            self.consume('(')
-            identifier = self.parse_items_identified_by()
-            self.consume(')')
-            if self.tokens[self.pos] == "|":
-                self.consume('|')
-                self.consume('|')
+            if self.tokens[self.pos] == '(':
                 self.consume('(')
-                identifier1 = self.parse_items_identified_by()
+            else:
+                pass
+            identifier = self.parse_items_identified_by()
+            if self.tokens[self.pos] == ')':
                 self.consume(')')
-            self.consume(')')
+            else:
+                pass
+
+
+            if self.tokens[self.pos] == "|":
+                while self.tokens[self.pos] == '|' and self.tokens[self.pos + 1] == '|':
+                    self.consume('|')
+                    self.consume('|')
+                    if self.tokens[self.pos] == '(':
+                        self.consume('(')
+                    else:
+                        pass
+                    identifier1 = self.parse_items_identified_by()
+                    if self.tokens[self.pos] == ')':
+                        self.consume(')')
+                    else:
+                        pass
+                else:
+                    pass
+            elif self.tokens[self.pos] == '&':
+                self.consume('&')
+                self.consume('&')
+                identifier1 = self.parse_items_identified_by()
+            if self.tokens[self.pos] == ')':
+                self.consume(')')   
+            else:
+                pass
         else:
             self.consume('(')
             identifier = self.parse_items_identified_by()
@@ -387,13 +431,24 @@ class Parser:
             identifier = self.consume()
             self.consume('"')
         elif self.tokens[self.pos] == 'strStartsWith':
-            self.consume('strStartsWith')
-            self.consume('(')
-            self.consume()
-            self.consume(',')
-            self.consume('"')
-            identifier = self.consume()
-            self.consume('"')
+            if self.tokens[self.pos] == '!':
+                self.consume('!')
+                self.consume('strStartsWith')
+                self.consume('(')
+                self.consume()
+                self.consume(',')
+                self.consume('"')
+                identifier+='!'
+                identifier+= self.consume()
+                self.consume('"')
+            else:
+                self.consume('strStartsWith')
+                self.consume('(')
+                self.consume()
+                self.consume(',')
+                self.consume('"')
+                identifier= self.consume()
+                self.consume('"')
             self.consume(')')
         elif self.tokens[self.pos] == 'strContains':
             self.consume('strContains')
@@ -467,10 +522,13 @@ class Parser:
                 if self.pos < len(self.tokens) and self.tokens[self.pos] == ',':
                     self.consume(',')
             elif token == 'encode_value':
+                encoded_value = []
                 self.consume('encode_value')
                 self.consume('(')
                 self.consume('"')
-                encoded_value = self.consume()
+                while self.tokens[self.pos] != '"':
+                    encoded_value1 = self.consume()
+                    encoded_value.append(encoded_value1)
                 self.consume('"')
                 self.consume(')')
             elif token == 'external_only':
@@ -529,7 +587,6 @@ def parse_multiple_lists(token_lists):
         except Exception as e:
             print(f"Error parsing AST: {ascii(e).replace("'", " ")}, \t at {parser.tokens[parser.pos]}, positing {parser.pos} in \n {tokens}")
             continue
-    
     return asts
 # Text parsing functions
 def check_Ext_int(tokens, key):
@@ -732,6 +789,7 @@ def parse_ast(ast_str):
     return external_declarations
 
 def main_check_code(q, maxfile):
+    maxfile+=1
     failed_Cases = 0
     failed_Cases_list = []
     passed_Cases = 0
@@ -783,6 +841,7 @@ def flask_app():
         app.run(host="0.0.0.0", port=5011, debug=True) 
 
 def main_check_test(q, maxfile):
+    maxfile+=1
     passed_Cases = 0
     failed_Cases = 0
     failed_Cases_list = []
@@ -809,4 +868,4 @@ def main_check_test(q, maxfile):
     print(f"Total Passed Cases: {passed_Cases}, Total Failed Cases: {failed_Cases}")
     print(f"Failed Cases: {failed_Cases_list}")
 
-main_check_code(36, 37)
+main_check_test(1, 84)
